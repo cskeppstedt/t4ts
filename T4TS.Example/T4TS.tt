@@ -1,0 +1,177 @@
+﻿<#@ template language="C#" debug="true" hostspecific="true" #>
+<#@ output extension=".ts" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="Microsoft.VisualStudio.Shell.Interop.8.0" #>
+<#@ assembly name="EnvDTE" #>
+<#@ assembly name="EnvDTE80" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="Microsoft.VisualStudio.Shell.Interop" #>
+<#@ import namespace="EnvDTE" #>
+<#@ import namespace="EnvDTE80" #>
+<#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
+<#PrepareDataToRender(this); #>
+/************************************************
+  Generated file
+************************************************/
+
+module Api {
+<# foreach(string line in output) { #>
+<#= line #>
+<# } #>
+}
+
+<#+ 
+static DTE Dte;
+static Project Project;
+static string AppRoot;
+static TextTransformation TT;
+static string T4FileName;
+static string T4Folder;
+static string GeneratedCode = @"GeneratedCode(""T4TS"", ""1.0"")";
+static string attributeFullName = "T4TS.TypeScriptInterfaceAttribute";
+static List<string> output;
+
+void PrepareDataToRender(TextTransformation tt) {
+    TT = tt;
+    T4FileName = Path.GetFileName(Host.TemplateFile);
+    T4Folder = Path.GetDirectoryName(Host.TemplateFile);
+	output = new List<string>();
+    //Areas = new HashSet<AreaInfo>();
+    //ResultTypes = new Dictionary<string, ResultTypeInfo>();
+
+    // Get the DTE service from the host
+    var serviceProvider = Host as IServiceProvider;
+    if (serviceProvider != null) {
+        Dte = serviceProvider.GetService(typeof(SDTE)) as DTE;
+    }
+
+    // Fail if we couldn't get the DTE. This can happen when trying to run in TextTransform.exe
+    if (Dte == null) {
+        throw new Exception("Can only execute through the Visual Studio host");
+    }
+
+    Project = GetProjectContainingT4File(Dte);
+	
+    if (Project == null) {
+        Error("Could not find the VS Project containing the T4TS file.");
+        return;
+    }
+
+    // Get the path of the root folder of the app
+    AppRoot = Path.GetDirectoryName(Project.FullName) + '\\';
+	VisitFiles(Project.ProjectItems, "");
+}
+
+void VisitFiles(ProjectItems items, string indentation) {
+    foreach (ProjectItem pi in items)
+    {
+		
+		if (pi.FileCodeModel != null && pi.FileCodeModel.CodeElements != null)
+        {
+			ShowAttributeCodeElements(pi.FileCodeModel.CodeElements, indentation);
+        }
+		
+		if (pi.ProjectItems != null && pi.ProjectItems.Count > 0)
+			VisitFiles(pi.ProjectItems, indentation);
+    }
+}
+
+void ShowAttributeCodeElements(CodeElements codeElements, string indentation)
+{
+    CodeProperty codeProperty;
+    CodeFunction codeFunction;
+
+    foreach (CodeElement codeElement in codeElements)
+    {
+        if (codeElement is CodeNamespace)
+            ShowAttributeCodeElements(((CodeNamespace)codeElement).Members, indentation + "    ");
+
+        else if (codeElement is CodeType)
+        {
+			bool foundAttribute = false;
+			var elem = (CodeType)codeElement;
+            if (elem.Attributes != null)
+            {
+                foreach (CodeAttribute attr in elem.Attributes)
+                {
+					if (attr.FullName == attributeFullName)
+                    {
+						foundAttribute = true;
+						break;
+                    }
+                }
+            }
+			
+			if (foundAttribute)
+            {
+                output.Add(indentation + "export interface " + elem.Name + " {");
+	            ShowAttributeCodeElements(elem.Members, indentation + "    ");
+				output.Add(indentation + "}");
+            }
+        }
+        else if (codeElement is CodeProperty)
+        {
+            codeProperty = (CodeProperty)codeElement;
+            
+			if (codeProperty.Access == vsCMAccess.vsCMAccessPublic)
+            {
+				codeFunction = codeProperty.Getter;
+				if (codeFunction != null)
+                {
+                    string tsTypeTerminator = GetTypeScriptTypeTermination(codeFunction.Type);
+					output.Add(indentation + codeFunction.Name + ": " + tsTypeTerminator);
+                }
+            }
+        }
+    }
+}
+
+string GetTypeScriptTypeTermination(CodeTypeRef codeType)
+{
+	switch(codeType.TypeKind)
+    {
+		case vsCMTypeRef.vsCMTypeRefChar: 
+		case vsCMTypeRef.vsCMTypeRefString: 
+			return "string;";
+		
+		case vsCMTypeRef.vsCMTypeRefBool: 
+			return "bool;";
+
+		case vsCMTypeRef.vsCMTypeRefArray:
+			return "any[];"; 
+
+		case vsCMTypeRef.vsCMTypeRefByte: 
+		case vsCMTypeRef.vsCMTypeRefDouble: 
+		case vsCMTypeRef.vsCMTypeRefInt: 
+		case vsCMTypeRef.vsCMTypeRefShort: 
+		case vsCMTypeRef.vsCMTypeRefFloat: 
+		case vsCMTypeRef.vsCMTypeRefLong: 
+		case vsCMTypeRef.vsCMTypeRefDecimal: 
+			return "number;";
+
+		default: return "any;";
+    }
+}
+
+Project GetProjectContainingT4File(DTE dte) {
+
+    // Find the .tt file's ProjectItem
+    ProjectItem projectItem = dte.Solution.FindProjectItem(Host.TemplateFile);
+
+    // If the .tt file is not opened, open it
+    if (projectItem.Document == null)
+        projectItem.Open(Constants.vsViewKindCode);
+
+    // Mark the .tt file as unsaved. This way it will be saved and update itself next time the
+    // project is built. Basically, it keeps marking itself as unsaved to make the next build work.
+    // Note: this is certainly hacky, but is the best I could come up with so far.
+    projectItem.Document.Saved = false;
+
+    return projectItem.ContainingProject;
+}
+
+#>
+
