@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{51E03259-D166-4DA9-8D55-1FA7BDE922ED}</ProjectGuid>
+    <ProjectGuid>{2B9CFEA6-586A-4E3B-8575-79447D5DC086}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>T4TS.Example</RootNamespace>
-    <AssemblyName>T4TS.Example</AssemblyName>
+    <RootNamespace>T4TS</RootNamespace>
+    <AssemblyName>T4TS</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,6 +30,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="EnvDTE80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -39,28 +45,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\Barfoo.cs" />
-    <Compile Include="Models\Foobar.cs" />
+    <Compile Include="CodeGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Content Include="T4TS.ts">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>T4TS.tt</DependentUpon>
-    </Content>
-    <Content Include="T4TS.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>T4TS.ts</LastGenOutput>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup />
-  <ItemGroup>
-    <ProjectReference Include="..\T4TS\T4TS.csproj">
-      <Project>{2b9cfea6-586a-4e3b-8575-79447d5dc086}</Project>
-      <Name>T4TS</Name>
-    </ProjectReference>
+    <Compile Include="TypeScriptInterface.cs" />
+    <Compile Include="TypeScriptInterfaceAttribute.cs" />
+    <Compile Include="TypeScriptInterfaceMember.cs" />
+    <Compile Include="TypeScriptType.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

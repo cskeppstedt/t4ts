@@ -11,15 +11,23 @@
 <#@ import namespace="Microsoft.VisualStudio.Shell.Interop" #>
 <#@ import namespace="EnvDTE" #>
 <#@ import namespace="EnvDTE80" #>
+<#@ assembly name="$(SolutionDir)\\T4TS\\bin\\Debug\\T4TS.Dll" #>
 <#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
+<#@ import namespace="T4TS" #>
+
 <#PrepareDataToRender(this); #>
 /************************************************
   Generated file
 ************************************************/
 
 module Api {
-<# foreach(string line in output) { #>
-<#= line #>
+<# foreach(var tsInterface in output) { #>
+    export interface <#= tsInterface.Name #> {
+	<# foreach(var member in tsInterface.Members) { #>
+	    <#= member.Name #>: <#=member.Type #>;
+    <# } #>
+
+    }
 <# } #>
 }
 
@@ -32,13 +40,12 @@ static string T4FileName;
 static string T4Folder;
 static string GeneratedCode = @"GeneratedCode(""T4TS"", ""1.0"")";
 static string attributeFullName = "T4TS.TypeScriptInterfaceAttribute";
-static List<string> output;
+static List<T4TS.Generator.TypeScriptInterface> output;
 
 void PrepareDataToRender(TextTransformation tt) {
     TT = tt;
     T4FileName = Path.GetFileName(Host.TemplateFile);
     T4Folder = Path.GetDirectoryName(Host.TemplateFile);
-	output = new List<string>();
     //Areas = new HashSet<AreaInfo>();
     //ResultTypes = new Dictionary<string, ResultTypeInfo>();
 
@@ -60,100 +67,13 @@ void PrepareDataToRender(TextTransformation tt) {
         return;
     }
 
+	var generator = new T4TS.Generator.CodeGenerator(Project);
+
+	output = generator.GetInterfaces().ToList();
+
     // Get the path of the root folder of the app
-    AppRoot = Path.GetDirectoryName(Project.FullName) + '\\';
-	VisitFiles(Project.ProjectItems, "");
-}
-
-void VisitFiles(ProjectItems items, string indentation) {
-    foreach (ProjectItem pi in items)
-    {
-		
-		if (pi.FileCodeModel != null && pi.FileCodeModel.CodeElements != null)
-        {
-			ShowAttributeCodeElements(pi.FileCodeModel.CodeElements, indentation);
-        }
-		
-		if (pi.ProjectItems != null && pi.ProjectItems.Count > 0)
-			VisitFiles(pi.ProjectItems, indentation);
-    }
-}
-
-void ShowAttributeCodeElements(CodeElements codeElements, string indentation)
-{
-    CodeProperty codeProperty;
-    CodeFunction codeFunction;
-
-    foreach (CodeElement codeElement in codeElements)
-    {
-        if (codeElement is CodeNamespace)
-            ShowAttributeCodeElements(((CodeNamespace)codeElement).Members, indentation + "    ");
-
-        else if (codeElement is CodeType)
-        {
-			bool foundAttribute = false;
-			var elem = (CodeType)codeElement;
-            if (elem.Attributes != null)
-            {
-                foreach (CodeAttribute attr in elem.Attributes)
-                {
-					if (attr.FullName == attributeFullName)
-                    {
-						foundAttribute = true;
-						break;
-                    }
-                }
-            }
-			
-			if (foundAttribute)
-            {
-                output.Add(indentation + "export interface " + elem.Name + " {");
-	            ShowAttributeCodeElements(elem.Members, indentation + "    ");
-				output.Add(indentation + "}");
-            }
-        }
-        else if (codeElement is CodeProperty)
-        {
-            codeProperty = (CodeProperty)codeElement;
-            
-			if (codeProperty.Access == vsCMAccess.vsCMAccessPublic)
-            {
-				codeFunction = codeProperty.Getter;
-				if (codeFunction != null)
-                {
-                    string tsTypeTerminator = GetTypeScriptTypeTermination(codeFunction.Type);
-					output.Add(indentation + codeFunction.Name + ": " + tsTypeTerminator);
-                }
-            }
-        }
-    }
-}
-
-string GetTypeScriptTypeTermination(CodeTypeRef codeType)
-{
-	switch(codeType.TypeKind)
-    {
-		case vsCMTypeRef.vsCMTypeRefChar: 
-		case vsCMTypeRef.vsCMTypeRefString: 
-			return "string;";
-		
-		case vsCMTypeRef.vsCMTypeRefBool: 
-			return "bool;";
-
-		case vsCMTypeRef.vsCMTypeRefArray:
-			return "any[];"; 
-
-		case vsCMTypeRef.vsCMTypeRefByte: 
-		case vsCMTypeRef.vsCMTypeRefDouble: 
-		case vsCMTypeRef.vsCMTypeRefInt: 
-		case vsCMTypeRef.vsCMTypeRefShort: 
-		case vsCMTypeRef.vsCMTypeRefFloat: 
-		case vsCMTypeRef.vsCMTypeRefLong: 
-		case vsCMTypeRef.vsCMTypeRefDecimal: 
-			return "number;";
-
-		default: return "any;";
-    }
+    //AppRoot = Path.GetDirectoryName(Project.FullName) + '\\';
+	//VisitFiles(Project.ProjectItems, "");
 }
 
 Project GetProjectContainingT4File(DTE dte) {
