@@ -23,15 +23,12 @@
 module Api {
 <# foreach(var tsInterface in output) { #>
     export interface <#= tsInterface.Name #> {
-	<# foreach(var member in tsInterface.Members) { #>
-	    <#= member.Name #>: <#=member.Type #>;
-    <# } #>
-
+<# foreach(var member in tsInterface.Members) { #>
+		<#= member.Name #>: <#=member.Type #>;
+<# } #>
     }
 <# } #>
-}
-
-<#+ 
+}<#+ 
 static DTE Dte;
 static Project Project;
 static string AppRoot;
