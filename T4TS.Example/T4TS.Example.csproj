@@ -42,14 +42,14 @@
     <Compile Include="Models\Barfoo.cs" />
     <Compile Include="Models\Foobar.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Content Include="T4TS.ts">
+    <Content Include="T4TS.d.ts">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>T4TS.tt</DependentUpon>
     </Content>
     <Content Include="T4TS.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>T4TS.ts</LastGenOutput>
+      <LastGenOutput>T4TS.d.ts</LastGenOutput>
     </Content>
   </ItemGroup>
   <ItemGroup>

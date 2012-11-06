@@ -1,5 +1,5 @@
 ﻿<#@ template language="C#" debug="true" hostspecific="true" #>
-<#@ output extension=".ts" #>
+<#@ output extension=".d.ts" #>
 <#@ assembly name="System.Core" #>
 <#@ assembly name="Microsoft.VisualStudio.Shell.Interop.8.0" #>
 <#@ assembly name="EnvDTE" #>
