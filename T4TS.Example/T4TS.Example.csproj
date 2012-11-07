@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="Models\Barfoo.cs" />
     <Compile Include="Models\Foobar.cs" />
+    <Compile Include="Models\Inherited.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="T4TS.d.ts">
       <AutoGen>True</AutoGen>

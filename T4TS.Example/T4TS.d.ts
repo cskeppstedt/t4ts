@@ -16,4 +16,8 @@ module Api {
 		NestedObjectArr: Barfoo[];
 		NestedObjectList: Barfoo[];
     }
+    export interface Inherited {
+		StringProperty: string;
+		[index: number]: Barfoo;
+    }
 }

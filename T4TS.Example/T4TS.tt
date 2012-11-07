@@ -25,6 +25,9 @@ module Api {
     export interface <#= tsInterface.Name #> {
 <# foreach(var member in tsInterface.Members) { #>
 		<#= member.Name #>: <#=member.Type #>;
+<# if (tsInterface.IndexerType != null) { #>
+		[index: number]: <#= tsInterface.IndexerType #>;
+<# } #>
 <# } #>
     }
 <# } #>

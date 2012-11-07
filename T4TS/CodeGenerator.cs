@@ -22,7 +22,7 @@ namespace T4TS.Generator
 
         public CodeGenerator(Project project)
         {
-            
+
             this.Project = project;
         }
 
@@ -71,7 +71,7 @@ namespace T4TS.Generator
                     var ct = codeElement as CodeType;
                     if (ct.Attributes == null)
                         continue;
-                    
+
                     foreach (CodeAttribute attr in ct.Attributes)
                     {
                         if (attr.FullName == AttributeFullName)
@@ -92,11 +92,29 @@ namespace T4TS.Generator
 
         private TypeScriptInterface GetInterface(AttributeDecoratedInstance instance, TypeContext typeContext)
         {
-            return new TypeScriptInterface
+            var tsInterface = new TypeScriptInterface
             {
                 Name = instance.CodeType.Name,
                 Members = GetMembers(instance, typeContext).ToList()
             };
+
+            if (instance.CodeType.Bases.Count > 0)
+            {
+                foreach (CodeElement elem in instance.CodeType.Bases)
+                {
+                    if (genericCollectionTypeStarts.Any(elem.FullName.StartsWith))
+                    {
+                        string fullName = UnwrapGenericType(elem.FullName);
+                        if (typeContext.ContainsKey(fullName))
+                        {
+                            tsInterface.IndexerType = typeContext[fullName].CodeType.Name;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return tsInterface;
         }
 
         private IEnumerable<TypeScriptInterfaceMember> GetMembers(AttributeDecoratedInstance instance, TypeContext typeContext)
@@ -154,7 +172,7 @@ namespace T4TS.Generator
                 string elemType = codeType.ElementType.AsFullName;
                 if (typeContext.ContainsKey(elemType))
                     return typeContext[elemType].CodeType.Name + "[]";
-                
+
                 return "any[]";
             }
 
@@ -163,7 +181,7 @@ namespace T4TS.Generator
 
             if (genericCollectionTypeStarts.Any(s => codeType.AsFullName.StartsWith(s)))
             {
-                string fullName = codeType.AsFullName.Split('<', '>')[1];
+                string fullName = UnwrapGenericType(codeType);
                 if (typeContext.ContainsKey(fullName))
                     return typeContext[fullName].CodeType.Name + "[]";
 
@@ -171,6 +189,16 @@ namespace T4TS.Generator
             }
 
             return "any";
+        }
+
+        private string UnwrapGenericType(CodeTypeRef codeType)
+        {
+            return UnwrapGenericType(codeType.AsFullName);
+        }
+
+        private string UnwrapGenericType(string typeFullName)
+        {
+            return typeFullName.Split('<', '>')[1];
         }
     }
 }
