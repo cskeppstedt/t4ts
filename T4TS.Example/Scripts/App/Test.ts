@@ -1,8 +1,6 @@
 /// <reference path="../Api/T4TS.d.ts" />
 /// <reference path="../lib/jquery-1.8.d.ts" />
 
-declare var $: any;
-
 module App {
     export class Test {
         
