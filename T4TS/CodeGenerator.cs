@@ -94,6 +94,7 @@ namespace T4TS.Generator
         {
             var tsInterface = new TypeScriptInterface
             {
+                FullName = instance.CodeType.FullName,
                 Name = instance.CodeType.Name,
                 Members = GetMembers(instance, typeContext).ToList()
             };
@@ -108,7 +109,7 @@ namespace T4TS.Generator
                         if (typeContext.ContainsKey(fullName))
                         {
                             tsInterface.IndexerType = typeContext[fullName].CodeType.Name;
-                            break;
+                            return tsInterface;
                         }
                     }
                 }
@@ -169,26 +170,52 @@ namespace T4TS.Generator
         {
             if (codeType.TypeKind == vsCMTypeRef.vsCMTypeRefArray)
             {
-                string elemType = codeType.ElementType.AsFullName;
-                if (typeContext.ContainsKey(elemType))
-                    return typeContext[elemType].CodeType.Name + "[]";
-
-                return "any[]";
+                string typeFullName = codeType.ElementType.AsFullName;
+                return TryResolveEnumerableType(typeFullName, typeContext);
             }
-
-            if (typeContext.ContainsKey(codeType.AsFullName))
-                return typeContext[codeType.AsFullName].CodeType.Name;
 
             if (genericCollectionTypeStarts.Any(s => codeType.AsFullName.StartsWith(s)))
             {
                 string fullName = UnwrapGenericType(codeType);
-                if (typeContext.ContainsKey(fullName))
-                    return typeContext[fullName].CodeType.Name + "[]";
-
-                return "any[]";
+                return TryResolveEnumerableType(fullName, typeContext);
             }
 
-            return "any";
+            return TryResolveUnknownType(codeType.AsFullName, typeContext);
+        }
+
+        private string TryResolveEnumerableType(string typeFullName, TypeContext typeContext)
+        {
+            return TryResolveUnknownType(typeFullName, typeContext) + "[]";
+        }
+
+        private string TryResolveUnknownType(string typeFullName, TypeContext typeContext)
+        {
+            AttributeDecoratedInstance instance;
+            if (typeContext.TryGetValue(typeFullName, out instance))
+                return instance.CodeType.Name;
+
+            switch (typeFullName)
+            {
+                case "System.Double":
+                case "System.Int16":
+                case "System.Int32":
+                case "System.Int64":
+                case "System.UInt16":
+                case "System.UInt32":
+                case "System.UInt64":
+                case "System.Decimal":
+                case "System.Byte":
+                case "System.SByte":
+                case "System.Single":
+                    return "number";
+
+                case "System.String":
+                case "System.DateTime":
+                    return "string";
+
+                default:
+                    return "any";
+            }
         }
 
         private string UnwrapGenericType(CodeTypeRef codeType)

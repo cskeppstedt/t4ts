@@ -9,6 +9,7 @@ namespace T4TS.Generator
     public class TypeScriptInterface
     {
         public string Name { get; set; }
+        public string FullName { get; set; }
         public List<TypeScriptInterfaceMember> Members { get; set; }
         public string IndexerType { get; set; }
     }

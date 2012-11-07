@@ -21,15 +21,18 @@
 ************************************************/
 
 module Api {
+
 <# foreach(var tsInterface in output) { #>
+    /** Generated from <#= tsInterface.FullName #> **/
     export interface <#= tsInterface.Name #> {
 <# foreach(var member in tsInterface.Members) { #>
-		<#= member.Name #>: <#=member.Type #>;
-<# if (tsInterface.IndexerType != null) { #>
-		[index: number]: <#= tsInterface.IndexerType #>;
+        <#= member.Name #>: <#=member.Type #>;
 <# } #>
+<# if (tsInterface.IndexerType != null) { #>
+        [index: number]: <#= tsInterface.IndexerType #>;
 <# } #>
     }
+
 <# } #>
 }<#+ 
 static DTE Dte;
