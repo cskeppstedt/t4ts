@@ -7,8 +7,8 @@ module Api {
 
     /** Generated from T4TS.Example.Models.Barfoo **/
     export interface Barfoo {
-        No: number;
-        Dbl: number;
+        Number: number;
+        Complex: Inherited;
         Name: string;
         DateTime: string;
     }

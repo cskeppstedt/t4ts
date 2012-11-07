@@ -8,8 +8,8 @@ namespace T4TS.Example.Models
     [TypeScriptInterface]
     public class Barfoo
     {
-        public int No { get; set; }
-        public double Dbl { get; set; }
+        public int Number { get; set; }
+        public Inherited Complex { get; set; }
         public string Name { get; set; }
         public DateTime DateTime { get; set; }
     }
