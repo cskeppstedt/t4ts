@@ -212,6 +212,9 @@ namespace T4TS.Generator
                 case "System.String":
                 case "System.DateTime":
                     return "string";
+                
+                case "System.Object":
+                    return "Object";
 
                 default:
                     return "any";
