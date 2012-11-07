@@ -8,11 +8,12 @@ module Api {
 		No: number;
 		Dbl: number;
 		Name: string;
-		TestArray: any[];
     }
     export interface Foobar {
 		IntegerProperty: number;
 		SomeString: string;
-		NestedObject: any;
+		NestedObject: Barfoo;
+		NestedObjectArr: Barfoo[];
+		NestedObjectList: Barfoo[];
     }
 }

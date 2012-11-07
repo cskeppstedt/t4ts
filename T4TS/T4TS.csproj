@@ -46,7 +46,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CodeGenerator.cs" />
+    <Compile Include="AttributeDecoratedInstance.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TypeContext.cs" />
     <Compile Include="TypeScriptInterface.cs" />
     <Compile Include="TypeScriptInterfaceAttribute.cs" />
     <Compile Include="TypeScriptInterfaceMember.cs" />

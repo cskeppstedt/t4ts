@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,18 +12,32 @@ namespace T4TS.Generator
     public class CodeGenerator
     {
         public Project Project { get; private set; }
+        private static readonly string AttributeFullName = typeof(TypeScriptInterfaceAttribute).FullName;
+
+        private static readonly string[] genericCollectionTypeStarts = new string[] {
+            "System.Collections.Generic.List<",
+            "System.Collections.Generic.IList<",
+            "System.Collections.Generic.ICollection<"
+        };
 
         public CodeGenerator(Project project)
         {
+            
             this.Project = project;
         }
 
         public IEnumerable<TypeScriptInterface> GetInterfaces()
         {
-            return VisitProjectItems(Project.ProjectItems);
+            // A context that holds all interfaces that will be generated.
+            // Keyed on the FullName of the CodeType.
+            var typeContext = new TypeContext(VisitProjectItems(Project.ProjectItems)
+                .ToDictionary(i => i.CodeType.FullName, i => i));
+
+            foreach (var instance in typeContext.Values)
+                yield return GetInterface(instance, typeContext);
         }
 
-        private IEnumerable<TypeScriptInterface> VisitProjectItems(ProjectItems items)
+        private IEnumerable<AttributeDecoratedInstance> VisitProjectItems(ProjectItems items)
         {
             foreach (ProjectItem pi in items)
             {
@@ -33,8 +48,8 @@ namespace T4TS.Generator
                     {
                         if (codeElement is CodeNamespace)
                         {
-                            foreach (var tsInterface in FindClassesWithAttribute(codeElement as CodeNamespace))
-                                yield return tsInterface;
+                            foreach (var instance in FindClassesWithAttribute(codeElement as CodeNamespace))
+                                yield return instance;
                         }
                     }
                 }
@@ -47,7 +62,7 @@ namespace T4TS.Generator
             }
         }
 
-        private IEnumerable<TypeScriptInterface> FindClassesWithAttribute(CodeNamespace ns)
+        private IEnumerable<AttributeDecoratedInstance> FindClassesWithAttribute(CodeNamespace ns)
         {
             foreach (CodeElement codeElement in ns.Members)
             {
@@ -56,28 +71,37 @@ namespace T4TS.Generator
                     var ct = codeElement as CodeType;
                     if (ct.Attributes == null)
                         continue;
-
+                    
                     foreach (CodeAttribute attr in ct.Attributes)
                     {
-                        if (attr.FullName == typeof(TypeScriptInterfaceAttribute).FullName)
-                            yield return GetInterface(ct);
+                        if (attr.FullName == AttributeFullName)
+                        {
+                            yield return new AttributeDecoratedInstance
+                            {
+                                CodeType = ct,
+                                Namespace = ns,
+                                TypescriptType = ct.Name
+                            };
+
+                            break;
+                        }
                     }
                 }
             }
         }
 
-        private TypeScriptInterface GetInterface(CodeType ct)
+        private TypeScriptInterface GetInterface(AttributeDecoratedInstance instance, TypeContext typeContext)
         {
             return new TypeScriptInterface
             {
-                Name = ct.Name,
-                Members = GetMembers(ct.Members).ToList()
+                Name = instance.CodeType.Name,
+                Members = GetMembers(instance, typeContext).ToList()
             };
         }
 
-        private IEnumerable<TypeScriptInterfaceMember> GetMembers(CodeElements members)
+        private IEnumerable<TypeScriptInterfaceMember> GetMembers(AttributeDecoratedInstance instance, TypeContext typeContext)
         {
-            foreach (CodeElement codeElement in members)
+            foreach (CodeElement codeElement in instance.CodeType.Members)
             {
                 if (!(codeElement is CodeProperty))
                     continue;
@@ -92,13 +116,13 @@ namespace T4TS.Generator
                     yield return new TypeScriptInterfaceMember
                     {
                         Name = codeProperty.Name,
-                        Type = GetTypeScriptType(func.Type)
+                        Type = GetTypeScriptType(instance, func.Type, codeProperty, typeContext)
                     };
                 }
             }
         }
 
-        private string GetTypeScriptType(CodeTypeRef codeType)
+        private string GetTypeScriptType(AttributeDecoratedInstance instance, CodeTypeRef codeType, CodeProperty codeProperty, TypeContext typeContext)
         {
             switch (codeType.TypeKind)
             {
@@ -109,9 +133,6 @@ namespace T4TS.Generator
                 case vsCMTypeRef.vsCMTypeRefBool:
                     return "bool";
 
-                case vsCMTypeRef.vsCMTypeRefArray:
-                    return "any[]";
-
                 case vsCMTypeRef.vsCMTypeRefByte:
                 case vsCMTypeRef.vsCMTypeRefDouble:
                 case vsCMTypeRef.vsCMTypeRefInt:
@@ -121,8 +142,35 @@ namespace T4TS.Generator
                 case vsCMTypeRef.vsCMTypeRefDecimal:
                     return "number";
 
-                default: return "any";
+                default:
+                    return TryResolveType(instance, codeType, codeProperty, typeContext);
             }
+        }
+
+        private string TryResolveType(AttributeDecoratedInstance instance, CodeTypeRef codeType, CodeProperty codeProperty, TypeContext typeContext)
+        {
+            if (codeType.TypeKind == vsCMTypeRef.vsCMTypeRefArray)
+            {
+                string elemType = codeType.ElementType.AsFullName;
+                if (typeContext.ContainsKey(elemType))
+                    return typeContext[elemType].CodeType.Name + "[]";
+                
+                return "any[]";
+            }
+
+            if (typeContext.ContainsKey(codeType.AsFullName))
+                return typeContext[codeType.AsFullName].CodeType.Name;
+
+            if (genericCollectionTypeStarts.Any(s => codeType.AsFullName.StartsWith(s)))
+            {
+                string fullName = codeType.AsFullName.Split('<', '>')[1];
+                if (typeContext.ContainsKey(fullName))
+                    return typeContext[fullName].CodeType.Name + "[]";
+
+                return "any[]";
+            }
+
+            return "any";
         }
     }
 }

@@ -12,5 +12,8 @@ namespace T4TS.Example.Models
         public int IntegerProperty { get; set; }
         public string SomeString { get; set; }
         public Barfoo NestedObject { get; set; }
+        public Barfoo[] NestedObjectArr { get; set; }
+        public List<Barfoo> NestedObjectList { get; set; }
+
     }
 }
