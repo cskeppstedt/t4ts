@@ -10,5 +10,7 @@ namespace T4TS.Example.Models
     public class Inherited: List<Barfoo>
     {
         public string StringProperty { get; set; }
+        public int[] Integers { get; set; }
+        public List<double> Doubles { get; set; }
     }
 }

@@ -11,5 +11,6 @@ namespace T4TS.Example.Models
         public int No { get; set; }
         public double Dbl { get; set; }
         public string Name { get; set; }
+        public DateTime DateTime { get; set; }
     }
 }
