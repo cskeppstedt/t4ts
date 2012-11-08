@@ -1,4 +1,4 @@
-t4ts
+T4TS
 ====
 
 T4 template to generate TypeScript interface definitions.
@@ -43,7 +43,7 @@ Resulting T4TS.d.ts:
             Name: string;
             Ref: ReferencedModel;
         }
-        export interface MyModel {
+        export interface ReferencedModel {
             Fraction: number;
             Digits: number[];
         }
