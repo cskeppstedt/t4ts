@@ -52,3 +52,21 @@ This interface can now be used in your TypeScript files:
         }
     }
 
+Specifications
+----
+ * Only public properties are considered
+
+ * Right now, `System.DateTime` is considered a `string` in the type translation. The main reason is that the [JSON serialization in .NET MVC](http://stackoverflow.com/questions/726334/asp-net-mvc-jsonresult-date-format) will typically serialize a `DateTime` as `"\/Date(ticks)\/"`
+
+ * The type translation works like this, from C# => TypeScript, for each property:
+   * Built-in numeric type (`int`, `double`, `float`, etc.) **=>** `number`
+   * `string` **=>** `string`
+   * A class marked with `[TypeScriptInterface]` **=>** lookup the generated TypeScript name
+   * Otherwise **=>** `any`
+   * For `Collection<T>`, `List<T>`, `IList<T>` and `T[]` **=>** lookup type for `T` as above, and return `T[]`.
+
+Future work and ideas
+----
+ * Settings-file to customize the generated interfaces.
+ * Add a `Module` property to `TypeScriptInterfaceAttribute` to control which module the generated TypeScript interface should be placed in.
+ * Add a `Name` property to `TypeScriptInterfaceAttribute` to control the name of the generated TypeScript interface.
