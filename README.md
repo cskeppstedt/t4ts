@@ -59,7 +59,7 @@ This interface can now be used in your TypeScript files:
             $.post('./example', {}, (data: T4TS.MyModel) => {
                 // Intellisense support for the properties:
                 alert(data.Number.toString());
-                alert(data.Ref.Digits[0]);
+                alert(data.Ref.Digits[0].toString());
             });
         }
     }
@@ -82,3 +82,4 @@ Future work and ideas
  * Settings-file to customize the generated interfaces.
  * Add a `Module` property to `TypeScriptInterfaceAttribute` to control which module the generated TypeScript interface should be placed in.
  * Add a `Name` property to `TypeScriptInterfaceAttribute` to control the name of the generated TypeScript interface.
+ * Make all interface property members optional, ie. `name?: type;` (so that you can use the interfaces without the need of setting all properties)
