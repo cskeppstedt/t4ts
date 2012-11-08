@@ -18,36 +18,48 @@ Usage
 Example
 ----
 
-C# class:
+C# classes:
 
     [TypeScriptInterface]
     public class MyModel
     {
         public int Number { get; set; }
         public string Name { get; set; }
+        public ReferencedModel Ref { get; set; }
+    }
+
+    [TypeScriptInterface]
+    public class ReferencedModel
+    {
+        public double Fraction { get; set; }
+        public int[] Digits { get; set; }
     }
 
 Resulting T4TS.d.ts:
 
     module T4TS {
         export interface MyModel {
-            Number: int;
+            Number: number;
             Name: string;
+            Ref: ReferencedModel;
+        }
+        export interface MyModel {
+            Fraction: number;
+            Digits: number[];
         }
     }
 
 This interface can now be used in your TypeScript files:
 
-    /// <reference path="../Api/T4TS.d.ts" />
+    /// <reference path="T4TS.d.ts" />
     class Test {
         constructor () {
             // Make an AJAX post and get some data from the server.
             // In the callback, you can specify that the data is of a certain type:
             $.post('./example', {}, (data: T4TS.MyModel) => {
-                
                 // Intellisense support for the properties:
                 alert(data.Number.toString());
-                alert(data.Name);
+                alert(data.Ref.Digits[0]);
             });
         }
     }
