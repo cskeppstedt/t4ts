@@ -47,13 +47,15 @@
   <ItemGroup>
     <Compile Include="CodeGenerator.cs" />
     <Compile Include="AttributeDecoratedInstance.cs" />
+    <Compile Include="Attributes\MemberAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TypeContext.cs" />
     <Compile Include="TypeScriptInterface.cs" />
-    <Compile Include="TypeScriptInterfaceAttribute.cs" />
+    <Compile Include="Attributes\TypeScriptInterfaceAttribute.cs" />
     <Compile Include="TypeScriptInterfaceMember.cs" />
     <Compile Include="TypeScriptType.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
