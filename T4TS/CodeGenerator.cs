@@ -7,228 +7,133 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace T4TS.Generator
+namespace T4TS
 {
     public class CodeGenerator
     {
         public Project Project { get; private set; }
         private static readonly string AttributeFullName = typeof(TypeScriptInterfaceAttribute).FullName;
 
-        private static readonly string[] genericCollectionTypeStarts = new string[] {
-            "System.Collections.Generic.List<",
-            "System.Collections.Generic.IList<",
-            "System.Collections.Generic.ICollection<"
-        };
-
         public CodeGenerator(Project project)
         {
-
             this.Project = project;
         }
 
-        public IEnumerable<TypeScriptInterface> GetInterfaces()
+        public TypeContext BuildContext()
         {
-            // A context that holds all interfaces that will be generated.
-            // Keyed on the FullName of the CodeType.
-            var typeContext = new TypeContext(VisitProjectItems(Project.ProjectItems)
-                .ToDictionary(i => i.CodeType.FullName, i => i));
+            var typeContext = new TypeContext();
 
-            foreach (var instance in typeContext.Values)
-                yield return GetInterface(instance, typeContext);
+            new ProjectTraverser(this.Project, (ns) =>
+            {
+                new NamespaceTraverser(ns, (codeClass) =>
+                {
+                    var values = GetInterfaceValues(codeClass);
+                    var customType = new CustomType(values.Name, values.Module);
+                    typeContext.AddCustomType(codeClass.FullName, customType);
+                });
+            });
+
+            return typeContext;
         }
 
-        private IEnumerable<AttributeDecoratedInstance> VisitProjectItems(ProjectItems items)
+        public IEnumerable<TypeScriptModule> GetAllInterfaces()
         {
-            foreach (ProjectItem pi in items)
-            {
-                if (pi.FileCodeModel != null)
-                {
-                    var codeElements = pi.FileCodeModel.CodeElements;
-                    foreach (CodeElement codeElement in codeElements)
-                    {
-                        if (codeElement is CodeNamespace)
-                        {
-                            foreach (var instance in FindClassesWithAttribute(codeElement as CodeNamespace))
-                                yield return instance;
-                        }
-                    }
-                }
+            var typeContext = BuildContext();
+            var modules = new Dictionary<string, TypeScriptModule>();
 
-                if (pi.ProjectItems != null && pi.ProjectItems.Count > 0)
+            new ProjectTraverser(this.Project, (ns) =>
+            {
+                new NamespaceTraverser(ns, (codeClass) =>
                 {
-                    foreach (var tsInterface in VisitProjectItems(pi.ProjectItems))
-                        yield return tsInterface;
+                    var values = GetInterfaceValues(codeClass);
+
+                    TypeScriptModule module;
+                    if (!modules.TryGetValue(values.Module, out module))
+                    {
+                        module = new TypeScriptModule { QualifiedName = values.Module };
+                        modules.Add(values.Module, module);
+                    }
+
+                    var tsInterface = new TypeScriptInterface
+                    {
+                        FullName = codeClass.FullName,
+                        Name = values.Name
+                    };
+
+                    TypescriptType indexedType;
+                    if (TryGetIndexedType(codeClass, typeContext, out indexedType))
+                        tsInterface.IndexedType = indexedType;
+
+                    new ClassTraverser(codeClass, (property) =>
+                    {
+                        TypeScriptInterfaceMember member;
+                        if (TryGetMember(property, typeContext, out member))
+                            tsInterface.Members.Add(member);
+                    });
+
+                    module.Interfaces.Add(tsInterface);
+                });
+            });
+
+            return modules.Values;
+        }
+
+        private bool TryGetIndexedType(CodeClass codeClass, TypeContext typeContext, out TypescriptType indexedType)
+        {
+            indexedType = null;
+            if (codeClass.Bases == null || codeClass.Bases.Count == 0)
+                return false;
+
+            foreach (CodeElement baseClass in codeClass.Bases)
+            {
+                if (typeContext.IsGenericEnumerable(baseClass.FullName))
+                {
+                    string fullName = typeContext.UnwrapGenericType(baseClass.FullName);
+                    indexedType = typeContext.GetTypeScriptType(fullName);
+                    return true;
                 }
             }
+
+            return false;
         }
 
-        private IEnumerable<AttributeDecoratedInstance> FindClassesWithAttribute(CodeNamespace ns)
+        private TypeScriptInterfaceAttributeValues GetInterfaceValues(CodeClass codeClass)
         {
-            foreach (CodeElement codeElement in ns.Members)
+            // TODO: implement
+            return new TypeScriptInterfaceAttributeValues
             {
-                if (codeElement is CodeType)
-                {
-                    var ct = codeElement as CodeType;
-                    if (ct.Attributes == null)
-                        continue;
-
-                    foreach (CodeAttribute attr in ct.Attributes)
-                    {
-                        if (attr.FullName == AttributeFullName)
-                        {
-                            yield return new AttributeDecoratedInstance
-                            {
-                                CodeType = ct,
-                                Namespace = ns,
-                                TypescriptType = ct.Name
-                            };
-
-                            break;
-                        }
-                    }
-                }
-            }
+                Name = codeClass.Name,
+                Module = "T4TS"
+            };
         }
 
-        private TypeScriptInterface GetInterface(AttributeDecoratedInstance instance, TypeContext typeContext)
+        private bool TryGetMember(CodeProperty property, TypeContext typeContext, out TypeScriptInterfaceMember member)
         {
-            var tsInterface = new TypeScriptInterface
+            member = null;
+            if (property.Access != vsCMAccess.vsCMAccessPublic)
+                return false;
+
+            var getter = property.Getter;
+            if (getter == null)
+                return false;
+            
+            var values = GetMemberValues(property, typeContext);
+            member = new TypeScriptInterfaceMember
             {
-                FullName = instance.CodeType.FullName,
-                Name = instance.CodeType.Name,
-                Members = GetMembers(instance, typeContext).ToList()
+                Name = values.Name ?? property.Name,
+                Optional = values.Optional,
+                Type = (string.IsNullOrWhiteSpace(values.Type))
+                    ? typeContext.GetTypeScriptType(getter.Type, property)
+                    : new CustomType(values.Type)
             };
 
-            if (instance.CodeType.Bases.Count > 0)
-            {
-                foreach (CodeElement elem in instance.CodeType.Bases)
-                {
-                    if (genericCollectionTypeStarts.Any(elem.FullName.StartsWith))
-                    {
-                        string fullName = UnwrapGenericType(elem.FullName);
-                        if (typeContext.ContainsKey(fullName))
-                        {
-                            tsInterface.IndexerType = typeContext[fullName].CodeType.Name;
-                            return tsInterface;
-                        }
-                    }
-                }
-            }
-
-            return tsInterface;
+            return true;
         }
 
-        private IEnumerable<TypeScriptInterfaceMember> GetMembers(AttributeDecoratedInstance instance, TypeContext typeContext)
+        private MemberAttributeValues GetMemberValues(CodeProperty property, TypeContext typeContext)
         {
-            foreach (CodeElement codeElement in instance.CodeType.Members)
-            {
-                if (!(codeElement is CodeProperty))
-                    continue;
-
-                var codeProperty = (CodeProperty)codeElement;
-                if (codeProperty.Access != vsCMAccess.vsCMAccessPublic)
-                    continue;
-
-                var func = codeProperty.Getter;
-                if (func != null)
-                {
-                    yield return new TypeScriptInterfaceMember
-                    {
-                        Name = codeProperty.Name,
-                        Type = GetTypeScriptType(instance, func.Type, codeProperty, typeContext)
-                    };
-                }
-            }
-        }
-
-        private string GetTypeScriptType(AttributeDecoratedInstance instance, CodeTypeRef codeType, CodeProperty codeProperty, TypeContext typeContext)
-        {
-            switch (codeType.TypeKind)
-            {
-                case vsCMTypeRef.vsCMTypeRefChar:
-                case vsCMTypeRef.vsCMTypeRefString:
-                    return "string";
-
-                case vsCMTypeRef.vsCMTypeRefBool:
-                    return "bool";
-
-                case vsCMTypeRef.vsCMTypeRefByte:
-                case vsCMTypeRef.vsCMTypeRefDouble:
-                case vsCMTypeRef.vsCMTypeRefInt:
-                case vsCMTypeRef.vsCMTypeRefShort:
-                case vsCMTypeRef.vsCMTypeRefFloat:
-                case vsCMTypeRef.vsCMTypeRefLong:
-                case vsCMTypeRef.vsCMTypeRefDecimal:
-                    return "number";
-
-                default:
-                    return TryResolveType(instance, codeType, codeProperty, typeContext);
-            }
-        }
-
-        private string TryResolveType(AttributeDecoratedInstance instance, CodeTypeRef codeType, CodeProperty codeProperty, TypeContext typeContext)
-        {
-            if (codeType.TypeKind == vsCMTypeRef.vsCMTypeRefArray)
-            {
-                string typeFullName = codeType.ElementType.AsFullName;
-                return TryResolveEnumerableType(typeFullName, typeContext);
-            }
-
-            if (genericCollectionTypeStarts.Any(s => codeType.AsFullName.StartsWith(s)))
-            {
-                string fullName = UnwrapGenericType(codeType);
-                return TryResolveEnumerableType(fullName, typeContext);
-            }
-
-            return TryResolveUnknownType(codeType.AsFullName, typeContext);
-        }
-
-        private string TryResolveEnumerableType(string typeFullName, TypeContext typeContext)
-        {
-            return TryResolveUnknownType(typeFullName, typeContext) + "[]";
-        }
-
-        private string TryResolveUnknownType(string typeFullName, TypeContext typeContext)
-        {
-            AttributeDecoratedInstance instance;
-            if (typeContext.TryGetValue(typeFullName, out instance))
-                return instance.CodeType.Name;
-
-            switch (typeFullName)
-            {
-                case "System.Double":
-                case "System.Int16":
-                case "System.Int32":
-                case "System.Int64":
-                case "System.UInt16":
-                case "System.UInt32":
-                case "System.UInt64":
-                case "System.Decimal":
-                case "System.Byte":
-                case "System.SByte":
-                case "System.Single":
-                    return "number";
-
-                case "System.String":
-                case "System.DateTime":
-                    return "string";
-                
-                case "System.Object":
-                    return "Object";
-
-                default:
-                    return "any";
-            }
-        }
-
-        private string UnwrapGenericType(CodeTypeRef codeType)
-        {
-            return UnwrapGenericType(codeType.AsFullName);
-        }
-
-        private string UnwrapGenericType(string typeFullName)
-        {
-            return typeFullName.Split('<', '>')[1];
+            // TODO: implement
+            return new MemberAttributeValues();
         }
     }
 }

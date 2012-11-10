@@ -23,5 +23,11 @@ namespace T4TS
         /// If not specified, the default value will be used.
         /// </summary>
         public bool Optional { get; set; }
+
+        /// <summary>
+        /// Specify which type the interface member will have.
+        /// If not specified, a suitable type will be determined.
+        /// </summary>
+        public string Type { get; set; }
     }
 }

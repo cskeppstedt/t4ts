@@ -19,20 +19,21 @@
 /************************************************
   Generated file
 ************************************************/
+<# foreach(var module in output) { #>
+module <#=module.QualifiedName#> {
 
-module Api {
-
-<# foreach(var tsInterface in output) { #>
+<# foreach(var tsInterface in module.Interfaces) { #>
     /** Generated from <#= tsInterface.FullName #> **/
     export interface <#= tsInterface.Name #> {
 <# foreach(var member in tsInterface.Members) { #>
         <#= member.Name #>: <#=member.Type #>;
 <# } #>
-<# if (tsInterface.IndexerType != null) { #>
-        [index: number]: <#= tsInterface.IndexerType #>;
+<# if (tsInterface.IndexedType != null) { #>
+        [index: number]: <#= tsInterface.IndexedType #>;
 <# } #>
     }
 
+<# } #>
 <# } #>
 }<#+ 
 static DTE Dte;
@@ -43,7 +44,7 @@ static string T4FileName;
 static string T4Folder;
 static string GeneratedCode = @"GeneratedCode(""T4TS"", ""1.0"")";
 static string attributeFullName = "T4TS.TypeScriptInterfaceAttribute";
-static List<T4TS.Generator.TypeScriptInterface> output;
+static List<T4TS.TypeScriptModule> output;
 
 void PrepareDataToRender(TextTransformation tt) {
     TT = tt;
@@ -70,9 +71,9 @@ void PrepareDataToRender(TextTransformation tt) {
         return;
     }
 
-	var generator = new T4TS.Generator.CodeGenerator(Project);
+	var generator = new T4TS.CodeGenerator(Project);
 
-	output = generator.GetInterfaces().ToList();
+	output = generator.GetAllInterfaces().ToList();
 
     // Get the path of the root folder of the app
     //AppRoot = Path.GetDirectoryName(Project.FullName) + '\\';

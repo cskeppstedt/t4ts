@@ -2,13 +2,12 @@
 /************************************************
   Generated file
 ************************************************/
-
-module Api {
+module T4TS {
 
     /** Generated from T4TS.Example.Models.Barfoo **/
     export interface Barfoo {
         Number: number;
-        Complex: Inherited;
+        Complex: T4TS.Inherited;
         Name: string;
         DateTime: string;
     }
@@ -17,9 +16,9 @@ module Api {
     export interface Foobar {
         IntegerProperty: number;
         SomeString: string;
-        NestedObject: Barfoo;
-        NestedObjectArr: Barfoo[];
-        NestedObjectList: Barfoo[];
+        NestedObject: T4TS.Barfoo;
+        NestedObjectArr: T4TS.Barfoo[];
+        NestedObjectList: T4TS.Barfoo[];
     }
 
     /** Generated from T4TS.Example.Models.Inherited **/
@@ -27,7 +26,7 @@ module Api {
         StringProperty: string;
         Integers: number[];
         Doubles: number[];
-        [index: number]: Barfoo;
+        [index: number]: T4TS.Barfoo;
     }
 
 }

@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace T4TS
 {
-    class TypeScriptType
+    public class TypeScriptInterfaceAttributeValues
     {
+        public string Module { get; set; }
+        public string Name { get; set; }
     }
 }
