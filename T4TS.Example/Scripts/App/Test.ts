@@ -7,7 +7,7 @@ module App {
         constructor () {
             // Make an AJAX post and get some data from the server.
             // In the callback, you can specify that the data is of a certain type:
-            $.post('./example', {}, (data: Api.Foobar) => {
+            $.post('./example', {}, (data: T4TS.Foobar) => {
                 
                 // Intellisense support for the properties:
                 alert(data.NestedObject.Name);
@@ -15,7 +15,7 @@ module App {
 
                 // When using lib functions (such as $.each) you need to help
                 // by explicitly typing the object in the callback:
-                $.each(data.NestedObjectArr, (i, v: Api.Barfoo) => {
+                $.each(data.NestedObjectArr, (i, v: T4TS.Barfoo) => {
                     alert(v.DateTime);
                 });
             });

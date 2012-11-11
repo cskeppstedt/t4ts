@@ -14,6 +14,7 @@ namespace T4TS.Example.Models
         public Barfoo NestedObject { get; set; }
         public Barfoo[] NestedObjectArr { get; set; }
         public List<Barfoo> NestedObjectList { get; set; }
-
+        public string[][] TwoDimensions { get; set; }
+        public string[][][] ThreeDimensions { get; set; }
     }
 }

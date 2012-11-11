@@ -30,7 +30,7 @@ namespace T4TS
             return customTypes.TryGetValue(typeFullName, out customType);
         }
 
-        public TypescriptType GetTypeScriptType(CodeTypeRef codeType, CodeProperty codeProperty)
+        public TypescriptType GetTypeScriptType(CodeTypeRef codeType)
         {
             switch (codeType.TypeKind)
             {
@@ -51,16 +51,18 @@ namespace T4TS
                     return new NumberType();
 
                 default:
-                    return TryResolveType(codeType, codeProperty);
+                    return TryResolveType(codeType);
             }
         }
 
-        private TypescriptType TryResolveType(CodeTypeRef codeType, CodeProperty codeProperty)
+        private TypescriptType TryResolveType(CodeTypeRef codeType)
         {
             if (codeType.TypeKind == vsCMTypeRef.vsCMTypeRefArray)
             {
-                string typeFullName = codeType.ElementType.AsFullName;
-                return TryResolveEnumerableType(typeFullName);
+                return new ArrayType()
+                {
+                    ElementType = GetTypeScriptType(codeType.ElementType)
+                };
             }
 
             if (genericCollectionTypeStarts.Any(s => codeType.AsFullName.StartsWith(s)))

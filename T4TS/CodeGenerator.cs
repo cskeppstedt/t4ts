@@ -29,6 +29,7 @@ namespace T4TS
                 {
                     var values = GetInterfaceValues(codeClass);
                     var customType = new CustomType(values.Name, values.Module);
+
                     typeContext.AddCustomType(codeClass.FullName, customType);
                 });
             });
@@ -121,9 +122,10 @@ namespace T4TS
             member = new TypeScriptInterfaceMember
             {
                 Name = values.Name ?? property.Name,
+                FullName = property.FullName,
                 Optional = values.Optional,
                 Type = (string.IsNullOrWhiteSpace(values.Type))
-                    ? typeContext.GetTypeScriptType(getter.Type, property)
+                    ? typeContext.GetTypeScriptType(getter.Type)
                     : new CustomType(values.Type)
             };
 

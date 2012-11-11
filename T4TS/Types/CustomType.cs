@@ -20,11 +20,14 @@ namespace T4TS
         public CustomType(string name, string qualifiedModule=null)
         {
             m_name = name;
-            this.QualifedModule  = qualifiedModule;
+            this.QualifedModule = qualifiedModule;
         }
 
         public override string ToString()
         {
+            if (string.IsNullOrWhiteSpace(QualifedModule))
+                return base.ToString();
+
             return QualifedModule + "." + base.ToString();
         }
     }
