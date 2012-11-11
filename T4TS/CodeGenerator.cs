@@ -13,6 +13,7 @@ namespace T4TS.Generator
     {
         public Project Project { get; private set; }
         private static readonly string AttributeFullName = typeof(TypeScriptInterfaceAttribute).FullName;
+        private static readonly string DefaultModuleName = "Api";
 
         private static readonly string[] genericCollectionTypeStarts = new string[] {
             "System.Collections.Generic.List<",
@@ -22,7 +23,6 @@ namespace T4TS.Generator
 
         public CodeGenerator(Project project)
         {
-
             this.Project = project;
         }
 
@@ -80,7 +80,8 @@ namespace T4TS.Generator
                             {
                                 CodeType = ct,
                                 Namespace = ns,
-                                TypescriptType = ct.Name
+                                TypescriptType = ct.Name,
+                                Module = GetAttributeModuleName(attr)
                             };
 
                             break;
@@ -90,12 +91,25 @@ namespace T4TS.Generator
             }
         }
 
+        private string GetAttributeModuleName(CodeAttribute codeAttribute)
+        {
+            foreach (CodeElement child in codeAttribute.Children)
+            {
+                EnvDTE80.CodeAttributeArgument property = (EnvDTE80.CodeAttributeArgument)child;
+                if (property.Name == "Module")
+                    return property.Value.Replace("\"","");
+            }
+
+            return DefaultModuleName;
+        }
+
         private TypeScriptInterface GetInterface(AttributeDecoratedInstance instance, TypeContext typeContext)
         {
             var tsInterface = new TypeScriptInterface
             {
                 FullName = instance.CodeType.FullName,
                 Name = instance.CodeType.Name,
+                Module = instance.Module,
                 Members = GetMembers(instance, typeContext).ToList()
             };
 
