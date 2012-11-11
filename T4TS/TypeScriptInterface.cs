@@ -10,6 +10,7 @@ namespace T4TS.Generator
     {
         public string Name { get; set; }
         public string FullName { get; set; }
+        public string Module { get; set; }
         public List<TypeScriptInterfaceMember> Members { get; set; }
         public string IndexerType { get; set; }
     }

@@ -3,7 +3,7 @@
   Generated file
 ************************************************/
 
-module Api {
+module Api{
 
     /** Generated from T4TS.Example.Models.Barfoo **/
     export interface Barfoo {

@@ -19,10 +19,11 @@
 /************************************************
   Generated file
 ************************************************/
+<# foreach(var tsInterfaceGroup in output.GroupBy(i => i.Module)) { #>
 
-module Api {
+module <#= tsInterfaceGroup.Key #>{
 
-<# foreach(var tsInterface in output) { #>
+<# foreach(var tsInterface in tsInterfaceGroup) { #>
     /** Generated from <#= tsInterface.FullName #> **/
     export interface <#= tsInterface.Name #> {
 <# foreach(var member in tsInterface.Members) { #>
@@ -34,7 +35,9 @@ module Api {
     }
 
 <# } #>
-}<#+ 
+}
+<# } #>
+<#+ 
 static DTE Dte;
 static Project Project;
 static string AppRoot;
