@@ -83,3 +83,7 @@ Future work and ideas
  * Add a `Module` property to `TypeScriptInterfaceAttribute` to control which module the generated TypeScript interface should be placed in.
  * Add a `Name` property to `TypeScriptInterfaceAttribute` to control the name of the generated TypeScript interface.
  * Make all interface property members optional, ie. `name?: type;` (so that you can use the interfaces without the need of setting all properties)
+
+License
+----
+[Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
