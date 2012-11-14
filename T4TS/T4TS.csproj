@@ -45,15 +45,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\TypeScriptInterfaceAttributeValues.cs" />
+    <Compile Include="Attributes\MemberAttributeValues.cs" />
     <Compile Include="CodeGenerator.cs" />
-    <Compile Include="AttributeDecoratedInstance.cs" />
+    <Compile Include="Attributes\MemberAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TypeContext.cs" />
-    <Compile Include="TypeScriptInterface.cs" />
-    <Compile Include="TypeScriptInterfaceAttribute.cs" />
-    <Compile Include="TypeScriptInterfaceMember.cs" />
-    <Compile Include="TypeScriptType.cs" />
+    <Compile Include="Traversal\ClassTraverser.cs" />
+    <Compile Include="Traversal\NamespaceTraverser.cs" />
+    <Compile Include="Traversal\ProjectTraverser.cs" />
+    <Compile Include="Outputs\TypeScriptModule.cs" />
+    <Compile Include="Types\ArrayType.cs" />
+    <Compile Include="Types\BoolType.cs" />
+    <Compile Include="Types\CustomType.cs" />
+    <Compile Include="Types\NumberType.cs" />
+    <Compile Include="Types\StringType.cs" />
+    <Compile Include="Types\TypeContext.cs" />
+    <Compile Include="Outputs\TypeScriptInterface.cs" />
+    <Compile Include="Attributes\TypeScriptInterfaceAttribute.cs" />
+    <Compile Include="Outputs\TypeScriptInterfaceMember.cs" />
+    <Compile Include="Types\TypescriptType.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
