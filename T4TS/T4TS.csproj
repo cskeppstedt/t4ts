@@ -59,7 +59,7 @@
     <Compile Include="Types\CustomType.cs" />
     <Compile Include="Types\NumberType.cs" />
     <Compile Include="Types\StringType.cs" />
-    <Compile Include="Types\TypeContext.cs" />
+    <Compile Include="TypeContext.cs" />
     <Compile Include="Outputs\TypeScriptInterface.cs" />
     <Compile Include="Attributes\TypeScriptInterfaceAttribute.cs" />
     <Compile Include="Outputs\TypeScriptInterfaceMember.cs" />
