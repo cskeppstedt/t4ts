@@ -43,12 +43,12 @@
     <Compile Include="Models\Foobar.cs" />
     <Compile Include="Models\Inherited.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Content Include="Scripts\Api\T4TS.d.ts">
+    <Content Include="T4TS.d.ts">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>T4TS.tt</DependentUpon>
     </Content>
-    <Content Include="Scripts\Api\T4TS.tt">
+    <Content Include="T4TS.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>T4TS.d.ts</LastGenOutput>
     </Content>
@@ -71,7 +71,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Scripts\Api\T4TS.tt.settings.tt" />
+    <None Include="T4TS.tt.settings.tt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
