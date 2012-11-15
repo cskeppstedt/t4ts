@@ -37,7 +37,11 @@ namespace T4TS
             {
                 new NamespaceTraverser(ns, (codeClass) =>
                 {
-                    var values = GetInterfaceValues(codeClass);
+                    CodeAttribute attribute;
+                    if (!TryGetAttribute(codeClass.Attributes, InterfaceAttributeFullName, out attribute))
+                        return;
+
+                    var values = GetInterfaceValues(codeClass, attribute);
                     var customType = new CustomType(values.Name, values.Module);
 
                     typeContext.AddCustomType(codeClass.FullName, customType);
@@ -50,43 +54,71 @@ namespace T4TS
         public IEnumerable<TypeScriptModule> GetAllInterfaces()
         {
             var typeContext = BuildContext();
-            var modules = new Dictionary<string, TypeScriptModule>();
+            var byModuleName = new Dictionary<string, TypeScriptModule>();
 
             new ProjectTraverser(this.Project, (ns) =>
             {
                 new NamespaceTraverser(ns, (codeClass) =>
                 {
-                    var values = GetInterfaceValues(codeClass);
+                    if (codeClass.Attributes == null || codeClass.Attributes.Count == 0)
+                        return;
+
+                    CodeAttribute attribute;
+                    if (!TryGetAttribute(codeClass.Attributes, InterfaceAttributeFullName, out attribute))
+                        return;
+
+                    var values = GetInterfaceValues(codeClass, attribute);
 
                     TypeScriptModule module;
-                    if (!modules.TryGetValue(values.Module, out module))
+                    if (!byModuleName.TryGetValue(values.Module, out module))
                     {
                         module = new TypeScriptModule { QualifiedName = values.Module };
-                        modules.Add(values.Module, module);
+                        byModuleName.Add(values.Module, module);
                     }
 
-                    var tsInterface = new TypeScriptInterface
-                    {
-                        FullName = codeClass.FullName,
-                        Name = values.Name
-                    };
-
-                    TypescriptType indexedType;
-                    if (TryGetIndexedType(codeClass, typeContext, out indexedType))
-                        tsInterface.IndexedType = indexedType;
-
-                    new ClassTraverser(codeClass, (property) =>
-                    {
-                        TypeScriptInterfaceMember member;
-                        if (TryGetMember(property, typeContext, out member))
-                            tsInterface.Members.Add(member);
-                    });
-
-                    module.Interfaces.Add(tsInterface);
+                    module.Interfaces.Add(BuildInterface(codeClass, values, typeContext));
                 });
             });
 
-            return modules.Values;
+            return byModuleName.Values
+                .OrderBy(m => m.QualifiedName)
+                .ToList();
+        }
+
+        private TypeScriptInterface BuildInterface(CodeClass codeClass, TypeScriptInterfaceAttributeValues attributeValues, TypeContext typeContext)
+        {
+            var tsInterface = new TypeScriptInterface
+            {
+                FullName = codeClass.FullName,
+                Name = attributeValues.Name
+            };
+
+            TypescriptType indexedType;
+            if (TryGetIndexedType(codeClass, typeContext, out indexedType))
+                tsInterface.IndexedType = indexedType;
+
+            new ClassTraverser(codeClass, (property) =>
+            {
+                TypeScriptInterfaceMember member;
+                if (TryGetMember(property, typeContext, out member))
+                    tsInterface.Members.Add(member);
+            });
+            return tsInterface;
+        }
+
+        private bool TryGetAttribute(CodeElements attributes, string attributeFullName, out CodeAttribute attribute)
+        {
+            foreach (CodeAttribute attr in attributes)
+            {
+                if (attr.FullName == attributeFullName)
+                {
+                    attribute = attr;
+                    return true;
+                }
+            }
+
+            attribute = null;
+            return false;
         }
 
         private bool TryGetIndexedType(CodeClass codeClass, TypeContext typeContext, out TypescriptType indexedType)
@@ -108,13 +140,14 @@ namespace T4TS
             return false;
         }
 
-        private TypeScriptInterfaceAttributeValues GetInterfaceValues(CodeClass codeClass)
+        private TypeScriptInterfaceAttributeValues GetInterfaceValues(CodeClass codeClass, CodeAttribute interfaceAttribute)
         {
-            // TODO: implement, lookup attribute values
+            var values = GetAttributeValues(interfaceAttribute);
+
             return new TypeScriptInterfaceAttributeValues
             {
-                Name = null ?? codeClass.Name,
-                Module = null ?? Settings.DefaultModule ?? "T4TS"
+                Name = values.ContainsKey("Name") ? values["Name"] : codeClass.Name,
+                Module = values.ContainsKey("Module") ? values["Module"] : Settings.DefaultModule ?? "T4TS",
             };
         }
 
@@ -127,7 +160,7 @@ namespace T4TS
             var getter = property.Getter;
             if (getter == null)
                 return false;
-            
+
             var values = GetMemberValues(property, typeContext);
             member = new TypeScriptInterfaceMember
             {
@@ -144,10 +177,20 @@ namespace T4TS
 
         private TypeScriptMemberAttributeValues GetMemberValues(CodeProperty property, TypeContext typeContext)
         {
-            // TODO: implement, lookup attribute values
             bool? attributeOptional = null;
             string attributeName = null;
             string attributeType = null;
+
+            CodeAttribute attribute;
+            if (TryGetAttribute(property.Attributes, MemberAttributeFullName, out attribute))
+            {
+                var values = GetAttributeValues(attribute);
+                if (values.ContainsKey("Optional"))
+                    attributeOptional = values["Optional"] == "true";
+
+                values.TryGetValue("Name", out attributeName);
+                values.TryGetValue("Type", out attributeType);
+            }
 
             return new TypeScriptMemberAttributeValues
             {
@@ -155,6 +198,26 @@ namespace T4TS
                 Name = attributeName,
                 Type = attributeType
             };
+        }
+
+        private Dictionary<string, string> GetAttributeValues(CodeAttribute codeAttribute)
+        {
+            var values = new Dictionary<string, string>();
+            foreach (CodeElement child in codeAttribute.Children)
+            {
+                var property = (EnvDTE80.CodeAttributeArgument)child;
+                if (property == null || property.Value == null)
+                    continue;
+                
+                // remove quotes if the property is a string
+                string val = property.Value ?? string.Empty;
+                if (val.StartsWith("\"") && val.EndsWith("\""))
+                    val = val.Substring(1, val.Length - 2);
+
+                values.Add(property.Name, val);
+            }
+
+            return values;
         }
     }
 }

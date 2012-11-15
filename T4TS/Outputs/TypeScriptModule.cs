@@ -11,6 +11,14 @@ namespace T4TS
         public string QualifiedName { get; set; }
         public List<TypeScriptInterface> Interfaces { get; set; }
 
+        /// <summary>
+        /// Returns true if this is the global namespace (ie. no module name)
+        /// </summary>
+        public bool IsGlobal
+        {
+            get { return string.IsNullOrWhiteSpace(QualifiedName); }
+        }
+
         public TypeScriptModule()
         {
             Interfaces = new List<TypeScriptInterface>();
