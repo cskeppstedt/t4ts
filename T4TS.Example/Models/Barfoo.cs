@@ -5,7 +5,7 @@ using System.Text;
 
 namespace T4TS.Example.Models
 {
-    [TypeScriptInterface]
+    [TypeScriptInterface(Module="")]
     public class Barfoo
     {
         public int Number { get; set; }
