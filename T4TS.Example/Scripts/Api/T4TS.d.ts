@@ -20,7 +20,7 @@ module T4TS {
         NestedObjectArr: T4TS.Barfoo[];
         NestedObjectList: T4TS.Barfoo[];
         TwoDimensions: string[][];
-        ThreeDimensions: string[][][];
+        ThreeDimensions: T4TS.Barfoo[][][];
     }
 
     /** Generated from T4TS.Example.Models.Inherited **/
@@ -28,7 +28,7 @@ module T4TS {
         StringProperty: string;
         Integers: number[];
         Doubles: number[];
-        TwoDimList: any[];
+        TwoDimList: number[][];
         [index: number]: T4TS.Barfoo;
     }
 

@@ -65,12 +65,6 @@ namespace T4TS
                 };
             }
 
-            if (genericCollectionTypeStarts.Any(s => codeType.AsFullName.StartsWith(s)))
-            {
-                string fullName = UnwrapGenericType(codeType);
-                return TryResolveEnumerableType(fullName);
-            }
-
             return GetTypeScriptType(codeType.AsFullName);
         }
 
@@ -87,6 +81,14 @@ namespace T4TS
             CustomType customType;
             if (customTypes.TryGetValue(typeFullName, out customType))
                 return customType;
+
+            if (IsGenericEnumerable(typeFullName))
+            {
+                return new ArrayType
+                {
+                    ElementType = GetTypeScriptType(UnwrapGenericType(typeFullName))
+                };
+            }
 
             switch (typeFullName)
             {
@@ -112,14 +114,10 @@ namespace T4TS
             }
         }
 
-        public string UnwrapGenericType(CodeTypeRef codeType)
-        {
-            return UnwrapGenericType(codeType.AsFullName);
-        }
-
         public string UnwrapGenericType(string typeFullName)
         {
-            return typeFullName.Split('<', '>')[1];
+            int firstIndex = typeFullName.IndexOf('<');
+            return typeFullName.Substring(firstIndex+1, typeFullName.Length - firstIndex- 2);
         }
 
         public bool IsGenericEnumerable(string typeFullName)
