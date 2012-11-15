@@ -9,7 +9,6 @@ namespace T4TS.Example.Models
     [TypeScriptInterface]
     public class Foobar
     {
-        public int IntegerProperty { get; set; }
         public string SomeString { get; set; }
         public Barfoo NestedObject { get; set; }
         public Barfoo[] NestedObjectArr { get; set; }

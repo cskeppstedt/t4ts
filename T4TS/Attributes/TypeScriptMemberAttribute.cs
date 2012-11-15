@@ -10,7 +10,7 @@ namespace T4TS
     /// Add this attribute to a property to customize the generated interface member
     /// </summary>
     [AttributeUsage(AttributeTargets.Property, AllowMultiple=false, Inherited=true)]
-    public class MemberAttribute: Attribute
+    public class TypeScriptMemberAttribute: Attribute
     {
         /// <summary>
         /// The member name in the interface.

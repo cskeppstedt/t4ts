@@ -12,11 +12,21 @@ namespace T4TS
     public class CodeGenerator
     {
         public Project Project { get; private set; }
-        private static readonly string AttributeFullName = typeof(TypeScriptInterfaceAttribute).FullName;
+        public Settings Settings { get; private set; }
 
-        public CodeGenerator(Project project)
+        private static readonly string InterfaceAttributeFullName = "T4TS.TypeScriptInterfaceAttribute";
+        private static readonly string MemberAttributeFullName = "T4TS.TypeScriptMemberAttribute";
+
+        public CodeGenerator(Project project, Settings settings)
         {
+            if (project == null)
+                throw new ArgumentNullException("project");
+
+            if (settings == null)
+                throw new ArgumentNullException("settings");
+
             this.Project = project;
+            this.Settings = settings;
         }
 
         public TypeContext BuildContext()
@@ -100,11 +110,11 @@ namespace T4TS
 
         private TypeScriptInterfaceAttributeValues GetInterfaceValues(CodeClass codeClass)
         {
-            // TODO: implement
+            // TODO: implement, lookup attribute values
             return new TypeScriptInterfaceAttributeValues
             {
-                Name = codeClass.Name,
-                Module = "T4TS"
+                Name = null ?? codeClass.Name,
+                Module = null ?? Settings.DefaultModule ?? "T4TS"
             };
         }
 
@@ -132,10 +142,19 @@ namespace T4TS
             return true;
         }
 
-        private MemberAttributeValues GetMemberValues(CodeProperty property, TypeContext typeContext)
+        private TypeScriptMemberAttributeValues GetMemberValues(CodeProperty property, TypeContext typeContext)
         {
-            // TODO: implement
-            return new MemberAttributeValues();
+            // TODO: implement, lookup attribute values
+            bool? attributeOptional = null;
+            string attributeName = null;
+            string attributeType = null;
+
+            return new TypeScriptMemberAttributeValues
+            {
+                Optional = attributeOptional.HasValue ? attributeOptional.Value : Settings.DefaultOptional,
+                Name = attributeName,
+                Type = attributeType
+            };
         }
     }
 }

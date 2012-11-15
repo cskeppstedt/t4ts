@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace T4TS
 {
-    public class MemberAttributeValues
+    public class TypeScriptMemberAttributeValues
     {
         public string Name { get; set; }
         public bool Optional { get; set; }
