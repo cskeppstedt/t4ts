@@ -26,8 +26,8 @@
         [index: number]: <#= tsInterface.IndexedType #>;
 <# } #>
     }
-<#= module.IsGlobal ? "// -- End global interfaces" : "}" #>
 <# } #>
+<#= module.IsGlobal ? "// -- End global interfaces" : "}" #>
 <# } #>
 <#+ 
 
