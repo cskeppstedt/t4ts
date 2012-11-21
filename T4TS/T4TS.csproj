@@ -48,7 +48,6 @@
     <Compile Include="Outputs\TypeScriptInterfaceAttributeValues.cs" />
     <Compile Include="Outputs\TypeScriptMemberAttributeValues.cs" />
     <Compile Include="CodeGenerator.cs" />
-    <Compile Include="Attributes\TypeScriptMemberAttribute.cs" />
     <Compile Include="Outputs\Settings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Traversal\ClassTraverser.cs" />
@@ -62,11 +61,12 @@
     <Compile Include="Types\StringType.cs" />
     <Compile Include="TypeContext.cs" />
     <Compile Include="Outputs\TypeScriptInterface.cs" />
-    <Compile Include="Attributes\TypeScriptInterfaceAttribute.cs" />
     <Compile Include="Outputs\TypeScriptInterfaceMember.cs" />
     <Compile Include="Types\TypescriptType.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Attributes\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

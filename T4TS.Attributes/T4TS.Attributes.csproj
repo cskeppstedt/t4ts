@@ -4,13 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{51E03259-D166-4DA9-8D55-1FA7BDE922ED}</ProjectGuid>
+    <ProjectGuid>{AF50A5E0-791D-47D4-91FE-56A7CE4577EB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>T4TS.Example</RootNamespace>
-    <AssemblyName>T4TS.Example</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <RootNamespace>T4TS.Attributes</RootNamespace>
+    <AssemblyName>T4TS.Attributes</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,43 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\Barfoo.cs" />
-    <Compile Include="Models\Foobar.cs" />
-    <Compile Include="Models\Inherited.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Content Include="T4TS.d.ts">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>T4TS.tt</DependentUpon>
-    </Content>
-    <Content Include="T4TS.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>T4TS.d.ts</LastGenOutput>
-    </Content>
-    <Content Include="Scripts\App\Test.js">
-      <DependentUpon>Test.ts</DependentUpon>
-    </Content>
-    <Content Include="Scripts\App\Test.min.js">
-      <DependentUpon>Test.ts</DependentUpon>
-    </Content>
-    <Content Include="Scripts\lib\jquery-1.8.d.ts" />
-    <TypeScriptCompile Include="Scripts\App\Test.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\T4TS.Attributes\T4TS.Attributes.csproj">
-      <Project>{af50a5e0-791d-47d4-91fe-56a7ce4577eb}</Project>
-      <Name>T4TS.Attributes</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\T4TS\T4TS.csproj">
-      <Project>{2b9cfea6-586a-4e3b-8575-79447d5dc086}</Project>
-      <Name>T4TS</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="T4TS.tt.settings.t4" />
+    <Compile Include="TypeScriptInterfaceAttribute.cs" />
+    <Compile Include="TypeScriptMemberAttribute.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
