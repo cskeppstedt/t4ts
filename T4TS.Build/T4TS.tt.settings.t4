@@ -1,0 +1,18 @@
+﻿<#+
+/************************************************
+  Settings for T4TS.tt
+************************************************/
+
+// The default module of the generated interface. If a module is 
+// not specified by the TypeScriptInterfaceAttribute, the interface 
+// will belong to this module (may be empty, in which case the 
+// interface will be globally accessible).
+const string DefaultModule = "T4TS";
+
+// The default value for the Optional flag for an interface member.
+// If not specified by the TypeScriptInterfaceAttribute, the Optional
+// flag will be set to this value. If the Optional flag is true, the
+// generated member will look like "member?: type" instead of "member: type".
+const bool DefaultOptional = false;
+
+#>
