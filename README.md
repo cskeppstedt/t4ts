@@ -104,7 +104,7 @@ Known problems
 ----
 **TextTransformation fails:**
 
-If the TextTransformation fails (for any reason), the `T4TS.cs` will not be generated correctly. This file contains `TypeScriptInterfaceAttribute` and `TypeScriptMemberAttribute`, so if they go amiss, there will be compile errors. This in turn will make the .tt file unable to be transformed. The workaround so far, is to open `T4TS.cs` and paste the code [from the source](https://github.com/cskeppstedt/t4ts/blob/master/build/T4TS.cs). I'm looking for a way to avoid this.
+I have experienced some error message the first time the T4TS package is installed via NuGet. However, if you build the project, or run the .tt-file, the error message disappears.
 
 License
 ----
