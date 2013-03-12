@@ -41,7 +41,12 @@
   <ItemGroup>
     <Compile Include="Models\Barfoo.cs" />
     <Compile Include="Models\Foobar.cs" />
+    <Compile Include="Models\InheritanceTest1.cs" />
+    <Compile Include="Models\InheritanceTest2.cs" />
+    <Compile Include="Models\InheritanceTest3.cs" />
+    <Compile Include="Models\InheritanceTest4.cs" />
     <Compile Include="Models\Inherited.cs" />
+    <Compile Include="Models\TestClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="T4TS.d.ts">
       <AutoGen>True</AutoGen>

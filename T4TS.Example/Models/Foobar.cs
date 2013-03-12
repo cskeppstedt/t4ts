@@ -1,15 +1,11 @@
-﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace T4TS.Example.Models
 {
     [TypeScriptInterface(Module = "Fooz")]
     public class Foobar
     {
-        [TypeScriptMember(Name="OverrideAll", Optional=true, Type="bool")]
+        [TypeScriptMember(Name = "OverrideAll", Optional = true, Type = "bool")]
         public string SomeString { get; set; }
         public Foobar Recursive { get; set; }
         public Barfoo[] NestedObjectArr { get; set; }
