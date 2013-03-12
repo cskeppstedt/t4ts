@@ -55,6 +55,7 @@ namespace T4TS
         {
             var typeContext = BuildContext();
             var byModuleName = new Dictionary<string, TypeScriptModule>();
+            var tsMap = new Dictionary<CodeClass, TypeScriptInterface>();
 
             new ProjectTraverser(this.Project, (ns) =>
             {
@@ -76,8 +77,19 @@ namespace T4TS
                         byModuleName.Add(values.Module, module);
                     }
 
-                    module.Interfaces.Add(BuildInterface(codeClass, values, typeContext));
+                    var tsInterface = BuildInterface(codeClass, values, typeContext);
+                    tsMap.Add(codeClass, tsInterface);
+                    tsInterface.Module = module;
+                    module.Interfaces.Add(tsInterface);
                 });
+            });
+
+            var tsInterfaces = tsMap.Values.ToList();
+            tsMap.Keys.ToList().ForEach(codeClass =>
+            {
+                var parent = tsInterfaces.LastOrDefault(intf => codeClass.IsDerivedFrom[intf.FullName] && intf.FullName != codeClass.FullName);
+                if (parent != null)
+                    tsMap[codeClass].Parent = parent;
             });
 
             return byModuleName.Values
@@ -147,7 +159,7 @@ namespace T4TS
             return new TypeScriptInterfaceAttributeValues
             {
                 Name = values.ContainsKey("Name") ? values["Name"] : codeClass.Name,
-                Module = values.ContainsKey("Module") ? values["Module"] : Settings.DefaultModule ?? "T4TS",
+                Module = values.ContainsKey("Module") ? values["Module"] : Settings.DefaultModule ?? "T4TS"
             };
         }
 

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace T4TS.Build
 {
@@ -36,4 +33,41 @@ namespace T4TS.Build
         public List<double> Doubles { get; set; }
         public List<List<int>> TwoDimList { get; set; }
     }
+
+    #region Inheritance Test
+
+    public class TestClass
+    {
+        public string Property { get; set; }
+    }
+
+    [TypeScriptInterface]
+    public class InheritanceTest1 : Barfoo
+    {
+        public string SomeString { get; set; }
+        public Foobar Recursive { get; set; }
+    }
+
+    [TypeScriptInterface]
+    public class InheritanceTest2 : InheritanceTest1
+    {
+        public string SomeString2 { get; set; }
+        public Foobar Recursive2 { get; set; }
+    }
+
+    [TypeScriptInterface]
+    public class InheritanceTest3 : Inherited
+    {
+        public string SomeString3 { get; set; }
+        public Foobar Recursive3 { get; set; }
+    }
+
+    [TypeScriptInterface]
+    public class InheritanceTest4 : TestClass
+    {
+        public string SomeString4 { get; set; }
+        public Foobar Recursive4 { get; set; }
+    }
+
+    #endregion
 }

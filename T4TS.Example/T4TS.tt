@@ -15,17 +15,17 @@
 ****************************************************************************/
 <# foreach(var module in GetDataToRender()) { #>
 
-<#= module.IsGlobal ? "// -- Begin global interfaces {" : "module "+module.QualifiedName + " {" #>
+<#= module.IsGlobal ? "// -- Begin global interfaces" : "module " + module.QualifiedName + " {" #>
 <# foreach(var tsInterface in module.Interfaces) { #>
-    /** Generated from <#= tsInterface.FullName #> **/
-    <#= module.IsGlobal?"":"export "#>interface <#= tsInterface.Name #> {
+<#= module.IsGlobal? "" : "    " #>/** Generated from <#= tsInterface.FullName #> **/
+<#= module.IsGlobal? "" : "    " #><#= module.IsGlobal?"":"export "#>interface <#= tsInterface.Name #> <#= tsInterface.Parent != null ? "extends "  + (tsInterface.Parent.Module.IsGlobal ? "/* global interface */" : tsInterface.Parent.Module.QualifiedName + ".") + tsInterface.Parent.Name : "" #> {
 <# foreach(var member in tsInterface.Members) { #>
-        <#= member.Name + (member.Optional ? "?" : "") #>: <#=member.Type #>;
+    <#= module.IsGlobal? "" : "    " #><#= member.Name + (member.Optional ? "?" : "") #>: <#=member.Type #>;
 <# } #>
 <# if (tsInterface.IndexedType != null) { #>
-        [index: number]: <#= tsInterface.IndexedType #>;
+    <#= module.IsGlobal? "" : "    " #>[index: number]: <#= tsInterface.IndexedType #>;
 <# } #>
-    }
+<#= module.IsGlobal? "" : "    " #>}
 <# } #>
 <#= module.IsGlobal ? "// -- End global interfaces" : "}" #>
 <# } #>
