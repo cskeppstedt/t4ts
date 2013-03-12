@@ -84,13 +84,12 @@ namespace T4TS
                 });
             });
 
-            tsMap.ToList().ForEach(ts =>
+            var tsInterfaces = tsMap.Values.ToList();
+            tsMap.Keys.ToList().ForEach(codeClass =>
             {
-                var tsList = tsMap.ToList();
-                foreach (var parent in tsList.Where(parent => ts.Key.IsDerivedFrom[parent.Value.FullName] && parent.Value.FullName != ts.Key.FullName))
-                {
-                    ts.Value.Parent = parent.Value;
-                }
+                var parent = tsInterfaces.LastOrDefault(intf => codeClass.IsDerivedFrom[intf.FullName] && intf.FullName != codeClass.FullName);
+                if (parent != null)
+                    tsMap[codeClass].Parent = parent;
             });
 
             return byModuleName.Values
