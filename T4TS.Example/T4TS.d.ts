@@ -3,18 +3,18 @@
 ****************************************************************************/
 
 // -- Begin global interfaces
-/** Generated from T4TS.Example.Models.Barfoo **/
-interface Barfoo  {
-    Number: number;
-    Complex: T4TS.OverridenName;
-    Name: string;
-    DateTime: string;
-}
+    /** Generated from T4TS.Example.Models.Barfoo **/
+    interface Barfoo {
+        Number: number;
+        Complex: T4TS.OverridenName;
+        Name: string;
+        DateTime: string;
+    }
 // -- End global interfaces
 
 module Fooz {
     /** Generated from T4TS.Example.Models.Foobar **/
-    export interface Foobar  {
+    export interface Foobar {
         OverrideAll?: bool;
         Recursive: Fooz.Foobar;
         NestedObjectArr: Barfoo[];
@@ -26,27 +26,27 @@ module Fooz {
 
 module T4TS {
     /** Generated from T4TS.Example.Models.InheritanceTest1 **/
-    export interface InheritanceTest1 extends /* global interface */Barfoo {
+    export interface InheritanceTest1 {
         SomeString: string;
         Recursive: Fooz.Foobar;
     }
     /** Generated from T4TS.Example.Models.InheritanceTest2 **/
-    export interface InheritanceTest2 extends T4TS.InheritanceTest1 {
+    export interface InheritanceTest2 {
         SomeString2: string;
         Recursive2: Fooz.Foobar;
     }
     /** Generated from T4TS.Example.Models.InheritanceTest3 **/
-    export interface InheritanceTest3 extends T4TS.OverridenName {
+    export interface InheritanceTest3 {
         SomeString3: string;
         Recursive3: Fooz.Foobar;
     }
     /** Generated from T4TS.Example.Models.InheritanceTest4 **/
-    export interface InheritanceTest4  {
+    export interface InheritanceTest4 {
         SomeString4: string;
         Recursive4: Fooz.Foobar;
     }
     /** Generated from T4TS.Example.Models.Inherited **/
-    export interface OverridenName  {
+    export interface OverridenName {
         OtherName?: string;
         Integers: number[];
         Doubles: number[];

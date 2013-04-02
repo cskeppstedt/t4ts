@@ -15,8 +15,8 @@ module App {
 
                 // When using lib functions (such as $.each) you need to help
                 // by explicitly typing the object in the callback:
-                $.each(data.NestedObjectArr, (i, v: T4TS.Barfoo) => {
-                    alert(v.DateTime);
+                $.each(data.NestedObjectArr, (i, v: T4TS.InheritanceTest1) => {
+                    alert(v.SomeString);
                 });
             });
         }
