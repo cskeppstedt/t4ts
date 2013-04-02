@@ -45,6 +45,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Outputs\OutputAppender.cs" />
+    <Compile Include="Outputs\InterfaceOutputAppender.cs" />
+    <Compile Include="Outputs\MemberOutputAppender.cs" />
+    <Compile Include="Outputs\ModuleOutputAppender.cs" />
+    <Compile Include="Outputs\OutputFormatter.cs" />
     <Compile Include="Outputs\TypeScriptInterfaceAttributeValues.cs" />
     <Compile Include="Outputs\TypeScriptMemberAttributeValues.cs" />
     <Compile Include="CodeTraverser.cs" />
