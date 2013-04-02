@@ -55,7 +55,7 @@ List<T4TS.TypeScriptModule> GetDataToRender() {
         DefaultOptional = DefaultOptional
     };
 
-    var generator = new T4TS.CodeGenerator(project, settings);
+    var generator = new T4TS.CodeTraverser(project, settings);
 
     return generator.GetAllInterfaces().ToList();
 }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace T4TS
 {
-    public class CodeGenerator
+    public class CodeTraverser
     {
         public Project Project { get; private set; }
         public Settings Settings { get; private set; }
@@ -17,7 +17,7 @@ namespace T4TS
         private static readonly string InterfaceAttributeFullName = "T4TS.TypeScriptInterfaceAttribute";
         private static readonly string MemberAttributeFullName = "T4TS.TypeScriptMemberAttribute";
 
-        public CodeGenerator(Project project, Settings settings)
+        public CodeTraverser(Project project, Settings settings)
         {
             if (project == null)
                 throw new ArgumentNullException("project");
