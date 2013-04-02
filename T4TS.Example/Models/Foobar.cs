@@ -12,5 +12,8 @@ namespace T4TS.Example.Models
         public List<Barfoo> NestedObjectList { get; set; }
         public string[][] TwoDimensions { get; set; }
         public Barfoo[][][] ThreeDimensions { get; set; }
+        
+        [TypeScriptMember(CamelCase=true)]
+        public int CamelCasePlease { get; set; }
     }
 }
