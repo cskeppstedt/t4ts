@@ -16,7 +16,7 @@ namespace T4TS
 
         /// <summary>
         /// Specify if the member should be optional, ie. "name?: type".
-        /// If not specified, the default value will be used.
+        /// If not specified, the default value will be used (see settings).
         /// </summary>
         public bool Optional { get; set; }
 
@@ -25,5 +25,11 @@ namespace T4TS
         /// If not specified, a suitable type will be determined.
         /// </summary>
         public string Type { get; set; }
+
+        /// <summary>
+        /// If set to true, the first character of the member name will be lower cased.
+        /// If not specified, the default value will be used (see settings).
+        /// </summary>
+        public bool CamelCase { get; set; }
     }
 }
