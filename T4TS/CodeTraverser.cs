@@ -184,12 +184,16 @@ namespace T4TS
                     : new CustomType(values.Type)
             };
 
+            if (values.CamelCase && values.Name == null)
+                member.Name = member.Name.Substring(0, 1).ToLowerInvariant() + member.Name.Substring(1);
+
             return true;
         }
 
         private TypeScriptMemberAttributeValues GetMemberValues(CodeProperty property, TypeContext typeContext)
         {
             bool? attributeOptional = null;
+            bool? attributeCamelCase = null;
             string attributeName = null;
             string attributeType = null;
 
@@ -200,6 +204,9 @@ namespace T4TS
                 if (values.ContainsKey("Optional"))
                     attributeOptional = values["Optional"] == "true";
 
+                if (values.ContainsKey("CamelCase"))
+                    attributeCamelCase = values["CamelCase"] == "true";
+
                 values.TryGetValue("Name", out attributeName);
                 values.TryGetValue("Type", out attributeType);
             }
@@ -208,7 +215,8 @@ namespace T4TS
             {
                 Optional = attributeOptional.HasValue ? attributeOptional.Value : Settings.DefaultOptional,
                 Name = attributeName,
-                Type = attributeType
+                Type = attributeType,
+                CamelCase = attributeCamelCase ?? Settings.DefaultCamelCaseMemberNames
             };
         }
 
