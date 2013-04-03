@@ -17,5 +17,10 @@ namespace T4TS
         /// The default value for Optional, if not specified by the TypeScriptMemberAttribute
         /// </summary>
         public bool DefaultOptional { get; set; }
+
+        /// <summary>
+        /// The default value for the CamelCase flag for an interface member name, if not specified by the TypeScriptMemberAttribute
+        /// </summary>
+        public bool DefaultCamelCaseMemberNames { get; set; }
     }
 }

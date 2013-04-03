@@ -15,4 +15,8 @@ const string DefaultModule = "T4TS";
 // generated member will look like "member?: type" instead of "member: type".
 const bool DefaultOptional = false;
 
+// The default value for the CamelCase flag for an interface member name.
+// If set to true, the first character of member names will be lower cased.
+const bool DefaultCamelCaseMemberNames = false;
+
 #>

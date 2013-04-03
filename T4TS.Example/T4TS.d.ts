@@ -21,6 +21,7 @@ module Fooz {
         NestedObjectList: Barfoo[];
         TwoDimensions: string[][];
         ThreeDimensions: Barfoo[][][];
+        camelCasePlease: number;
     }
 }
 
