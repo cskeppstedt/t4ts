@@ -11,5 +11,6 @@ namespace T4TS
     {
         public string Module { get; set; }
         public string Name { get; set; }
+        public string NamePrefix { get; set; }
     }
 }

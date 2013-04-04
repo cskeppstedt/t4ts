@@ -19,4 +19,9 @@ const bool DefaultOptional = false;
 // If set to true, the first character of member names will be lower cased.
 const bool DefaultCamelCaseMemberNames = false;
 
+// The default string to prefix interface names with. For instance, you
+// might want to prefix the names with an "I" to get conventional
+// interface names.
+const string DefaultInterfaceNamePrefix = "";
+
 #>

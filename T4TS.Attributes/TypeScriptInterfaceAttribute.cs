@@ -19,5 +19,10 @@ namespace T4TS
         /// If not specified, the name of the class will be used.
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// If specified, the interface name will be prefixed with this string.
+        /// </summary>
+        public string NamePrefix { get; set; }
     }
 }
