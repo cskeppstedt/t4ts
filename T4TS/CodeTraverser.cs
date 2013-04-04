@@ -42,7 +42,7 @@ namespace T4TS
                         return;
 
                     var values = GetInterfaceValues(codeClass, attribute);
-                    var customType = new CustomType(values.Name, values.Module);
+                    var customType = new CustomType(GetInterfaceName(values), values.Module);
 
                     typeContext.AddCustomType(codeClass.FullName, customType);
                 });
@@ -96,13 +96,21 @@ namespace T4TS
                 .OrderBy(m => m.QualifiedName)
                 .ToList();
         }
+        
+        private string GetInterfaceName(TypeScriptInterfaceAttributeValues attributeValues)
+        {
+            if (!string.IsNullOrEmpty(attributeValues.NamePrefix))
+                return attributeValues.NamePrefix + attributeValues.Name;
+
+            return attributeValues.Name;
+        }
 
         private TypeScriptInterface BuildInterface(CodeClass codeClass, TypeScriptInterfaceAttributeValues attributeValues, TypeContext typeContext)
         {
             var tsInterface = new TypeScriptInterface
             {
                 FullName = codeClass.FullName,
-                Name = attributeValues.Name
+                Name = GetInterfaceName(attributeValues)
             };
 
             TypescriptType indexedType;
@@ -159,7 +167,8 @@ namespace T4TS
             return new TypeScriptInterfaceAttributeValues
             {
                 Name = values.ContainsKey("Name") ? values["Name"] : codeClass.Name,
-                Module = values.ContainsKey("Module") ? values["Module"] : Settings.DefaultModule ?? "T4TS"
+                Module = values.ContainsKey("Module") ? values["Module"] : Settings.DefaultModule ?? "T4TS",
+                NamePrefix = values.ContainsKey("NamePrefix") ? values["NamePrefix"] : Settings.DefaultInterfaceNamePrefix ?? string.Empty
             };
         }
 
