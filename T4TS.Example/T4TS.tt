@@ -35,7 +35,8 @@ List<T4TS.TypeScriptModule> GetDataToRender() {
     {
         DefaultModule = DefaultModule,
         DefaultOptional = DefaultOptional,
-        DefaultCamelCaseMemberNames = DefaultCamelCaseMemberNames
+        DefaultCamelCaseMemberNames = DefaultCamelCaseMemberNames,
+        DefaultInterfaceNamePrefix = DefaultInterfaceNamePrefix
     };
 
     var generator = new T4TS.CodeTraverser(project, settings);
