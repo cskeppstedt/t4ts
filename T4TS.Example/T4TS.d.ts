@@ -17,6 +17,8 @@ module Fooz {
     export interface IFoobar {
         OverrideAll?: bool;
         Recursive: Fooz.IFoobar;
+        NullableInt?: number;
+        NullableDouble?: number;
         NestedObjectArr: Barfoo[];
         NestedObjectList: Barfoo[];
         TwoDimensions: string[][];

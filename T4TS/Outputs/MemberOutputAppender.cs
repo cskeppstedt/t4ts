@@ -17,12 +17,14 @@ namespace T4TS
         {
             AppendIndendation();
 
+            bool isOptional = member.Optional || (member.Type is NullableType);
+
             Output.AppendFormat("{0}{1}: {2}",
                 member.Name,
-                (member.Optional ? "?" : ""),
+                (isOptional ? "?" : ""),
                 member.Type
             );
-
+            
             Output.AppendLine(";");
         }
     }

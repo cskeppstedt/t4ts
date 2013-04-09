@@ -15,6 +15,8 @@ namespace T4TS
             "System.Collections.Generic.ICollection<"
         };
 
+        private static readonly string nullableTypeStart = "System.Nullable<";
+
         /// <summary>
         /// Lookup table for "custom types", ie. non-builtin types. Keyed on the FullName of the type.
         /// </summary>
@@ -89,6 +91,13 @@ namespace T4TS
                     ElementType = GetTypeScriptType(UnwrapGenericType(typeFullName))
                 };
             }
+            else if (IsNullable(typeFullName))
+            {
+                return new NullableType
+                {
+                    WrappedType = GetTypeScriptType(UnwrapGenericType(typeFullName))
+                };
+            }
 
             switch (typeFullName)
             {
@@ -112,6 +121,11 @@ namespace T4TS
                 default:
                     return new TypescriptType();
             }
+        }
+
+        private bool IsNullable(string typeFullName)
+        {
+            return typeFullName.StartsWith(nullableTypeStart);
         }
 
         public string UnwrapGenericType(string typeFullName)
