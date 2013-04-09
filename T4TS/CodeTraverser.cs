@@ -42,7 +42,7 @@ namespace T4TS
                         return;
 
                     var values = GetInterfaceValues(codeClass, attribute);
-                    var customType = new CustomType(values.Name, values.Module);
+                    var customType = new CustomType(GetInterfaceName(values), values.Module);
 
                     typeContext.AddCustomType(codeClass.FullName, customType);
                 });
@@ -96,13 +96,21 @@ namespace T4TS
                 .OrderBy(m => m.QualifiedName)
                 .ToList();
         }
+        
+        private string GetInterfaceName(TypeScriptInterfaceAttributeValues attributeValues)
+        {
+            if (!string.IsNullOrEmpty(attributeValues.NamePrefix))
+                return attributeValues.NamePrefix + attributeValues.Name;
+
+            return attributeValues.Name;
+        }
 
         private TypeScriptInterface BuildInterface(CodeClass codeClass, TypeScriptInterfaceAttributeValues attributeValues, TypeContext typeContext)
         {
             var tsInterface = new TypeScriptInterface
             {
                 FullName = codeClass.FullName,
-                Name = attributeValues.Name
+                Name = GetInterfaceName(attributeValues)
             };
 
             TypescriptType indexedType;
@@ -159,7 +167,8 @@ namespace T4TS
             return new TypeScriptInterfaceAttributeValues
             {
                 Name = values.ContainsKey("Name") ? values["Name"] : codeClass.Name,
-                Module = values.ContainsKey("Module") ? values["Module"] : Settings.DefaultModule ?? "T4TS"
+                Module = values.ContainsKey("Module") ? values["Module"] : Settings.DefaultModule ?? "T4TS",
+                NamePrefix = values.ContainsKey("NamePrefix") ? values["NamePrefix"] : Settings.DefaultInterfaceNamePrefix ?? string.Empty
             };
         }
 
@@ -184,12 +193,16 @@ namespace T4TS
                     : new CustomType(values.Type)
             };
 
+            if (values.CamelCase && values.Name == null)
+                member.Name = member.Name.Substring(0, 1).ToLowerInvariant() + member.Name.Substring(1);
+
             return true;
         }
 
         private TypeScriptMemberAttributeValues GetMemberValues(CodeProperty property, TypeContext typeContext)
         {
             bool? attributeOptional = null;
+            bool? attributeCamelCase = null;
             string attributeName = null;
             string attributeType = null;
 
@@ -200,6 +213,9 @@ namespace T4TS
                 if (values.ContainsKey("Optional"))
                     attributeOptional = values["Optional"] == "true";
 
+                if (values.ContainsKey("CamelCase"))
+                    attributeCamelCase = values["CamelCase"] == "true";
+
                 values.TryGetValue("Name", out attributeName);
                 values.TryGetValue("Type", out attributeType);
             }
@@ -208,7 +224,8 @@ namespace T4TS
             {
                 Optional = attributeOptional.HasValue ? attributeOptional.Value : Settings.DefaultOptional,
                 Name = attributeName,
-                Type = attributeType
+                Type = attributeType,
+                CamelCase = attributeCamelCase ?? Settings.DefaultCamelCaseMemberNames
             };
         }
 

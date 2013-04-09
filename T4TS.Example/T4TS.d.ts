@@ -14,15 +14,16 @@
 
 module Fooz {
     /** Generated from T4TS.Example.Models.Foobar **/
-    export interface Foobar {
+    export interface IFoobar {
         OverrideAll?: bool;
-        Recursive: Fooz.Foobar;
+        Recursive: Fooz.IFoobar;
         NullableInt?: number;
         NullableDouble?: number;
         NestedObjectArr: Barfoo[];
         NestedObjectList: Barfoo[];
         TwoDimensions: string[][];
         ThreeDimensions: Barfoo[][][];
+        camelCasePlease: number;
     }
 }
 
@@ -30,22 +31,22 @@ module T4TS {
     /** Generated from T4TS.Example.Models.InheritanceTest1 **/
     export interface InheritanceTest1 {
         SomeString: string;
-        Recursive: Fooz.Foobar;
+        Recursive: Fooz.IFoobar;
     }
     /** Generated from T4TS.Example.Models.InheritanceTest2 **/
     export interface InheritanceTest2 {
         SomeString2: string;
-        Recursive2: Fooz.Foobar;
+        Recursive2: Fooz.IFoobar;
     }
     /** Generated from T4TS.Example.Models.InheritanceTest3 **/
     export interface InheritanceTest3 {
         SomeString3: string;
-        Recursive3: Fooz.Foobar;
+        Recursive3: Fooz.IFoobar;
     }
     /** Generated from T4TS.Example.Models.InheritanceTest4 **/
     export interface InheritanceTest4 {
         SomeString4: string;
-        Recursive4: Fooz.Foobar;
+        Recursive4: Fooz.IFoobar;
     }
     /** Generated from T4TS.Example.Models.Inherited **/
     export interface OverridenName {
