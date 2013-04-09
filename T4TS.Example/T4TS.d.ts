@@ -29,17 +29,17 @@ module Fooz {
 
 module T4TS {
     /** Generated from T4TS.Example.Models.InheritanceTest1 **/
-    export interface InheritanceTest1 {
+    export interface InheritanceTest1 extends Barfoo {
         SomeString: string;
         Recursive: Fooz.IFoobar;
     }
     /** Generated from T4TS.Example.Models.InheritanceTest2 **/
-    export interface InheritanceTest2 {
+    export interface InheritanceTest2 extends T4TS.InheritanceTest1 {
         SomeString2: string;
         Recursive2: Fooz.IFoobar;
     }
     /** Generated from T4TS.Example.Models.InheritanceTest3 **/
-    export interface InheritanceTest3 {
+    export interface InheritanceTest3 extends T4TS.OverridenName {
         SomeString3: string;
         Recursive3: Fooz.IFoobar;
     }
