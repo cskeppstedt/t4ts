@@ -71,34 +71,39 @@ Specifications
 
  * Right now, `System.DateTime` is considered a `string` in the type translation. The main reason is that the [JSON serialization in .NET MVC](http://stackoverflow.com/questions/726334/asp-net-mvc-jsonresult-date-format) will typically serialize a `DateTime` as `"\/Date(ticks)\/"`
 
- * The type translation works like this, from C# => TypeScript, for each property:
+ * The type translation works like this, from C# **=>** TypeScript, for each property:
    * Built-in numeric type (`int`, `double`, `float`, etc.) **=>** `number`
    * `string` **=>** `string`
+   * `Nullable<T>` **=>** `T?`
    * A class marked with `[TypeScriptInterface]` **=>** lookup the generated TypeScript name
    * Otherwise **=>** `any`
    * For `Collection<T>`, `List<T>`, `IList<T>` and `T[]` **=>** lookup type for `T` as above, and return `T[]`.
 
+ * Inheritance of interfaces is supported. If `Bar` inherits `Foo` in C# and both are marked with the `TypeScriptInterfaceAttribute`, the generated interface would be `interface Bar extends Foo {...`.
+
 Customize the generated interfaces
 ----
 The attribute `TypeScriptInterfaceAttribute` is set on C# classes, and has the following properties:
+
 * **Name:** Specifies the name of the interface (default is the class name).
 * **Module:** Specifies the module of the interface (default _T4TS_).
+* **NamePrefix:** If specified, the interface name will be prefixed with this string.
 
 The attribute `TypeScriptMemberAttribute` can be set on the properties of a C# class, and has the following properties:
+
 * **Name:** Specifies the name of the member (default is the property name).
 * **Optional:** Specifies whether this member should be optional, ie. `member?: type` instead of `member: type`.
 * **Type:** Specifies the type of the member (default is to do type translation of the property).
+* **CamelCase:** If set to true, the first character of the member name will be lower cased.
 
 Default settings
 ----
 There are a couple of default settings that can be specified in the `T4TS.tt.settings.t4` file.
 
-* **DefaultModule:** The default module name of an interfaces (if not specified by `TypeScriptInterfaceAttribute`).
-* **DefaultOptional:** The default value for the Optional flag for `TypeScriptMemberAttribute`.
-
-Wiki
-----
-See the [Wiki](https://github.com/cskeppstedt/t4ts/wiki) for more information.
+* **DefaultModule:** The default module name of an interfaces (if not specified by `TypeScriptInterfaceAttribute`). Default is `"T4TS"`.
+* **DefaultOptional:** The default value for the `Optional` flag for `TypeScriptMemberAttribute`. Default is `false`.
+* **DefaultCamelCaseMemberNames:** The default value for the `CamelCase` flag for `TypeScriptMemberAttribute`. Default is `false`.
+* **DefaultInterfaceNamePrefix:** The default value for the `NamePrefix` flag for `TypeScriptInterfaceAttribute`. Default is `""`.
 
 Known problems
 ----
