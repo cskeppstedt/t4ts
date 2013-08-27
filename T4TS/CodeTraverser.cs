@@ -1,11 +1,7 @@
 ﻿using EnvDTE;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace T4TS
 {
@@ -32,6 +28,7 @@ namespace T4TS
         public TypeContext BuildContext()
         {
             var typeContext = new TypeContext();
+            var partialClasses = new Dictionary<string, CodeClass>();
 
             new ProjectTraverser(this.Project, (ns) =>
             {
@@ -42,9 +39,10 @@ namespace T4TS
                         return;
 
                     var values = GetInterfaceValues(codeClass, attribute);
-                    var customType = new CustomType(GetInterfaceName(values), values.Module);
+                    var interfaceType = new InterfaceType(values);
 
-                    typeContext.AddCustomType(codeClass.FullName, customType);
+                    if (!typeContext.ContainsInterfaceType(codeClass.FullName))
+                        typeContext.AddInterfaceType(codeClass.FullName, interfaceType);
                 });
             });
 
@@ -61,15 +59,12 @@ namespace T4TS
             {
                 new NamespaceTraverser(ns, (codeClass) =>
                 {
-                    if (codeClass.Attributes == null || codeClass.Attributes.Count == 0)
+                    InterfaceType interfaceType;
+                    if (!typeContext.TryGetInterfaceType(codeClass.FullName, out interfaceType))
                         return;
 
-                    CodeAttribute attribute;
-                    if (!TryGetAttribute(codeClass.Attributes, InterfaceAttributeFullName, out attribute))
-                        return;
-
-                    var values = GetInterfaceValues(codeClass, attribute);
-
+                    var values = interfaceType.AttributeValues;
+                    
                     TypeScriptModule module;
                     if (!byModuleName.TryGetValue(values.Module, out module))
                     {
@@ -123,6 +118,7 @@ namespace T4TS
                 if (TryGetMember(property, typeContext, out member))
                     tsInterface.Members.Add(member);
             });
+
             return tsInterface;
         }
 
@@ -190,7 +186,7 @@ namespace T4TS
                 Optional = values.Optional,
                 Type = (string.IsNullOrWhiteSpace(values.Type))
                     ? typeContext.GetTypeScriptType(getter.Type)
-                    : new CustomType(values.Type)
+                    : new InterfaceType(values.Type)
             };
 
             if (values.CamelCase && values.Name == null)

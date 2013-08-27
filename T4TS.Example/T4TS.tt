@@ -3,17 +3,20 @@
 <#@ assembly name="System.Core" #>
 <#@ assembly name="Microsoft.VisualStudio.Shell.Interop.8.0" #>
 <#@ assembly name="EnvDTE" #>
+<#@ assembly name="EnvDTE80" #>
+<#@ assembly name="$(SolutionDir)\\T4TS\\bin\\Debug\\T4TS.Dll" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
 <#@ import namespace="EnvDTE" #>
+<#@ import namespace="T4TS" #>
 <#@ import namespace="Microsoft.VisualStudio.Shell.Interop" #>
 <#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
-<#@ assembly name="$(SolutionDir)\\T4TS\\bin\\Debug\\T4TS.Dll" #>
 <#@ Include File="T4TS.tt.settings.t4" #>
 <#= 
     T4TS.OutputFormatter.GetOutput(GetDataToRender()) #><#+ 
 
-List<T4TS.TypeScriptModule> GetDataToRender() {
+List<TypeScriptModule> GetDataToRender() {
     DTE dte = null;
 
     // Get the DTE service from the host
@@ -31,7 +34,7 @@ List<T4TS.TypeScriptModule> GetDataToRender() {
         throw new Exception("Could not find the VS project containing the T4TS file.");
 
     // Read settings from T4TS.tt.settings.tt
-    var settings = new T4TS.Settings
+    var settings = new Settings
     {
         DefaultModule = DefaultModule,
         DefaultOptional = DefaultOptional,
@@ -39,7 +42,7 @@ List<T4TS.TypeScriptModule> GetDataToRender() {
         DefaultInterfaceNamePrefix = DefaultInterfaceNamePrefix
     };
 
-    var generator = new T4TS.CodeTraverser(project, settings);
+    var generator = new CodeTraverser(project, settings);
 
     return generator.GetAllInterfaces().ToList();
 }
@@ -60,5 +63,4 @@ Project GetProjectContainingT4File(DTE dte) {
 
     return projectItem.ContainingProject;
 }
-
 #>
