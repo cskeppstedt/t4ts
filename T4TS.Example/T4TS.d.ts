@@ -56,4 +56,13 @@ module T4TS {
         TwoDimList: number[][];
         [index: number]: Barfoo;
     }
+    /** Generated from T4TS.Example.Models.Partial **/
+    export interface Partial {
+        FromFirstClass: string;
+    }
+    /** Generated from T4TS.Example.Models.Partial **/
+    export interface Partial {
+        FromSecondClass: string;
+        AlsoSecondClass?: any;
+    }
 }

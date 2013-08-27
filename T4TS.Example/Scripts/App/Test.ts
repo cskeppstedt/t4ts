@@ -3,12 +3,20 @@
 
 module App {
     export class Test {
-        
-        constructor () {
+        private partialClass: T4TS.Partial;
+
+        constructor() {
+
+            this.partialClass = {
+                FromFirstClass: '',
+                FromSecondClass: '',
+                AlsoSecondClass: true
+            };
+
             // Make an AJAX post and get some data from the server.
             // In the callback, you can specify that the data is of a certain type:
-            $.post('./example', {}, (data: Fooz.Foobar) => {
-                
+            $.post('./example', {}, (data: Fooz.IFoobar) => {
+
                 // Intellisense support for the properties:
                 alert(data.NestedObjectArr[0].Name);
                 alert(data.Recursive.OverrideAll ? "1" : "0");
