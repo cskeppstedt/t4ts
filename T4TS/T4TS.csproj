@@ -61,7 +61,7 @@
     <Compile Include="Outputs\TypeScriptModule.cs" />
     <Compile Include="Types\ArrayType.cs" />
     <Compile Include="Types\BoolType.cs" />
-    <Compile Include="Types\CustomType.cs" />
+    <Compile Include="Types\InterfaceType.cs" />
     <Compile Include="Types\NullableType.cs" />
     <Compile Include="Types\NumberType.cs" />
     <Compile Include="Types\StringType.cs" />

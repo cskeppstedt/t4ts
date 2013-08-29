@@ -1,9 +1,6 @@
 ﻿using EnvDTE;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace T4TS
 {
@@ -18,18 +15,23 @@ namespace T4TS
         private static readonly string nullableTypeStart = "System.Nullable<";
 
         /// <summary>
-        /// Lookup table for "custom types", ie. non-builtin types. Keyed on the FullName of the type.
+        /// Lookup table for "interface types", ie. non-builtin types (typically classes or unknown types). Keyed on the FullName of the type.
         /// </summary>
-        private Dictionary<string, CustomType> customTypes = new Dictionary<string, CustomType>();
+        private Dictionary<string, InterfaceType> interfaceTypes = new Dictionary<string, InterfaceType>();
 
-        public void AddCustomType(string typeFullName, CustomType customType)
+        public void AddInterfaceType(string typeFullName, InterfaceType interfaceType)
         {
-            customTypes.Add(typeFullName, customType);
+            interfaceTypes.Add(typeFullName, interfaceType);
         }
 
-        public bool TryGetCustomType(string typeFullName, out CustomType customType)
+        public bool TryGetInterfaceType(string typeFullName, out InterfaceType interfaceType)
         {
-            return customTypes.TryGetValue(typeFullName, out customType);
+            return interfaceTypes.TryGetValue(typeFullName, out interfaceType);
+        }
+
+        public bool ContainsInterfaceType(string typeFullName)
+        {
+            return interfaceTypes.ContainsKey(typeFullName);
         }
 
         public TypescriptType GetTypeScriptType(CodeTypeRef codeType)
@@ -80,9 +82,9 @@ namespace T4TS
 
         public TypescriptType GetTypeScriptType(string typeFullName)
         {
-            CustomType customType;
-            if (customTypes.TryGetValue(typeFullName, out customType))
-                return customType;
+            InterfaceType interfaceType;
+            if (interfaceTypes.TryGetValue(typeFullName, out interfaceType))
+                return interfaceType;
 
             if (IsGenericEnumerable(typeFullName))
             {
