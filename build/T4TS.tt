@@ -62,6 +62,457 @@ Project GetProjectContainingT4File(DTE dte) {
     return projectItem.ContainingProject;
 }
 
+public class InterfaceOutputAppender : OutputAppender<TypeScriptInterface>
+    {
+        private bool InGlobalModule { get; set; }
+
+        public InterfaceOutputAppender(StringBuilder output, int baseIndentation, bool inGlobalModule)
+            : base(output, baseIndentation)
+        {
+            this.InGlobalModule = inGlobalModule;
+        }
+
+        public override void AppendOutput(TypeScriptInterface tsInterface)
+        {
+            BeginInterface(tsInterface);
+
+            AppendMembers(tsInterface);
+            
+            if (tsInterface.IndexedType != null)
+                AppendIndexer(tsInterface);
+
+            EndInterface();
+        }
+
+        private void AppendMembers(TypeScriptInterface tsInterface)
+        {
+            var appender = new MemberOutputAppender(Output, BaseIndentation + 4);
+            foreach (var member in tsInterface.Members)
+                appender.AppendOutput(member);
+        }
+
+        private void BeginInterface(TypeScriptInterface tsInterface)
+        {
+            AppendIndentedLine("/** Generated from " + tsInterface.FullName + " **/");
+
+            if (InGlobalModule)
+                AppendIndented("interface " + tsInterface.Name);
+            else
+                AppendIndented("export interface " + tsInterface.Name);
+
+            if (tsInterface.Parent != null)
+                Output.Append(" extends " + (tsInterface.Parent.Module.IsGlobal ? "" : tsInterface.Parent.Module.QualifiedName + ".") + tsInterface.Parent.Name);
+
+            Output.AppendLine(" {");
+        }
+
+        private void EndInterface()
+        {
+            AppendIndentedLine("}");
+        }
+
+        private void AppendIndexer(TypeScriptInterface tsInterface)
+        {
+            AppendIndendation();
+            Output.AppendFormat("    [index: number]: {0};", tsInterface.IndexedType);
+            Output.AppendLine();
+        }
+    }
+
+    public class MemberOutputAppender : OutputAppender<TypeScriptInterfaceMember>
+    {
+        public MemberOutputAppender(StringBuilder output, int baseIndentation)
+            : base(output, baseIndentation)
+        {
+        }
+
+        public override void AppendOutput(TypeScriptInterfaceMember member)
+        {
+            AppendIndendation();
+
+            bool isOptional = member.Optional || (member.Type is NullableType);
+
+            Output.AppendFormat("{0}{1}: {2}",
+                member.Name,
+                (isOptional ? "?" : ""),
+                member.Type
+            );
+            
+            Output.AppendLine(";");
+        }
+    }
+    
+    public class ModuleOutputAppender : OutputAppender<TypeScriptModule>
+    {
+        public ModuleOutputAppender(StringBuilder output, int baseIndentation)
+            : base(output, baseIndentation)
+        {
+        }
+
+        public override void AppendOutput(TypeScriptModule module)
+        {
+            BeginModule(module);
+
+            var interfaceAppender = new InterfaceOutputAppender(Output, BaseIndentation + 4, module.IsGlobal);
+            foreach (var tsInterface in module.Interfaces)
+                interfaceAppender.AppendOutput(tsInterface);
+
+            EndModule(module);
+        }
+
+        private void BeginModule(TypeScriptModule module)
+        {
+            if (module.IsGlobal)
+            {
+                Output.AppendLine("// -- Begin global interfaces");
+            }
+            else
+            {
+                Output.Append("module ");
+                Output.Append(module.QualifiedName);
+                Output.AppendLine(" {");
+            }
+        }
+
+        private void EndModule(TypeScriptModule module)
+        {
+            if (module.IsGlobal)
+                Output.AppendLine("// -- End global interfaces");
+            else
+                Output.AppendLine("}");
+        }
+    }
+    
+    public abstract class OutputAppender<TSegment> where TSegment: class
+    {
+        protected StringBuilder Output { get; private set; }
+        protected int BaseIndentation { get; private set; }
+
+        public OutputAppender(StringBuilder output, int baseIndentation)
+        {
+            if (output == null)
+                throw new ArgumentNullException("output");
+
+            this.Output = output;
+            this.BaseIndentation = baseIndentation;
+        }
+
+        public abstract void AppendOutput(TSegment segment);
+
+        protected void AppendIndented(string text)
+        {
+            AppendIndendation();
+            Output.Append(text);
+        }
+
+        protected void AppendIndentedLine(string line)
+        {
+            AppendIndendation();
+            Output.AppendLine(line);
+        }
+
+        protected void AppendIndendation()
+        {
+            Output.Append(' ', BaseIndentation);
+        }
+
+        public override string ToString()
+        {
+            return Output.ToString();
+        }
+    }
+    
+    public static class OutputFormatter
+    {
+        public static string GetOutput(List<TypeScriptModule> modules)
+        {
+            var output = new StringBuilder();
+            
+            output.AppendLine("/****************************************************************************");
+            output.AppendLine("  Generated by T4TS.tt - don't make any changes in this file");
+            output.AppendLine("****************************************************************************/");
+
+            var moduleAppender = new ModuleOutputAppender(output, 0);
+            foreach (var module in modules)
+            {
+                output.AppendLine();
+                moduleAppender.AppendOutput(module);
+            }
+
+            return output.ToString();
+        }
+    }
+    
+    public class Settings
+    {
+        /// <summary>
+        /// The default module of the generated interface, if not specified by the TypeScriptInterfaceAttribute
+        /// </summary>
+        public string DefaultModule { get; set; }
+
+        /// <summary>
+        /// The default value for Optional, if not specified by the TypeScriptMemberAttribute
+        /// </summary>
+        public bool DefaultOptional { get; set; }
+
+        /// <summary>
+        /// The default value for the CamelCase flag for an interface member name, if not specified by the TypeScriptMemberAttribute
+        /// </summary>
+        public bool DefaultCamelCaseMemberNames { get; set; }
+
+        /// <summary>
+        /// The default string to prefix interface names with. For instance, you might want to prefix the names with an "I" to get conventional interface names.
+        /// </summary>
+        public string DefaultInterfaceNamePrefix { get; set; }
+    }
+    
+    public class TypeScriptInterface
+    {
+        public string Name { get; set; }
+        public string FullName { get; set; }
+
+        public List<TypeScriptInterfaceMember> Members { get; set; }
+        public TypescriptType IndexedType { get; set; }
+        public TypeScriptInterface Parent { get; set; }
+        public TypeScriptModule Module { get; set; }
+
+        public TypeScriptInterface()
+        {
+            Members = new List<TypeScriptInterfaceMember>();
+        }
+    }
+    
+    public class TypeScriptInterfaceAttributeValues
+    {
+        public string Module { get; set; }
+        public string Name { get; set; }
+        public string NamePrefix { get; set; }
+    }
+    
+    public class TypeScriptInterfaceMember
+    {
+        public string Name { get; set; }
+        public TypescriptType Type { get; set; }
+        public bool Optional { get; set; }
+        public string FullName { get; set; }
+    }
+    
+    public class TypeScriptMemberAttributeValues
+    {
+        public string Name { get; set; }
+        public bool Optional { get; set; }
+        public string Type { get; set; }
+        public bool CamelCase { get; set; }
+    }
+
+    public class TypeScriptModule
+    {
+        public string QualifiedName { get; set; }
+        public List<TypeScriptInterface> Interfaces { get; set; }
+
+        /// <summary>
+        /// Returns true if this is the global namespace (ie. no module name)
+        /// </summary>
+        public bool IsGlobal
+        {
+            get { return string.IsNullOrWhiteSpace(QualifiedName); }
+        }
+
+        public TypeScriptModule()
+        {
+            Interfaces = new List<TypeScriptInterface>();
+        }
+    }
+    
+    public class ClassTraverser
+    {
+        public CodeClass CodeClass { get; private set; }
+        public Action<CodeProperty> WithProperty { get; set; }
+
+        public ClassTraverser(CodeClass codeClass, Action<CodeProperty> withProperty)
+        {
+            if (codeClass == null)
+                throw new ArgumentNullException("codeClass");
+            
+            if (withProperty == null)
+                throw new ArgumentNullException("withProperty");
+
+            this.CodeClass = codeClass;
+            this.WithProperty = withProperty;
+
+            if (codeClass.Members != null)
+                Traverse(codeClass.Members);
+        }
+
+        private void Traverse(CodeElements members)
+        {
+            foreach (var property in members.OfType<CodeProperty>())
+                WithProperty(property);
+        }
+    }
+    
+    public class NamespaceTraverser
+    {
+        public Action<CodeClass> WithCodeClass { get; private set; }
+
+        public NamespaceTraverser(CodeNamespace ns, Action<CodeClass> withCodeClass)
+        {
+            if (ns == null)
+                throw new ArgumentNullException("ns");
+            
+            if (withCodeClass == null)
+                throw new ArgumentNullException("withCodeClass");
+            
+            WithCodeClass = withCodeClass;
+            
+            if (ns.Members != null)
+                Traverse(ns.Members);
+        }
+
+        private void Traverse(CodeElements members)
+        {
+            foreach (var codeClass in members.OfType<CodeClass>())
+                WithCodeClass(codeClass);
+        }
+    }
+    
+    public class ProjectTraverser
+    {
+        public Action<CodeNamespace> WithNamespace { get; private set; }
+
+        public ProjectTraverser(Project project, Action<CodeNamespace> withNamespace)
+        {
+            if (project == null)
+                throw new ArgumentNullException("project");
+            
+            if (withNamespace == null)
+                throw new ArgumentNullException("withNamespace");
+
+            WithNamespace = withNamespace;
+
+            if (project.ProjectItems != null)
+                Traverse(project.ProjectItems);
+        }
+
+        private void Traverse(ProjectItems items)
+        {
+            foreach (ProjectItem pi in items)
+            {
+                if (pi.FileCodeModel != null)
+                {
+                    var codeElements = pi.FileCodeModel.CodeElements;
+                    foreach (var ns in codeElements.OfType<CodeNamespace>())
+                        WithNamespace(ns);
+                }
+
+                if (pi.ProjectItems != null)
+                    Traverse(pi.ProjectItems);
+            }
+        }
+    }
+    
+    public class ArrayType: TypescriptType
+    {
+        public TypescriptType ElementType { get; set; }
+
+        public override string ToString()
+        {
+            return ElementType.ToString() + "[]";
+        }
+    }
+    
+    public class BoolType: TypescriptType
+    {
+        public override string Name
+        {
+            get { return "bool"; }
+        }
+    }
+    
+    public class InterfaceType : TypescriptType
+    {
+        public TypeScriptInterfaceAttributeValues AttributeValues { get; private set; }
+
+        public string QualifedModule 
+        { 
+            get 
+            {
+                if (AttributeValues == null)
+                    return null;
+
+                return AttributeValues.Module; 
+            } 
+        }
+
+        public override string Name
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(AttributeValues.NamePrefix))
+                    return AttributeValues.NamePrefix + AttributeValues.Name;
+
+                return AttributeValues.Name;
+            }
+        }
+
+        public InterfaceType(TypeScriptInterfaceAttributeValues values)
+        {
+            AttributeValues = values;
+        }
+
+        public InterfaceType(string name)
+        {
+            AttributeValues = new TypeScriptInterfaceAttributeValues
+            {
+                Name = name
+            };
+        }
+
+        public override string ToString()
+        {
+            if (string.IsNullOrWhiteSpace(QualifedModule))
+                return base.ToString();
+
+            return QualifedModule + "." + base.ToString();
+        }
+    }
+    
+    public class NullableType : TypescriptType
+    {
+        public TypescriptType WrappedType { get; set; }
+
+        public override string ToString()
+        {
+            return WrappedType.ToString();
+        }
+    }
+    
+    public class NumberType : TypescriptType
+    {
+        public override string Name
+        {
+            get { return "number"; }
+        }
+    }
+    
+    public class StringType: TypescriptType
+    {
+        public override string Name
+        {
+            get { return "string"; }
+        }
+    }
+
+    public class TypescriptType
+    {
+        public virtual string Name { get { return "any"; } }
+
+        public override string ToString()
+        {
+            return Name;
+        }
+    }
+    
     public class CodeTraverser
     {
         public Project Project { get; private set; }
@@ -85,6 +536,7 @@ Project GetProjectContainingT4File(DTE dte) {
         public TypeContext BuildContext()
         {
             var typeContext = new TypeContext();
+            var partialClasses = new Dictionary<string, CodeClass>();
 
             new ProjectTraverser(this.Project, (ns) =>
             {
@@ -95,9 +547,10 @@ Project GetProjectContainingT4File(DTE dte) {
                         return;
 
                     var values = GetInterfaceValues(codeClass, attribute);
-                    var customType = new CustomType(GetInterfaceName(values), values.Module);
+                    var interfaceType = new InterfaceType(values);
 
-                    typeContext.AddCustomType(codeClass.FullName, customType);
+                    if (!typeContext.ContainsInterfaceType(codeClass.FullName))
+                        typeContext.AddInterfaceType(codeClass.FullName, interfaceType);
                 });
             });
 
@@ -114,15 +567,12 @@ Project GetProjectContainingT4File(DTE dte) {
             {
                 new NamespaceTraverser(ns, (codeClass) =>
                 {
-                    if (codeClass.Attributes == null || codeClass.Attributes.Count == 0)
+                    InterfaceType interfaceType;
+                    if (!typeContext.TryGetInterfaceType(codeClass.FullName, out interfaceType))
                         return;
 
-                    CodeAttribute attribute;
-                    if (!TryGetAttribute(codeClass.Attributes, InterfaceAttributeFullName, out attribute))
-                        return;
-
-                    var values = GetInterfaceValues(codeClass, attribute);
-
+                    var values = interfaceType.AttributeValues;
+                    
                     TypeScriptModule module;
                     if (!byModuleName.TryGetValue(values.Module, out module))
                     {
@@ -176,6 +626,7 @@ Project GetProjectContainingT4File(DTE dte) {
                 if (TryGetMember(property, typeContext, out member))
                     tsInterface.Members.Add(member);
             });
+
             return tsInterface;
         }
 
@@ -243,7 +694,7 @@ Project GetProjectContainingT4File(DTE dte) {
                 Optional = values.Optional,
                 Type = (string.IsNullOrWhiteSpace(values.Type))
                     ? typeContext.GetTypeScriptType(getter.Type)
-                    : new CustomType(values.Type)
+                    : new InterfaceType(values.Type)
             };
 
             if (values.CamelCase && values.Name == null)
@@ -302,6 +753,7 @@ Project GetProjectContainingT4File(DTE dte) {
             return values;
         }
     }
+    
     public class TypeContext
     {
         private static readonly string[] genericCollectionTypeStarts = new string[] {
@@ -313,18 +765,23 @@ Project GetProjectContainingT4File(DTE dte) {
         private static readonly string nullableTypeStart = "System.Nullable<";
 
         /// <summary>
-        /// Lookup table for "custom types", ie. non-builtin types. Keyed on the FullName of the type.
+        /// Lookup table for "interface types", ie. non-builtin types (typically classes or unknown types). Keyed on the FullName of the type.
         /// </summary>
-        private Dictionary<string, CustomType> customTypes = new Dictionary<string, CustomType>();
+        private Dictionary<string, InterfaceType> interfaceTypes = new Dictionary<string, InterfaceType>();
 
-        public void AddCustomType(string typeFullName, CustomType customType)
+        public void AddInterfaceType(string typeFullName, InterfaceType interfaceType)
         {
-            customTypes.Add(typeFullName, customType);
+            interfaceTypes.Add(typeFullName, interfaceType);
         }
 
-        public bool TryGetCustomType(string typeFullName, out CustomType customType)
+        public bool TryGetInterfaceType(string typeFullName, out InterfaceType interfaceType)
         {
-            return customTypes.TryGetValue(typeFullName, out customType);
+            return interfaceTypes.TryGetValue(typeFullName, out interfaceType);
+        }
+
+        public bool ContainsInterfaceType(string typeFullName)
+        {
+            return interfaceTypes.ContainsKey(typeFullName);
         }
 
         public TypescriptType GetTypeScriptType(CodeTypeRef codeType)
@@ -375,9 +832,9 @@ Project GetProjectContainingT4File(DTE dte) {
 
         public TypescriptType GetTypeScriptType(string typeFullName)
         {
-            CustomType customType;
-            if (customTypes.TryGetValue(typeFullName, out customType))
-                return customType;
+            InterfaceType interfaceType;
+            if (interfaceTypes.TryGetValue(typeFullName, out interfaceType))
+                return interfaceType;
 
             if (IsGenericEnumerable(typeFullName))
             {
@@ -432,414 +889,6 @@ Project GetProjectContainingT4File(DTE dte) {
         public bool IsGenericEnumerable(string typeFullName)
         {
             return genericCollectionTypeStarts.Any(t => typeFullName.StartsWith(t));
-        }
-    }
-    public class InterfaceOutputAppender : OutputAppender<TypeScriptInterface>
-    {
-        private bool InGlobalModule { get; set; }
-
-        public InterfaceOutputAppender(StringBuilder output, int baseIndentation, bool inGlobalModule)
-            : base(output, baseIndentation)
-        {
-            this.InGlobalModule = inGlobalModule;
-        }
-
-        public override void AppendOutput(TypeScriptInterface tsInterface)
-        {
-            BeginInterface(tsInterface);
-
-            AppendMembers(tsInterface);
-            
-            if (tsInterface.IndexedType != null)
-                AppendIndexer(tsInterface);
-
-            EndInterface();
-        }
-
-        private void AppendMembers(TypeScriptInterface tsInterface)
-        {
-            var appender = new MemberOutputAppender(Output, BaseIndentation + 4);
-            foreach (var member in tsInterface.Members)
-                appender.AppendOutput(member);
-        }
-
-        private void BeginInterface(TypeScriptInterface tsInterface)
-        {
-            AppendIndentedLine("/** Generated from " + tsInterface.FullName + " **/");
-
-            if (InGlobalModule)
-                AppendIndented("interface " + tsInterface.Name);
-            else
-                AppendIndented("export interface " + tsInterface.Name);
-            
-            if (tsInterface.Parent != null)
-                Output.Append(" extends " + (tsInterface.Parent.Module.IsGlobal ? "" : tsInterface.Parent.Module.QualifiedName + ".") + tsInterface.Parent.Name);
-            
-            Output.AppendLine(" {");
-        }
-
-        private void EndInterface()
-        {
-            AppendIndentedLine("}");
-        }
-
-        private void AppendIndexer(TypeScriptInterface tsInterface)
-        {
-            AppendIndendation();
-            Output.AppendFormat("    [index: number]: {0};", tsInterface.IndexedType);
-            Output.AppendLine();
-        }
-    }
-    public class MemberOutputAppender : OutputAppender<TypeScriptInterfaceMember>
-    {
-        public MemberOutputAppender(StringBuilder output, int baseIndentation)
-            : base(output, baseIndentation)
-        {
-        }
-
-        public override void AppendOutput(TypeScriptInterfaceMember member)
-        {
-            AppendIndendation();
-
-            bool isOptional = member.Optional || (member.Type is NullableType);
-
-            Output.AppendFormat("{0}{1}: {2}",
-                member.Name,
-                (isOptional ? "?" : ""),
-                member.Type
-            );
-            
-            Output.AppendLine(";");
-        }
-    }
-    public class ModuleOutputAppender : OutputAppender<TypeScriptModule>
-    {
-        public ModuleOutputAppender(StringBuilder output, int baseIndentation)
-            : base(output, baseIndentation)
-        {
-        }
-
-        public override void AppendOutput(TypeScriptModule module)
-        {
-            BeginModule(module);
-
-            var interfaceAppender = new InterfaceOutputAppender(Output, BaseIndentation + 4, module.IsGlobal);
-            foreach (var tsInterface in module.Interfaces)
-                interfaceAppender.AppendOutput(tsInterface);
-
-            EndModule(module);
-        }
-
-        private void BeginModule(TypeScriptModule module)
-        {
-            if (module.IsGlobal)
-            {
-                Output.AppendLine("// -- Begin global interfaces");
-            }
-            else
-            {
-                Output.Append("module ");
-                Output.Append(module.QualifiedName);
-                Output.AppendLine(" {");
-            }
-        }
-
-        private void EndModule(TypeScriptModule module)
-        {
-            if (module.IsGlobal)
-                Output.AppendLine("// -- End global interfaces");
-            else
-                Output.AppendLine("}");
-        }
-    }
-    public abstract class OutputAppender<TSegment> where TSegment: class
-    {
-        protected StringBuilder Output { get; private set; }
-        protected int BaseIndentation { get; private set; }
-
-        public OutputAppender(StringBuilder output, int baseIndentation)
-        {
-            if (output == null)
-                throw new ArgumentNullException("output");
-
-            this.Output = output;
-            this.BaseIndentation = baseIndentation;
-        }
-
-        public abstract void AppendOutput(TSegment segment);
-
-        protected void AppendIndented(string text)
-        {
-            AppendIndendation();
-            Output.Append(text);
-        }
-
-        protected void AppendIndentedLine(string line)
-        {
-            AppendIndendation();
-            Output.AppendLine(line);
-        }
-
-        protected void AppendIndendation()
-        {
-            Output.Append(' ', BaseIndentation);
-        }
-
-        public override string ToString()
-        {
-            return Output.ToString();
-        }
-    }
-    public static class OutputFormatter
-    {
-        public static string GetOutput(List<TypeScriptModule> modules)
-        {
-            var output = new StringBuilder();
-            
-            output.AppendLine("/****************************************************************************");
-            output.AppendLine("  Generated by T4TS.tt - don't make any changes in this file");
-            output.AppendLine("****************************************************************************/");
-
-            var moduleAppender = new ModuleOutputAppender(output, 0);
-            foreach (var module in modules)
-            {
-                output.AppendLine();
-                moduleAppender.AppendOutput(module);
-            }
-
-            return output.ToString();
-        }
-    }
-    public class Settings
-    {
-        /// <summary>
-        /// The default module of the generated interface, if not specified by the TypeScriptInterfaceAttribute
-        /// </summary>
-        public string DefaultModule { get; set; }
-
-        /// <summary>
-        /// The default value for Optional, if not specified by the TypeScriptMemberAttribute
-        /// </summary>
-        public bool DefaultOptional { get; set; }
-
-        /// <summary>
-        /// The default value for the CamelCase flag for an interface member name, if not specified by the TypeScriptMemberAttribute
-        /// </summary>
-        public bool DefaultCamelCaseMemberNames { get; set; }
-
-        /// <summary>
-        /// The default string to prefix interface names with. For instance, you might want to prefix the names with an "I" to get conventional interface names.
-        /// </summary>
-        public string DefaultInterfaceNamePrefix { get; set; }
-    }
-    public class TypeScriptInterface
-    {
-        public string Name { get; set; }
-        public string FullName { get; set; }
-
-        public List<TypeScriptInterfaceMember> Members { get; set; }
-        public TypescriptType IndexedType { get; set; }
-        public TypeScriptInterface Parent { get; set; }
-        public TypeScriptModule Module { get; set; }
-
-        public TypeScriptInterface()
-        {
-            Members = new List<TypeScriptInterfaceMember>();
-        }
-    }
-    public class TypeScriptInterfaceAttributeValues
-    {
-        public string Module { get; set; }
-        public string Name { get; set; }
-        public string NamePrefix { get; set; }
-    }
-    public class TypeScriptInterfaceMember
-    {
-        public string Name { get; set; }
-        public TypescriptType Type { get; set; }
-        public bool Optional { get; set; }
-        public string FullName { get; set; }
-    }
-    public class TypeScriptMemberAttributeValues
-    {
-        public string Name { get; set; }
-        public bool Optional { get; set; }
-        public string Type { get; set; }
-        public bool CamelCase { get; set; }
-    }
-    public class TypeScriptModule
-    {
-        public string QualifiedName { get; set; }
-        public List<TypeScriptInterface> Interfaces { get; set; }
-
-        /// <summary>
-        /// Returns true if this is the global namespace (ie. no module name)
-        /// </summary>
-        public bool IsGlobal
-        {
-            get { return string.IsNullOrWhiteSpace(QualifiedName); }
-        }
-
-        public TypeScriptModule()
-        {
-            Interfaces = new List<TypeScriptInterface>();
-        }
-    }
-    public class ClassTraverser
-    {
-        public CodeClass CodeClass { get; private set; }
-        public Action<CodeProperty> WithProperty { get; set; }
-
-        public ClassTraverser(CodeClass codeClass, Action<CodeProperty> withProperty)
-        {
-            if (codeClass == null)
-                throw new ArgumentNullException("codeClass");
-            
-            if (withProperty == null)
-                throw new ArgumentNullException("withProperty");
-
-            this.CodeClass = codeClass;
-            this.WithProperty = withProperty;
-
-            if (codeClass.Members != null)
-                Traverse(codeClass.Members);
-        }
-
-        private void Traverse(CodeElements members)
-        {
-            foreach (var property in members.OfType<CodeProperty>())
-                WithProperty(property);
-        }
-    }
-    public class NamespaceTraverser
-    {
-        public Action<CodeClass> WithCodeClass { get; private set; }
-
-        public NamespaceTraverser(CodeNamespace ns, Action<CodeClass> withCodeClass)
-        {
-            if (ns == null)
-                throw new ArgumentNullException("ns");
-            
-            if (withCodeClass == null)
-                throw new ArgumentNullException("withCodeClass");
-            
-            WithCodeClass = withCodeClass;
-            
-            if (ns.Members != null)
-                Traverse(ns.Members);
-        }
-
-        private void Traverse(CodeElements members)
-        {
-            foreach (var codeClass in members.OfType<CodeClass>())
-                WithCodeClass(codeClass);
-        }
-    }
-    public class ProjectTraverser
-    {
-        public Action<CodeNamespace> WithNamespace { get; private set; }
-
-        public ProjectTraverser(Project project, Action<CodeNamespace> withNamespace)
-        {
-            if (project == null)
-                throw new ArgumentNullException("project");
-            
-            if (withNamespace == null)
-                throw new ArgumentNullException("withNamespace");
-
-            WithNamespace = withNamespace;
-
-            if (project.ProjectItems != null)
-                Traverse(project.ProjectItems);
-        }
-
-        private void Traverse(ProjectItems items)
-        {
-            foreach (ProjectItem pi in items)
-            {
-                if (pi.FileCodeModel != null)
-                {
-                    var codeElements = pi.FileCodeModel.CodeElements;
-                    foreach (var ns in codeElements.OfType<CodeNamespace>())
-                        WithNamespace(ns);
-                }
-
-                if (pi.ProjectItems != null)
-                    Traverse(pi.ProjectItems);
-            }
-        }
-    }
-    public class ArrayType: TypescriptType
-    {
-        public TypescriptType ElementType { get; set; }
-
-        public override string ToString()
-        {
-            return ElementType.ToString() + "[]";
-        }
-    }
-    public class BoolType: TypescriptType
-    {
-        public override string Name
-        {
-            get { return "bool"; }
-        }
-    }
-    public class CustomType: TypescriptType
-    {
-        private string m_name;
-
-        public override string Name
-        {
-            get { return m_name; }
-        }
-        
-        public string QualifedModule { get; private set; }
-
-        public CustomType(string name, string qualifiedModule=null)
-        {
-            m_name = name;
-            this.QualifedModule = qualifiedModule;
-        }
-
-        public override string ToString()
-        {
-            if (string.IsNullOrWhiteSpace(QualifedModule))
-                return base.ToString();
-
-            return QualifedModule + "." + base.ToString();
-        }
-    }
-    public class NullableType : TypescriptType
-    {
-        public TypescriptType WrappedType { get; set; }
-
-        public override string ToString()
-        {
-            return WrappedType.ToString();
-        }
-    }
-    public class NumberType : TypescriptType
-    {
-        public override string Name
-        {
-            get { return "number"; }
-        }
-    }
-    public class StringType: TypescriptType
-    {
-        public override string Name
-        {
-            get { return "string"; }
-        }
-    }
-    public class TypescriptType
-    {
-        public virtual string Name { get { return "any"; } }
-
-        public override string ToString()
-        {
-            return Name;
         }
     }
 #>

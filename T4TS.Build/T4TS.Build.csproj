@@ -47,7 +47,36 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models.cs" />
+    <Compile Include="..\T4TS.Example\Models\Barfoo.cs">
+      <Link>Models\Barfoo.cs</Link>
+    </Compile>
+    <Compile Include="..\T4TS.Example\Models\Foobar.cs">
+      <Link>Models\Foobar.cs</Link>
+    </Compile>
+    <Compile Include="..\T4TS.Example\Models\InheritanceTest1.cs">
+      <Link>Models\InheritanceTest1.cs</Link>
+    </Compile>
+    <Compile Include="..\T4TS.Example\Models\InheritanceTest2.cs">
+      <Link>Models\InheritanceTest2.cs</Link>
+    </Compile>
+    <Compile Include="..\T4TS.Example\Models\InheritanceTest3.cs">
+      <Link>Models\InheritanceTest3.cs</Link>
+    </Compile>
+    <Compile Include="..\T4TS.Example\Models\InheritanceTest4.cs">
+      <Link>Models\InheritanceTest4.cs</Link>
+    </Compile>
+    <Compile Include="..\T4TS.Example\Models\Inherited.cs">
+      <Link>Models\Inherited.cs</Link>
+    </Compile>
+    <Compile Include="..\T4TS.Example\Models\Partial.First.cs">
+      <Link>Models\Partial.First.cs</Link>
+    </Compile>
+    <Compile Include="..\T4TS.Example\Models\Partial.Second.cs">
+      <Link>Models\Partial.Second.cs</Link>
+    </Compile>
+    <Compile Include="..\T4TS.Example\Models\TestClass.cs">
+      <Link>Models\TestClass.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

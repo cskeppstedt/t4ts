@@ -3,7 +3,7 @@
 ****************************************************************************/
 
 // -- Begin global interfaces
-    /** Generated from T4TS.Build.Barfoo **/
+    /** Generated from T4TS.Example.Models.Barfoo **/
     interface Barfoo {
         Number: number;
         Complex: T4TS.OverridenName;
@@ -13,7 +13,7 @@
 // -- End global interfaces
 
 module Fooz {
-    /** Generated from T4TS.Build.Foobar **/
+    /** Generated from T4TS.Example.Models.Foobar **/
     export interface IFoobar {
         OverrideAll?: bool;
         Recursive: Fooz.IFoobar;
@@ -28,7 +28,27 @@ module Fooz {
 }
 
 module T4TS {
-    /** Generated from T4TS.Build.Inherited **/
+    /** Generated from T4TS.Example.Models.InheritanceTest1 **/
+    export interface InheritanceTest1 extends Barfoo {
+        SomeString: string;
+        Recursive: Fooz.IFoobar;
+    }
+    /** Generated from T4TS.Example.Models.InheritanceTest2 **/
+    export interface InheritanceTest2 extends T4TS.InheritanceTest1 {
+        SomeString2: string;
+        Recursive2: Fooz.IFoobar;
+    }
+    /** Generated from T4TS.Example.Models.InheritanceTest3 **/
+    export interface InheritanceTest3 extends T4TS.OverridenName {
+        SomeString3: string;
+        Recursive3: Fooz.IFoobar;
+    }
+    /** Generated from T4TS.Example.Models.InheritanceTest4 **/
+    export interface InheritanceTest4 {
+        SomeString4: string;
+        Recursive4: Fooz.IFoobar;
+    }
+    /** Generated from T4TS.Example.Models.Inherited **/
     export interface OverridenName {
         OtherName?: string;
         Integers: number[];
@@ -36,24 +56,13 @@ module T4TS {
         TwoDimList: number[][];
         [index: number]: Barfoo;
     }
-    /** Generated from T4TS.Build.InheritanceTest1 **/
-    export interface InheritanceTest1 extends Barfoo {
-        SomeString: string;
-        Recursive: Fooz.IFoobar;
+    /** Generated from T4TS.Example.Models.Partial **/
+    export interface Partial {
+        FromFirstClass: string;
     }
-    /** Generated from T4TS.Build.InheritanceTest2 **/
-    export interface InheritanceTest2 extends T4TS.InheritanceTest1 {
-        SomeString2: string;
-        Recursive2: Fooz.IFoobar;
-    }
-    /** Generated from T4TS.Build.InheritanceTest3 **/
-    export interface InheritanceTest3 extends T4TS.OverridenName {
-        SomeString3: string;
-        Recursive3: Fooz.IFoobar;
-    }
-    /** Generated from T4TS.Build.InheritanceTest4 **/
-    export interface InheritanceTest4 {
-        SomeString4: string;
-        Recursive4: Fooz.IFoobar;
+    /** Generated from T4TS.Example.Models.Partial **/
+    export interface Partial {
+        FromSecondClass: string;
+        AlsoSecondClass?: any;
     }
 }
