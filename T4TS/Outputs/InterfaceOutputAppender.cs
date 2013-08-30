@@ -10,8 +10,8 @@ namespace T4TS
     {
         private bool InGlobalModule { get; set; }
 
-        public InterfaceOutputAppender(StringBuilder output, int baseIndentation, bool inGlobalModule)
-            : base(output, baseIndentation)
+        public InterfaceOutputAppender(StringBuilder output, int baseIndentation, Settings settings, bool inGlobalModule)
+            : base(output, baseIndentation, settings)
         {
             this.InGlobalModule = inGlobalModule;
         }
@@ -30,7 +30,7 @@ namespace T4TS
 
         private void AppendMembers(TypeScriptInterface tsInterface)
         {
-            var appender = new MemberOutputAppender(Output, BaseIndentation + 4);
+            var appender = new MemberOutputAppender(Output, BaseIndentation + 4, Settings);
             foreach (var member in tsInterface.Members)
                 appender.AppendOutput(member);
         }

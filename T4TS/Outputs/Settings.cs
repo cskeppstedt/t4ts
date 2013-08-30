@@ -27,5 +27,10 @@ namespace T4TS
         /// The default string to prefix interface names with. For instance, you might want to prefix the names with an "I" to get conventional interface names.
         /// </summary>
         public string DefaultInterfaceNamePrefix { get; set; }
+
+        /// <summary>
+        /// The version of Typescript that is targeted
+        /// </summary>
+        public Version CompatibilityVersion { get; set; }
     }
 }

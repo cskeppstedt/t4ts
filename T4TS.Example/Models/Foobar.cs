@@ -5,7 +5,7 @@ namespace T4TS.Example.Models
     [TypeScriptInterface(Module = "Fooz", NamePrefix = "I")]
     public class Foobar
     {
-        [TypeScriptMember(Name = "OverrideAll", Optional = true, Type = "bool")]
+        [TypeScriptMember(Name = "OverrideAll", Optional = true, Type = "any")]
         public string SomeString { get; set; }
         public Foobar Recursive { get; set; }
         public int? NullableInt { get; set; }

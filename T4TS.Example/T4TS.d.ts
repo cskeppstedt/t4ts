@@ -12,10 +12,10 @@
     }
 // -- End global interfaces
 
-module Fooz {
+declare module Fooz {
     /** Generated from T4TS.Example.Models.Foobar **/
     export interface IFoobar {
-        OverrideAll?: bool;
+        OverrideAll?: any;
         Recursive: Fooz.IFoobar;
         NullableInt?: number;
         NullableDouble?: number;
@@ -27,7 +27,7 @@ module Fooz {
     }
 }
 
-module T4TS {
+declare module T4TS {
     /** Generated from T4TS.Example.Models.InheritanceTest1 **/
     export interface InheritanceTest1 extends Barfoo {
         SomeString: string;

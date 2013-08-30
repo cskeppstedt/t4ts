@@ -10,7 +10,7 @@ namespace T4TS
     {
         public override string Name
         {
-            get { return "bool"; }
+            get { return "boolean"; }
         }
     }
 }

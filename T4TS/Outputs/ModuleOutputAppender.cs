@@ -8,8 +8,8 @@ namespace T4TS
 {
     public class ModuleOutputAppender : OutputAppender<TypeScriptModule>
     {
-        public ModuleOutputAppender(StringBuilder output, int baseIndentation)
-            : base(output, baseIndentation)
+        public ModuleOutputAppender(StringBuilder output, int baseIndentation, Settings settings)
+            : base(output, baseIndentation, settings)
         {
         }
 
@@ -17,7 +17,7 @@ namespace T4TS
         {
             BeginModule(module);
 
-            var interfaceAppender = new InterfaceOutputAppender(Output, BaseIndentation + 4, module.IsGlobal);
+            var interfaceAppender = new InterfaceOutputAppender(Output, BaseIndentation + 4, Settings, module.IsGlobal);
             foreach (var tsInterface in module.Interfaces)
                 interfaceAppender.AppendOutput(tsInterface);
 
@@ -32,6 +32,9 @@ namespace T4TS
             }
             else
             {
+                if (Settings.CompatibilityVersion != null && Settings.CompatibilityVersion >= new Version(0, 9, 0))
+                    Output.Append("declare ");
+
                 Output.Append("module ");
                 Output.Append(module.QualifiedName);
                 Output.AppendLine(" {");
