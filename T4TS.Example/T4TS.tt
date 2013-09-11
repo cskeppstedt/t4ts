@@ -12,9 +12,17 @@
 <#@ import namespace="T4TS" #>
 <#@ import namespace="Microsoft.VisualStudio.Shell.Interop" #>
 <#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
-<#@ Include File="T4TS.tt.settings.t4" #>
-<#= 
-    T4TS.OutputFormatter.GetOutput(GetDataToRender(), ReadSettings()) #><#+ 
+<#@ Include File="T4TS.tt.settings.t4" #><#= 
+    T4TS.OutputFormatter.GetOutput(GetDataToRender(), GetSettings()) #><#+ 
+
+Settings settings = null;
+Settings GetSettings()
+{
+    if (settings== null)
+        settings = Settings.Parse(SettingsValues);
+
+    return settings;
+}
 
 List<TypeScriptModule> GetDataToRender() {
     DTE dte = null;
@@ -33,54 +41,8 @@ List<TypeScriptModule> GetDataToRender() {
     if (project == null)
         throw new Exception("Could not find the VS project containing the T4TS file.");
 
-    var generator = new CodeTraverser(project, ReadSettings());
+    var generator = new CodeTraverser(project, GetSettings());
     return generator.GetAllInterfaces().ToList();
-}
-
-Settings ReadSettings()
-{
-    // Read settings from T4TS.tt.settings.tt
-    return new Settings
-    {
-        DefaultModule = ParseSettingReferenceType("DefaultModule", s => s as string, "T4TS"),
-        DefaultOptional = ParseSettingNullableType("DefaultOptional", false),
-        DefaultCamelCaseMemberNames = ParseSettingNullableType("DefaultCamelCaseMemberNames", false),
-        DefaultInterfaceNamePrefix = ParseSettingReferenceType("DefaultInterfaceNamePrefix", s => s as string, string.Empty),
-        CompatibilityVersion = ParseSettingReferenceType("CompatibilityVersion", v => v as Version, new Version(0,9,1,1))
-    };
-}
-
-T ParseSettingReferenceType<T>(string key, Func<object, T> convert, T defaultValue) where T:class
-{
-    object val;
-    if (SettingsValues.TryGetValue(key, out val))
-        return convert(val) ?? defaultValue;
-
-    return defaultValue;
-}
-
-T ParseSettingNullableType<T>(string key, T defaultValue) where T: struct
-{
-    object val;
-    if (SettingsValues.TryGetValue(key, out val))
-    {
-        var nullable = val as Nullable<T>;
-        if (nullable == null || !nullable.HasValue)
-            return defaultValue;
-
-        return nullable.Value;
-    }
-
-    return defaultValue;
-}
-
-T ParseConfigValueType<T>(string key, Func<object, T> convert, T defaultValue)
-{
-    object val;
-    if (SettingsValues.TryGetValue(key, out val))
-        return convert(val);
-
-    return defaultValue;
 }
 
 Project GetProjectContainingT4File(DTE dte) {
