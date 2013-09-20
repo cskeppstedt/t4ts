@@ -104,6 +104,7 @@ There are a couple of default settings that can be specified in the `T4TS.tt.set
 * **DefaultOptional:** The default value for the `Optional` flag for `TypeScriptMemberAttribute`. Default is `false`.
 * **DefaultCamelCaseMemberNames:** The default value for the `CamelCase` flag for `TypeScriptMemberAttribute`. Default is `false`.
 * **DefaultInterfaceNamePrefix:** The default value for the `NamePrefix` flag for `TypeScriptInterfaceAttribute`. Default is `""`.
+* **CompatibilityVersion:** The version of Typescript that is targeted. This will help handling breaking changes in the language grammar and/or compiler. Default (right now) is _0.9.1.1_.
 
 Known problems
 ----
