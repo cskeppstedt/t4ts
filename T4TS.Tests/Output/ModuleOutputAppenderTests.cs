@@ -11,7 +11,7 @@ namespace T4TS.Tests
     public class ModuleOutputAppenderTests
     {
         [TestMethod]
-        public void RespectsCompatibilityVersion()
+        public void ModuleOutputAppenderRespectsCompatibilityVersion()
         {
             var sb = new StringBuilder();
             var module = new TypeScriptModule

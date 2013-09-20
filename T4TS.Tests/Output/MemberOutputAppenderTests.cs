@@ -11,7 +11,7 @@ namespace T4TS.Tests
     public class MemberOutputAppenderTests
     {
         [TestMethod]
-        public void RespectsCompatibilityVersion()
+        public void MemberOutputAppenderRespectsCompatibilityVersion()
         {
             var sb = new StringBuilder();
             
