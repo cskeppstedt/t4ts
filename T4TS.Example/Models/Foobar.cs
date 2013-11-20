@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace T4TS.Example.Models
@@ -7,6 +8,7 @@ namespace T4TS.Example.Models
     {
         [TypeScriptMember(Name = "OverrideAll", Optional = true, Type = "any")]
         public string SomeString { get; set; }
+		public Guid AGuid { get; set; }
         public Foobar Recursive { get; set; }
         public int? NullableInt { get; set; }
         public double? NullableDouble { get; set; }

@@ -68,6 +68,7 @@
     <Compile Include="TypeContext.cs" />
     <Compile Include="Outputs\TypeScriptInterface.cs" />
     <Compile Include="Outputs\TypeScriptInterfaceMember.cs" />
+    <Compile Include="Types\GuidType.cs" />
     <Compile Include="Types\TypescriptType.cs" />
   </ItemGroup>
   <ItemGroup />
