@@ -95,6 +95,7 @@ The attribute `TypeScriptMemberAttribute` can be set on the properties of a C# c
 * **Optional:** Specifies whether this member should be optional, ie. `member?: type` instead of `member: type`.
 * **Type:** Specifies the type of the member (default is to do type translation of the property).
 * **CamelCase:** If set to true, the first character of the member name will be lower cased.
+* **Ignore:** If set to true, the property will be ignored.
 
 Default settings
 ----

@@ -24,6 +24,7 @@ declare module Fooz {
         TwoDimensions: string[][];
         ThreeDimensions: Barfoo[][][];
         camelCasePlease: number;
+        DoNotIgnoreMe: number;
     }
 }
 

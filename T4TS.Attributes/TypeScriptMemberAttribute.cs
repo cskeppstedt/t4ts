@@ -31,5 +31,10 @@ namespace T4TS
         /// If not specified, the default value will be used (see settings).
         /// </summary>
         public bool CamelCase { get; set; }
+
+		/// <summary>
+		/// If set to true, this property will be ignored.
+		/// </summary>
+		public bool Ignore { get; set; }
     }
 }

@@ -17,5 +17,11 @@ namespace T4TS.Example.Models
         
         [TypeScriptMember(CamelCase=true)]
         public int CamelCasePlease { get; set; }
+
+		[TypeScriptMember(Ignore = true)]
+		public int IgnoreMe { get; set; }
+
+		[TypeScriptMember(Ignore = false)]
+		public int DoNotIgnoreMe { get; set; }
     }
 }
