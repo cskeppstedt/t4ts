@@ -32,9 +32,9 @@ namespace T4TS
         /// </summary>
         public bool CamelCase { get; set; }
 
-		/// <summary>
-		/// If set to true, this property will be ignored.
-		/// </summary>
-		public bool Ignore { get; set; }
+        /// <summary>
+        /// If set to true, this property will be ignored.
+        /// </summary>
+        public bool Ignore { get; set; }
     }
 }

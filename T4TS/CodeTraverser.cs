@@ -184,16 +184,16 @@ namespace T4TS
                 Name = values.Name ?? property.Name,
                 FullName = property.FullName,
                 Optional = values.Optional,
-				Ignore = values.Ignore,
+                Ignore = values.Ignore,
                 Type = (string.IsNullOrWhiteSpace(values.Type))
                     ? typeContext.GetTypeScriptType(getter.Type)
                     : new InterfaceType(values.Type)
             };
 
-			if (member.Ignore)
-			{
-				return false;
-			}
+            if (member.Ignore)
+            {
+                return false;
+            }
 
             if (values.CamelCase && values.Name == null)
                 member.Name = member.Name.Substring(0, 1).ToLowerInvariant() + member.Name.Substring(1);
@@ -205,7 +205,7 @@ namespace T4TS
         {
             bool? attributeOptional = null;
             bool? attributeCamelCase = null;
-			bool attributeIgnore = false;
+            bool attributeIgnore = false;
             string attributeName = null;
             string attributeType = null;
 
@@ -219,8 +219,8 @@ namespace T4TS
                 if (values.ContainsKey("CamelCase"))
                     attributeCamelCase = values["CamelCase"] == "true";
 
-				if (values.ContainsKey("Ignore"))
-					attributeIgnore = values["Ignore"] == "true";
+                if (values.ContainsKey("Ignore"))
+                    attributeIgnore = values["Ignore"] == "true";
 
                 values.TryGetValue("Name", out attributeName);
                 values.TryGetValue("Type", out attributeType);
@@ -232,7 +232,7 @@ namespace T4TS
                 Name = attributeName,
                 Type = attributeType,
                 CamelCase = attributeCamelCase ?? Settings.DefaultCamelCaseMemberNames,
-				Ignore = attributeIgnore
+                Ignore = attributeIgnore
             };
         }
 
