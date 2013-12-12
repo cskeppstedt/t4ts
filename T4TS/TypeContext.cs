@@ -6,6 +6,12 @@ namespace T4TS
 {
     public class TypeContext
     {
+        public Settings Settings { get; private set; }
+        public TypeContext(Settings settings)
+        {
+            this.Settings = settings;
+        }
+
         private static readonly string[] genericCollectionTypeStarts = new string[] {
             "System.Collections.Generic.List<",
             "System.Collections.Generic.IList<",
@@ -117,8 +123,15 @@ namespace T4TS
                     return new NumberType();
 
                 case "System.String":
-                case "System.DateTime":
                     return new StringType();
+
+                case "System.DateTime":
+                    if (Settings.DateTimeToString)
+                    {
+                        return new StringType();
+                    }
+
+                    return new DateTimeType();
 
                 default:
                     return new TypescriptType();

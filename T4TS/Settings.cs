@@ -33,6 +33,11 @@ namespace T4TS
         /// </summary>
         public Version CompatibilityVersion { get; set; }
 
+        /// <summary>
+        /// The DateTime type translation
+        /// </summary>
+        public bool DateTimeToString { get; set; }
+
         public static Settings Parse(Dictionary<string,object> settingsValues)
         {
             // Read settings from T4TS.tt.settings.tt
@@ -42,7 +47,8 @@ namespace T4TS
                 DefaultOptional = ParseSettingNullableType(settingsValues, "DefaultOptional", false),
                 DefaultCamelCaseMemberNames = ParseSettingNullableType(settingsValues, "DefaultCamelCaseMemberNames", false),
                 DefaultInterfaceNamePrefix = ParseSettingReferenceType(settingsValues, "DefaultInterfaceNamePrefix", s => s as string, string.Empty),
-                CompatibilityVersion = ParseSettingReferenceType(settingsValues, "CompatibilityVersion", v => v as Version, new Version(0, 9, 1, 1))
+                CompatibilityVersion = ParseSettingReferenceType(settingsValues, "CompatibilityVersion", v => v as Version, new Version(0, 9, 1, 1)),
+                DateTimeToString = ParseSettingNullableType(settingsValues, "DateTimeToString", false)
             };
         }
 
