@@ -34,9 +34,9 @@ namespace T4TS
         public Version CompatibilityVersion { get; set; }
 
         /// <summary>
-        /// The DateTime type translation
+        /// If true translates System.DateTime to native date
         /// </summary>
-        public bool DateTimeToString { get; set; }
+        public bool UseNativeDates { get; set; }
 
         public static Settings Parse(Dictionary<string,object> settingsValues)
         {
@@ -48,7 +48,7 @@ namespace T4TS
                 DefaultCamelCaseMemberNames = ParseSettingNullableType(settingsValues, "DefaultCamelCaseMemberNames", false),
                 DefaultInterfaceNamePrefix = ParseSettingReferenceType(settingsValues, "DefaultInterfaceNamePrefix", s => s as string, string.Empty),
                 CompatibilityVersion = ParseSettingReferenceType(settingsValues, "CompatibilityVersion", v => v as Version, new Version(0, 9, 1, 1)),
-                DateTimeToString = ParseSettingNullableType(settingsValues, "DateTimeToString", false)
+                UseNativeDates = ParseSettingNullableType(settingsValues, "UseNativeDates", false)
             };
         }
 

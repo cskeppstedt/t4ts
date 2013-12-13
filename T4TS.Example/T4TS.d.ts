@@ -8,7 +8,7 @@
         Number: number;
         Complex: T4TS.OverridenName;
         Name: string;
-        DateTime: Date;
+        DateTime: string;
     }
 // -- End global interfaces
 

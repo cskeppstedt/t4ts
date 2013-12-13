@@ -126,12 +126,10 @@ namespace T4TS
                     return new StringType();
 
                 case "System.DateTime":
-                    if (Settings.DateTimeToString)
-                    {
+                    if (Settings.UseNativeDates)
+                        return new DateTimeType();
+                    else
                         return new StringType();
-                    }
-
-                    return new DateTimeType();
 
                 default:
                     return new TypescriptType();
