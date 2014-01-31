@@ -16,6 +16,7 @@ declare module Fooz {
     /** Generated from T4TS.Example.Models.Foobar **/
     export interface IFoobar {
         OverrideAll?: any;
+        AGuid: string;
         Recursive: Fooz.IFoobar;
         NullableInt?: number;
         NullableDouble?: number;
@@ -24,6 +25,7 @@ declare module Fooz {
         TwoDimensions: string[][];
         ThreeDimensions: Barfoo[][][];
         camelCasePlease: number;
+        DoNotIgnoreMe: number;
     }
 }
 

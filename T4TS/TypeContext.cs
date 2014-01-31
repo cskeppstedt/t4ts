@@ -103,6 +103,9 @@ namespace T4TS
 
             switch (typeFullName)
             {
+                case "System.Guid":
+                    return new GuidType();
+
                 case "System.Double":
                 case "System.Int16":
                 case "System.Int32":
