@@ -27,7 +27,7 @@ namespace T4TS
 
         public TypeContext BuildContext()
         {
-            var typeContext = new TypeContext();
+            var typeContext = new TypeContext(this.Settings);
             var partialClasses = new Dictionary<string, CodeClass>();
 
             new ProjectTraverser(this.Project, (ns) =>

@@ -64,6 +64,7 @@
     <Compile Include="Types\InterfaceType.cs" />
     <Compile Include="Types\NullableType.cs" />
     <Compile Include="Types\NumberType.cs" />
+    <Compile Include="Types\DateTimeType.cs" />
     <Compile Include="Types\StringType.cs" />
     <Compile Include="TypeContext.cs" />
     <Compile Include="Outputs\TypeScriptInterface.cs" />
