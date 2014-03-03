@@ -82,9 +82,19 @@ namespace T4TS
             var tsInterfaces = tsMap.Values.ToList();
             tsMap.Keys.ToList().ForEach(codeClass =>
             {
-                var parent = tsInterfaces.LastOrDefault(intf => codeClass.IsDerivedFrom[intf.FullName] && intf.FullName != codeClass.FullName);
-                if (parent != null)
-                    tsMap[codeClass].Parent = parent;
+                CodeElements baseClasses = codeClass.Bases;
+                if (baseClasses.Count > 0)
+                {
+                    CodeElement baseClass = baseClasses.Item(1);
+                    if (baseClass != null)
+                    {
+                        var parent = tsInterfaces.SingleOrDefault(intf => intf.FullName == baseClass.FullName);
+                        if (parent != null)
+                        {
+                            tsMap[codeClass].Parent = parent;
+                        }
+                    }
+                }
             });
 
             return byModuleName.Values
