@@ -7,21 +7,21 @@ namespace T4TS
 {
     public class CodeTraverser
     {
-        public Project Project { get; private set; }
+        public Solution Solution { get; private set; }
         public Settings Settings { get; private set; }
 
         private static readonly string InterfaceAttributeFullName = "T4TS.TypeScriptInterfaceAttribute";
         private static readonly string MemberAttributeFullName = "T4TS.TypeScriptMemberAttribute";
 
-        public CodeTraverser(Project project, Settings settings)
+        public CodeTraverser(Solution solution, Settings settings)
         {
-            if (project == null)
-                throw new ArgumentNullException("project");
+            if (solution == null)
+                throw new ArgumentNullException("solution");
 
             if (settings == null)
                 throw new ArgumentNullException("settings");
 
-            this.Project = project;
+            Solution = solution;
             this.Settings = settings;
         }
 
@@ -30,7 +30,7 @@ namespace T4TS
             var typeContext = new TypeContext(this.Settings);
             var partialClasses = new Dictionary<string, CodeClass>();
 
-            new ProjectTraverser(this.Project, (ns) =>
+            new SolutionTraverser(this.Solution, (ns) =>
             {
                 new NamespaceTraverser(ns, (codeClass) =>
                 {
@@ -55,7 +55,7 @@ namespace T4TS
             var byModuleName = new Dictionary<string, TypeScriptModule>();
             var tsMap = new Dictionary<CodeClass, TypeScriptInterface>();
 
-            new ProjectTraverser(this.Project, (ns) =>
+            new SolutionTraverser(this.Solution, (ns) =>
             {
                 new NamespaceTraverser(ns, (codeClass) =>
                 {
