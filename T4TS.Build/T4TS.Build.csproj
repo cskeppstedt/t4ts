@@ -65,6 +65,9 @@
     <Compile Include="..\T4TS.Example\Models\InheritanceTest4.cs">
       <Link>Models\InheritanceTest4.cs</Link>
     </Compile>
+    <Compile Include="..\T4TS.Example\Models\InheritanceTestExternal.cs">
+      <Link>Models\InheritanceTestExternal.cs</Link>
+    </Compile>
     <Compile Include="..\T4TS.Example\Models\Inherited.cs">
       <Link>Models\Inherited.cs</Link>
     </Compile>
@@ -95,6 +98,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>T4TS.tt</DependentUpon>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\T4TS.Example.Models\T4TS.Example.Models.csproj">
+      <Project>{93ee0391-db26-40cc-a613-6ca32e3eeb18}</Project>
+      <Name>T4TS.Example.Models</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
