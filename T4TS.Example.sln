@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "T4TS.Example", "T4TS.Example\T4TS.Example.csproj", "{51E03259-D166-4DA9-8D55-1FA7BDE922ED}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "T4TS", "T4TS\T4TS.csproj", "{2B9CFEA6-586A-4E3B-8575-79447D5DC086}"
@@ -8,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "T4TS.Attributes", "T4TS.Attributes\T4TS.Attributes.csproj", "{AF50A5E0-791D-47D4-91FE-56A7CE4577EB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "T4TS.Tests", "T4TS.Tests\T4TS.Tests.csproj", "{93F7F024-CE32-476E-995A-0B6AA5A649F3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "T4TS.Example.Models", "T4TS.Example.Models\T4TS.Example.Models.csproj", "{93EE0391-DB26-40CC-A613-6CA32E3EEB18}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +35,10 @@ Global
 		{93F7F024-CE32-476E-995A-0B6AA5A649F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{93F7F024-CE32-476E-995A-0B6AA5A649F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{93F7F024-CE32-476E-995A-0B6AA5A649F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93EE0391-DB26-40CC-A613-6CA32E3EEB18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93EE0391-DB26-40CC-A613-6CA32E3EEB18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93EE0391-DB26-40CC-A613-6CA32E3EEB18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93EE0391-DB26-40CC-A613-6CA32E3EEB18}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

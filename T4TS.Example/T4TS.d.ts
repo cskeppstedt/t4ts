@@ -67,4 +67,8 @@ declare module T4TS {
         FromSecondClass: string;
         AlsoSecondClass?: any;
     }
+    /** Generated from T4TS.Example.Models.ModelFromDifferentProject **/
+    export interface ModelFromDifferentProject {
+        Id: number;
+    }
 }
