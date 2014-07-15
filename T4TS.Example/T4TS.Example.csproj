@@ -45,6 +45,7 @@
     <Compile Include="Models\InheritanceTest2.cs" />
     <Compile Include="Models\InheritanceTest3.cs" />
     <Compile Include="Models\InheritanceTest4.cs" />
+    <Compile Include="Models\InheritanceTestExternal.cs" />
     <Compile Include="Models\Inherited.cs" />
     <Compile Include="Models\Partial.First.cs" />
     <Compile Include="Models\Partial.Second.cs" />
@@ -69,6 +70,10 @@
     <ProjectReference Include="..\T4TS.Attributes\T4TS.Attributes.csproj">
       <Project>{af50a5e0-791d-47d4-91fe-56a7ce4577eb}</Project>
       <Name>T4TS.Attributes</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\T4TS.Example.Models\T4TS.Example.Models.csproj">
+      <Project>{93ee0391-db26-40cc-a613-6ca32e3eeb18}</Project>
+      <Name>T4TS.Example.Models</Name>
     </ProjectReference>
     <ProjectReference Include="..\T4TS\T4TS.csproj">
       <Project>{2b9cfea6-586a-4e3b-8575-79447d5dc086}</Project>

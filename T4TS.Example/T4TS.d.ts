@@ -12,6 +12,13 @@
     }
 // -- End global interfaces
 
+declare module External {
+    /** Generated from T4TS.Example.Models.ModelFromDifferentProject **/
+    export interface ModelFromDifferentProject {
+        Id: number;
+    }
+}
+
 declare module Fooz {
     /** Generated from T4TS.Example.Models.Foobar **/
     export interface IFoobar {
@@ -50,6 +57,9 @@ declare module T4TS {
         SomeString4: string;
         Recursive4: Fooz.IFoobar;
     }
+    /** Generated from T4TS.Example.Models.InheritanceTestExternal **/
+    export interface InheritanceTestExternal extends External.ModelFromDifferentProject {
+    }
     /** Generated from T4TS.Example.Models.Inherited **/
     export interface OverridenName {
         OtherName?: string;
@@ -66,9 +76,5 @@ declare module T4TS {
     export interface Partial {
         FromSecondClass: string;
         AlsoSecondClass?: any;
-    }
-    /** Generated from T4TS.Example.Models.ModelFromDifferentProject **/
-    export interface ModelFromDifferentProject {
-        Id: number;
     }
 }
