@@ -39,7 +39,7 @@ List<TypeScriptModule> GetDataToRender() {
     if (project == null)
         throw new Exception("Could not find the VS project containing the T4TS file.");
 
-    var generator = new CodeTraverser(project, GetSettings());
+    var generator = new CodeTraverser(dte.Solution, GetSettings());
     return generator.GetAllInterfaces().ToList();
 }
 
@@ -59,8 +59,7 @@ Project GetProjectContainingT4File(DTE dte) {
 
     return projectItem.ContainingProject;
 }
-
-    public class InterfaceOutputAppender : OutputAppender<TypeScriptInterface>
+public class InterfaceOutputAppender : OutputAppender<TypeScriptInterface>
     {
         private bool InGlobalModule { get; set; }
 
@@ -406,6 +405,33 @@ Project GetProjectContainingT4File(DTE dte) {
         }
     }
 
+    public class SolutionTraverser
+    {
+        public Action<CodeNamespace> WithNamespace { get; private set; }
+
+        public SolutionTraverser(Solution solution, Action<CodeNamespace> withNamespace)
+        {
+            if (solution == null)
+                throw new ArgumentNullException("solution");
+
+            if (withNamespace == null)
+                throw new ArgumentNullException("withNamespace");
+
+            WithNamespace = withNamespace;
+
+            if (solution.Projects != null)
+                Traverse(solution.Projects);
+        }
+
+        private void Traverse(Projects projects)
+        {
+            foreach (Project project in projects)
+            {
+                new ProjectTraverser(project, WithNamespace);
+            }
+        }
+    }
+
     public class ArrayType: TypescriptType
     {
         public TypescriptType ElementType { get; set; }
@@ -526,21 +552,21 @@ Project GetProjectContainingT4File(DTE dte) {
 
     public class CodeTraverser
     {
-        public Project Project { get; private set; }
+        public Solution Solution { get; private set; }
         public Settings Settings { get; private set; }
 
         private static readonly string InterfaceAttributeFullName = "T4TS.TypeScriptInterfaceAttribute";
         private static readonly string MemberAttributeFullName = "T4TS.TypeScriptMemberAttribute";
 
-        public CodeTraverser(Project project, Settings settings)
+        public CodeTraverser(Solution solution, Settings settings)
         {
-            if (project == null)
-                throw new ArgumentNullException("project");
+            if (solution == null)
+                throw new ArgumentNullException("solution");
 
             if (settings == null)
                 throw new ArgumentNullException("settings");
 
-            this.Project = project;
+            Solution = solution;
             this.Settings = settings;
         }
 
@@ -549,7 +575,7 @@ Project GetProjectContainingT4File(DTE dte) {
             var typeContext = new TypeContext(this.Settings);
             var partialClasses = new Dictionary<string, CodeClass>();
 
-            new ProjectTraverser(this.Project, (ns) =>
+            new SolutionTraverser(this.Solution, (ns) =>
             {
                 new NamespaceTraverser(ns, (codeClass) =>
                 {
@@ -574,7 +600,7 @@ Project GetProjectContainingT4File(DTE dte) {
             var byModuleName = new Dictionary<string, TypeScriptModule>();
             var tsMap = new Dictionary<CodeClass, TypeScriptInterface>();
 
-            new ProjectTraverser(this.Project, (ns) =>
+            new SolutionTraverser(this.Solution, (ns) =>
             {
                 new NamespaceTraverser(ns, (codeClass) =>
                 {
