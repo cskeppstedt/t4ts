@@ -113,6 +113,10 @@ Known problems
 
 I have experienced some error message the first time the T4TS package is installed via NuGet. However, if you build the project, or run the .tt-file, the error message disappears.
 
+Building
+----
+See README.md in T4TS.Build and T4TS.Build.Builder for details.
+
 License
 ----
 [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)

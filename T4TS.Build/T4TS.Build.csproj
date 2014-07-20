@@ -35,6 +35,12 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Build" />
+    <Reference Include="Microsoft.Build.Conversion.v4.0" />
+    <Reference Include="Microsoft.Build.Engine" />
+    <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="Microsoft.Build.Tasks.v4.0" />
+    <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -83,21 +89,18 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="T4TS.tt">
+    <None Include="..\build\T4TS.tt">
+      <Link>T4TS.tt</Link>
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>T4TS.d.ts</LastGenOutput>
     </None>
-    <None Include="T4TS.tt.settings.t4" />
+    <None Include="..\build\T4TS.tt.settings.t4">
+      <Link>T4TS.tt.settings.t4</Link>
+    </None>
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="T4TS.d.ts">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>T4TS.tt</DependentUpon>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\T4TS.Example.Models\T4TS.Example.Models.csproj">
@@ -105,12 +108,17 @@
       <Name>T4TS.Example.Models</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\build\T4TS.d.ts">
+      <Link>T4TS.d.ts</Link>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>T4TS.tt</DependentUpon>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
+    <MSBuild Projects="..\T4TS.Build.Builder\BuildTemplate.csproj" ContinueOnError="false" Properties="Configuration=$(Configuration)">
+    </MSBuild>
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

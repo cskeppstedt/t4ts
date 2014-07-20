@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="RunBuildTemplateTask" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!--
+  # ==========================================================================
+  # Configuration decides what configuration to use for
+  # T4TS.Attributes.csproj and T4TS.Build.Builder.csproj 
+  # ==========================================================================
+  -->
+  <PropertyGroup>
+    <Configuration>Release</Configuration>
+    <OutputDir>..\build</OutputDir>
+  </PropertyGroup>
+
+  <Target Name="BuildPrerequisites">
+    
+    <!--
+    # ========================================================================
+    # Build T4TS.Attributes.csproj and store the build .dll in the
+    # @AttributeFile variable.
+    # ========================================================================
+    -->
+    <MSBuild Projects ="..\T4TS.Attributes\T4TS.Attributes.csproj" ContinueOnError ="false" Properties="Configuration=$(Configuration)">
+        <Output ItemName="AttributeFile" TaskParameter="TargetOutputs"/>
+    </MSBuild>
+
+    <!--
+    # ========================================================================
+    # Build T4TS.Build.Builder.csproj so that the task BuildTemplateTask is
+    # available in the .dll in the bin\$(Configuration) folder.
+    # ========================================================================
+    -->
+    <MSBuild Projects ="T4TS.Build.Builder.csproj" ContinueOnError ="false" Properties="Configuration=$(Configuration)" />
+  </Target>
+
+  <!--
+  # ==========================================================================
+  # Import the T4TS project. All files that we are interested in will be in
+  # the ItemGroup "Compile".
+  # ==========================================================================
+  -->
+  <Import Project="..\T4TS\T4TS.csproj" />
+
+  <!--
+  # ==========================================================================
+  # The SourceFiles that we want to merge are all the files in the T4TS.csproj
+  # project (in the Compile ItemGroup), except Properties\AssemblyInfo.cs
+  # ==========================================================================
+  -->
+  <ItemGroup>
+    <SourceFiles Include="@(Compile)" Exclude="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  
+  <UsingTask TaskName="T4TS.Build.Builder.BuildTemplateTask" AssemblyFile="bin\$(Configuration)\T4TS.Build.Builder.dll" />
+
+  <Target Name="RunBuildTemplateTask" DependsOnTargets="BuildPrerequisites">
+
+    <!--
+    # ========================================================================
+    # Run the BuildTemplateTask with the given SourceFiles. The generated
+    # T4TS.tt file path is stored in the @TemplateOutputFile variable. The
+    # file is saved to the OutputDir directory.  T4TS.tt.settings.t4 is also 
+    # saved to the same directory as the .tt file.
+    # ========================================================================
+    -->
+    <BuildTemplateTask SourceFiles="@(SourceFiles)" OutputDir="$(OutputDir)">
+      <Output ItemName="TemplateOutputFile" TaskParameter="TemplateOutputFile"/>
+    </BuildTemplateTask>
+
+    <!--
+    # ========================================================================
+    # Finally, copy the T4TS.Attributes.dll to the OutputDir.
+    # ========================================================================
+    -->
+    <Copy SourceFiles="@(AttributeFile)" DestinationFolder="$(OutputDir)" />
+  </Target>
+</Project>
