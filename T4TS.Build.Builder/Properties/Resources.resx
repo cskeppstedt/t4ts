@@ -1,0 +1,234 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="TemplatePrefix" xml:space="preserve">
+    <value>&lt;#@ template language="C#" debug="true" hostspecific="true" #&gt;
+&lt;#@ output extension=".d.ts" #&gt;
+&lt;#@ assembly name="System.Core" #&gt;
+&lt;#@ assembly name="Microsoft.VisualStudio.Shell.Interop.8.0" #&gt;
+&lt;#@ assembly name="EnvDTE" #&gt;
+&lt;#@ assembly name="EnvDTE80" #&gt;
+&lt;#@ import namespace="System.Collections.Generic" #&gt;
+&lt;#@ import namespace="System.Linq" #&gt;
+&lt;#@ import namespace="System.Text" #&gt;
+&lt;#@ import namespace="EnvDTE" #&gt;
+&lt;#@ import namespace="Microsoft.VisualStudio.Shell.Interop" #&gt;
+&lt;#@ import namespace="Microsoft.VisualStudio.TextTemplating" #&gt;
+&lt;#@ Include File="T4TS.tt.settings.t4" #&gt;&lt;#= 
+    OutputFormatter.GetOutput(GetDataToRender(), GetSettings()) #&gt;&lt;#+ 
+
+Settings settings = null;
+Settings GetSettings()
+{
+    if (settings== null)
+        settings = Settings.Parse(SettingsValues);
+
+    return settings;
+}
+
+List&lt;TypeScriptModule&gt; GetDataToRender() {
+    DTE dte = null;
+
+    // Get the DTE service from the host
+    var serviceProvider = Host as IServiceProvider;
+    if (serviceProvider != null)
+        dte = serviceProvider.GetService(typeof(SDTE)) as DTE;
+
+    // Fail if we couldn't get the DTE. This can happen when trying to run in TextTransform.exe
+    if (dte == null)
+        throw new Exception("Can only execute through the Visual Studio host");
+
+    var project = GetProjectContainingT4File(dte);
+        
+    if (project == null)
+        throw new Exception("Could not find the VS project containing the T4TS file.");
+
+    var generator = new CodeTraverser(dte.Solution, GetSettings());
+    return generator.GetAllInterfaces().ToList();
+}
+
+Project GetProjectContainingT4File(DTE dte) {
+
+    // Find the .tt file's ProjectItem
+    ProjectItem projectItem = dte.Solution.FindProjectItem(Host.TemplateFile);
+
+    // If the .tt file is not opened, open it
+    if (projectItem.Document == null)
+        projectItem.Open(Constants.vsViewKindCode);
+
+    // Mark the .tt file as unsaved. This way it will be saved and update itself next time the
+    // project is built. Basically, it keeps marking itself as unsaved to make the next build work.
+    // Note: this is certainly hacky, but is the best I could come up with so far.
+    projectItem.Document.Saved = false;
+
+    return projectItem.ContainingProject;
+}
+</value>
+    <comment>The text to place in the beginning of T4TS.tt, before all code definitions.</comment>
+  </data>
+  <data name="TemplateSettings" xml:space="preserve">
+    <value>&lt;#+
+/// &lt;summary&gt;
+/// These settings can be used to customize the output of T4TS.
+/// The default for all settings are determined by T4TS.tt in ReadSettings().
+/// &lt;/summary&gt;
+readonly Dictionary&lt;string, object&gt; SettingsValues = new Dictionary&lt;string, object&gt;()
+{
+    // The default module of the generated interface. If a module is 
+    // not specified by the TypeScriptInterfaceAttribute, the interface 
+    // will belong to this module (may be empty, in which case the 
+    // interface will be globally accessible).
+    // Type: string, defaults to "T4TS" if not specified.
+    { "DefaultModule", null },
+
+    // The default value for the Optional flag for an interface member.
+    // If not specified by the TypeScriptInterfaceAttribute, the Optional
+    // flag will be set to this value. If the Optional flag is true, the
+    // generated member will look like "member?: type" instead of "member: type".
+    // Type: bool?, defaults to false if not specified.
+    { "DefaultOptional", null },
+    
+    // The default value for the CamelCase flag for an interface member name.
+    // If set to true, the first character of member names will be lower cased.
+    // Type: bool?, defaults to false if not specified.
+    { "DefaultCamelCaseMemberNames", null },
+
+    // The default string to prefix interface names with. For instance, you
+    // might want to prefix the names with an "I" to get conventional
+    // interface names.
+    // Type: string, defaults to "" if not specified.
+    { "DefaultInterfaceNamePrefix", null },
+
+    // The version of Typescript that is targeted. This is required to handle
+    // breaking changes in the language grammar and/or compiler.
+    // Type: System.Version
+    { "CompatibilityVersion", null },
+
+    // The default value for DateTime type translation.
+    // Type: bool?, defaults to false if not specified.
+    { "UseNativeDates", null }
+};
+#&gt;</value>
+    <comment>The contents of the generated template settings file T4TS.tt.settings.t4</comment>
+  </data>
+  <data name="TemplateSuffix" xml:space="preserve">
+    <value>#&gt;</value>
+    <comment>The text to place after all the code definition.</comment>
+  </data>
+</root>
