@@ -35,6 +35,14 @@ namespace T4TS
 
                 if (pi.ProjectItems != null)
                     Traverse(pi.ProjectItems);
+
+                /* LionSoft: Process projects in solution folders */
+                else if (pi.SubProject != null && pi.SubProject.ProjectItems != null)
+                {
+                    Traverse(pi.SubProject.ProjectItems);
+                }
+                /* --- */
+
             }
         }
     }
