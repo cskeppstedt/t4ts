@@ -35,8 +35,14 @@ readonly Dictionary<string, object> SettingsValues = new Dictionary<string, obje
     // Type: System.Version
     { "CompatibilityVersion", null },
 
-	// The default value for DateTime type translation.
-	// Type: bool?, defaults to false if not specified.
-    { "UseNativeDates", null }
+    // The default value for DateTime type translation.
+    // Type: bool?, defaults to false if not specified.
+    { "UseNativeDates", null },
+
+
+    // List of the project names to process divided with comma to process.
+    // Type: string, defaults to null if not specified means that the all projects in solution should be processed.
+//    { "ProjectNamesToProcess", null }
+    { "ProjectNamesToProcess", "T4TS.Example, T4TS.Example.Models" }
 };
 #>
