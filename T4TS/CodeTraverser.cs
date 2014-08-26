@@ -8,7 +8,7 @@ namespace T4TS
     public class CodeTraverser
     {
         public Solution Solution { get; private set; }
-        public Settings Settings { get; private set; }
+        public static Settings Settings { get; private set; }
 
         private static readonly string InterfaceAttributeFullName = "T4TS.TypeScriptInterfaceAttribute";
         private static readonly string MemberAttributeFullName = "T4TS.TypeScriptMemberAttribute";
@@ -22,12 +22,12 @@ namespace T4TS
                 throw new ArgumentNullException("settings");
 
             Solution = solution;
-            this.Settings = settings;
+            Settings = settings;
         }
 
         public TypeContext BuildContext()
         {
-            var typeContext = new TypeContext(this.Settings);
+            var typeContext = new TypeContext(Settings);
             var partialClasses = new Dictionary<string, CodeClass>();
 
             new SolutionTraverser(this.Solution, (ns) =>

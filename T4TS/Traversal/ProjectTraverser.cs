@@ -28,13 +28,25 @@ namespace T4TS
             {
                 if (pi.FileCodeModel != null)
                 {
-                    var codeElements = pi.FileCodeModel.CodeElements;
-                    foreach (var ns in codeElements.OfType<CodeNamespace>())
-                        WithNamespace(ns);
+                    if (CodeTraverser.Settings.ProjectNamesToProcess == null ||
+                        CodeTraverser.Settings.ProjectNamesToProcess.Contains(pi.ContainingProject.Name))
+                    {
+                        var codeElements = pi.FileCodeModel.CodeElements;
+                        foreach (var ns in codeElements.OfType<CodeNamespace>())
+                            WithNamespace(ns);
+                    }
                 }
 
                 if (pi.ProjectItems != null)
                     Traverse(pi.ProjectItems);
+
+                /* LionSoft: Process projects in solution folders */
+                else if (pi.SubProject != null && pi.SubProject.ProjectItems != null)
+                {
+                    Traverse(pi.SubProject.ProjectItems);
+                }
+                /* --- */
+
             }
         }
     }
