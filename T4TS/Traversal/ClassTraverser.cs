@@ -26,8 +26,11 @@ namespace T4TS
 
         private void Traverse(CodeElements members)
         {
-            foreach (var property in members.OfType<CodeProperty>())
-                WithProperty(property);
+            foreach (var property in members)
+            {
+                if (property is CodeProperty)
+                    WithProperty((CodeProperty)property);
+            }
         }
     }
 }

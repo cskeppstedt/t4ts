@@ -18,7 +18,7 @@ namespace T4TS.Tests
             var member = new TypeScriptInterfaceMember
             {
                 Name = "Foo",
-                FullName = "Foo",
+                //FullName = "Foo",
                 Type = new BoolType()
             };
 

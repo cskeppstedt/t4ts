@@ -29,8 +29,12 @@ namespace T4TS
                 if (pi.FileCodeModel != null)
                 {
                     var codeElements = pi.FileCodeModel.CodeElements;
-                    foreach (var ns in codeElements.OfType<CodeNamespace>())
-                        WithNamespace(ns);
+                    
+                    foreach (object elem in codeElements)
+                    {
+                        if (elem is CodeNamespace)
+                            WithNamespace((CodeNamespace)elem);
+                    }
                 }
 
                 if (pi.ProjectItems != null)
