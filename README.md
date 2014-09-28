@@ -122,3 +122,8 @@ License
 [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
 Thanks to [T4MVC](http://t4mvc.codeplex.com/), which has been the inspiration. I also learned how to use the .tt-stuff from reading the source, and using part of the source code from T4MVC.
+
+Build status
+----
+[![Build status](https://ci.appveyor.com/api/projects/status/s7mxgiqykroujn8e/branch/master)](https://ci.appveyor.com/project/cskeppstedt/t4ts/branch/master)
+
