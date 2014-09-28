@@ -24,8 +24,11 @@ namespace T4TS
 
         private void Traverse(CodeElements members)
         {
-            foreach (var codeClass in members.OfType<CodeClass>())
-                WithCodeClass(codeClass);
+            foreach (object elem in members)
+            {
+                if (elem is CodeClass)
+                    WithCodeClass((CodeClass)elem);
+            }
         }
     }
 }

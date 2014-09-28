@@ -83,7 +83,7 @@ namespace T4TS
             tsMap.Keys.ToList().ForEach(codeClass =>
             {
                 CodeElements baseClasses = codeClass.Bases;
-                if (baseClasses.Count > 0)
+                if (baseClasses != null && baseClasses.Count > 0)
                 {
                     CodeElement baseClass = baseClasses.Item(1);
                     if (baseClass != null)
@@ -192,7 +192,7 @@ namespace T4TS
             member = new TypeScriptInterfaceMember
             {
                 Name = values.Name ?? property.Name,
-                FullName = property.FullName,
+                //FullName = property.FullName,
                 Optional = values.Optional,
                 Ignore = values.Ignore,
                 Type = (string.IsNullOrWhiteSpace(values.Type))
@@ -223,14 +223,15 @@ namespace T4TS
             if (TryGetAttribute(property.Attributes, MemberAttributeFullName, out attribute))
             {
                 var values = GetAttributeValues(attribute);
-                if (values.ContainsKey("Optional"))
-                    attributeOptional = values["Optional"] == "true";
+                bool parsedProperty;
+                if (values.ContainsKey("Optional") && bool.TryParse(values["Optional"], out parsedProperty))
+                    attributeOptional = parsedProperty;
 
-                if (values.ContainsKey("CamelCase"))
-                    attributeCamelCase = values["CamelCase"] == "true";
+                if (values.ContainsKey("CamelCase") && bool.TryParse(values["CamelCase"], out parsedProperty))
+                    attributeCamelCase = parsedProperty;
 
-                if (values.ContainsKey("Ignore"))
-                    attributeIgnore = values["Ignore"] == "true";
+                if (values.ContainsKey("Ignore") && bool.TryParse(values["Ignore"], out parsedProperty))
+                    attributeIgnore = parsedProperty;
 
                 values.TryGetValue("Name", out attributeName);
                 values.TryGetValue("Type", out attributeType);
