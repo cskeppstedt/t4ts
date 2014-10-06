@@ -11,7 +11,7 @@ namespace T4TS.Tests
     public class ModuleOutputAppenderTests
     {
         [TestMethod]
-        public void ModuleOutputAppenderRespectsCompatibilityVersion()
+        public void TypescriptVersion083YieldsModule()
         {
             var sb = new StringBuilder();
             var module = new TypeScriptModule
@@ -19,22 +19,49 @@ namespace T4TS.Tests
                 QualifiedName = "Foo"
             };
             
-            var settings = new Settings();
-            var appender = new ModuleOutputAppender(sb, 0, settings);
+            var appender = new ModuleOutputAppender(sb, 0, new Settings
+            {
+                CompatibilityVersion = new Version(0, 8, 3)
+            });
 
-            settings.CompatibilityVersion = new Version(0, 8, 3);
             appender.AppendOutput(module);
-            Assert.IsTrue(sb.ToString().StartsWith("module"));
-            sb.Clear();
+            Assert.IsTrue(sb.ToString().StartsWith("module "));
+        }
 
-            settings.CompatibilityVersion = new Version(0, 9, 0);
-            appender.AppendOutput(module);
-            Assert.IsTrue(sb.ToString().StartsWith("declare module"));
-            sb.Clear();
+        [TestMethod]
+        public void TypescriptVersion090YieldsDeclareModule()
+        {
+            var sb = new StringBuilder();
+            var module = new TypeScriptModule
+            {
+                QualifiedName = "Foo"
+            };
 
-            settings.CompatibilityVersion = null;
+            var appender = new ModuleOutputAppender(sb, 0, new Settings
+            {
+                CompatibilityVersion = new Version(0, 9, 0)
+            });
+
             appender.AppendOutput(module);
-            Assert.IsTrue(sb.ToString().StartsWith("declare module"));
+            Assert.IsTrue(sb.ToString().StartsWith("declare module "));
+        }
+
+        [TestMethod]
+        public void DefaultTypescriptVersionYieldsDeclareModule()
+        {
+            var sb = new StringBuilder();
+            var module = new TypeScriptModule
+            {
+                QualifiedName = "Foo"
+            };
+
+            var appender = new ModuleOutputAppender(sb, 0, new Settings
+            {
+                CompatibilityVersion = null
+            });
+
+            appender.AppendOutput(module);
+            Assert.IsTrue(sb.ToString().StartsWith("declare module "));
         }
     }
 }
