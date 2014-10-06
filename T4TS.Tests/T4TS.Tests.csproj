@@ -76,6 +76,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CodeTraverserTests.cs" />
     <Compile Include="Traversal\ClassTraversalTests.cs" />
+    <Compile Include="Traversal\ProjectTraversalTests.cs" />
     <Compile Include="Traversal\NamespaceTraverserTests.cs" />
     <Compile Include="Utils\DTETransformer.cs" />
   </ItemGroup>

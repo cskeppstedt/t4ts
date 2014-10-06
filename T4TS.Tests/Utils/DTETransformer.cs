@@ -37,41 +37,57 @@ namespace T4TS.Tests.Utils
             return moqSolution.Object;
         }
 
-        public static Project BuildDteProject(IEnumerable<Type> fromClassTypes, string assemblyName)
+        public static Project BuildDteProject(IEnumerable<Type> fromClassTypes, string projectName, ProjectItems subProjectItems = null)
         {
             var moqProject = new Mock<Project>();
-            var moqProjectItem = new Mock<ProjectItem>();
             var moqProjectItems = new Mock<ProjectItems>();
-
-            var moqProjCodeElements = new Mock<CodeElements>();
-            var moqCodeNamespace = new Mock<CodeNamespace>();
-            var moqMembers = new Mock<CodeElements>();
-            var moqFileCodeModel = new Mock<FileCodeModel>();
-
-            var namespaces = new List<CodeNamespace>
-            { 
-                moqCodeNamespace.Object
-            };
-
-            moqFileCodeModel.SetupGet(x => x.CodeElements).Returns(moqProjCodeElements.Object);
-            moqProjCodeElements.Setup(x => x.GetEnumerator()).Returns(() => namespaces.GetEnumerator());
 
             moqProject.SetupGet(x => x.ProjectItems).Returns(moqProjectItems.Object);
 
-            moqProjectItem.SetupProperty(x => x.Name, assemblyName);
-            moqProjectItem.SetupGet(x => x.FileCodeModel).Returns(moqFileCodeModel.Object);
-            moqProjectItem.SetupGet(x => x.ProjectItems).Returns((ProjectItems)null);
-            moqProjectItems.Setup(x => x.GetEnumerator()).Returns(() => new[] { moqProjectItem.Object }.GetEnumerator());
-
-            moqCodeNamespace.SetupGet(x => x.Members).Returns(moqMembers.Object);
-
-            var classes = fromClassTypes
-                .Select(BuildDteClass)
-                .ToList();
-
-            moqMembers.Setup(x => x.GetEnumerator()).Returns(() => classes.GetEnumerator());
+            var projectItem = BuildDteProjectItem(fromClassTypes, projectName, subProjectItems);
+            moqProjectItems.Setup(x => x.GetEnumerator()).Returns(() => new[] { projectItem }.GetEnumerator());
 
             return moqProject.Object;
+        }
+
+        public static ProjectItem BuildDteProjectItem(IEnumerable<Type> fromClassTypes, string projectItemName, ProjectItems subProjectItems = null)
+        {
+            var moqFileCodeModel = new Mock<FileCodeModel>();
+            var moqProjectItem = new Mock<ProjectItem>();
+            var moqProjCodeElements = new Mock<CodeElements>();
+            var moqMembers = new Mock<CodeElements>();
+
+            var namespaces = new List<CodeNamespace>();
+
+            var byNamespace = fromClassTypes
+                .GroupBy(x => x.Namespace)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.ToList()
+                );
+
+            foreach (string namespaceName in byNamespace.Keys)
+            {
+                var moqCodeNamespace = new Mock<CodeNamespace>();
+
+                var classes = byNamespace[namespaceName]
+                    .Select(BuildDteClass)
+                    .ToList();
+
+                moqMembers.Setup(x => x.GetEnumerator()).Returns(() => classes.GetEnumerator());
+                moqCodeNamespace.SetupGet(x => x.Members).Returns(moqMembers.Object);
+                moqCodeNamespace.SetupGet(x => x.Name).Returns(namespaceName);
+
+                namespaces.Add(moqCodeNamespace.Object);
+            }
+
+            moqProjCodeElements.Setup(x => x.GetEnumerator()).Returns(() => namespaces.GetEnumerator());
+            moqFileCodeModel.SetupGet(x => x.CodeElements).Returns(moqProjCodeElements.Object);
+            moqProjectItem.SetupProperty(x => x.Name, projectItemName);
+            moqProjectItem.SetupGet(x => x.FileCodeModel).Returns(moqFileCodeModel.Object);
+            moqProjectItem.SetupGet(x => x.ProjectItems).Returns(subProjectItems);
+
+            return moqProjectItem.Object;
         }
 
         public static CodeClass BuildDteClass(Type fromClass)
