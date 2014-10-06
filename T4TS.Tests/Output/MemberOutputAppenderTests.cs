@@ -11,34 +11,60 @@ namespace T4TS.Tests
     public class MemberOutputAppenderTests
     {
         [TestMethod]
-        public void MemberOutputAppenderRespectsCompatibilityVersion()
+        public void TypescriptVersion083YieldsBool()
         {
             var sb = new StringBuilder();
-            
             var member = new TypeScriptInterfaceMember
             {
                 Name = "Foo",
-                //FullName = "Foo",
                 Type = new BoolType()
             };
 
-            var settings = new Settings();
-            var appender = new MemberOutputAppender(sb, 0, settings);
+            var appender = new MemberOutputAppender(sb, 0, new Settings
+            {
+                CompatibilityVersion = new Version(0, 8, 3)
+            });
 
-            settings.CompatibilityVersion = new Version(0, 8, 3);
             appender.AppendOutput(member);
-            Assert.IsTrue(sb.ToString().Contains("bool"));
-            Assert.IsFalse(sb.ToString().Contains("boolean"));
-            sb.Clear();
+            Assert.AreEqual("Foo: bool;", sb.ToString().Trim());
+        }
 
-            settings.CompatibilityVersion = new Version(0, 9, 0);
-            appender.AppendOutput(member);
-            Assert.IsTrue(sb.ToString().Contains("boolean"));
-            sb.Clear();
+        [TestMethod]
+        public void TypescriptVersion090YieldsBoolean()
+        {
+            var sb = new StringBuilder();
+            var member = new TypeScriptInterfaceMember
+            {
+                Name = "Foo",
+                Type = new BoolType()
+            };
 
-            settings.CompatibilityVersion = null;
+            var appender = new MemberOutputAppender(sb, 0, new Settings
+            {
+                CompatibilityVersion = new Version(0, 9, 0)
+            });
+
             appender.AppendOutput(member);
-            Assert.IsTrue(sb.ToString().Contains("boolean"));
+            Assert.AreEqual("Foo: boolean;", sb.ToString().Trim());
+        }
+
+        [TestMethod]
+        public void DefaultTypescriptVersionYieldsBoolean()
+        {
+            var sb = new StringBuilder();
+            var member = new TypeScriptInterfaceMember
+            {
+                Name = "Foo",
+                Type = new BoolType()
+            };
+
+            var appender = new MemberOutputAppender(sb, 0, new Settings
+            {
+                CompatibilityVersion = null
+            });
+
+            appender.AppendOutput(member);
+            Assert.AreEqual("Foo: boolean;", sb.ToString().Trim());
         }
     }
 }
