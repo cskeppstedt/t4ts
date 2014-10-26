@@ -9,3 +9,6 @@ _ReSharper.T4TS.Example
 T4TS.Build/_ReSharper.T4TS.Build
 !buid/T4TS.Attributes.dll
 packages/
+*.user
+/T4TS.Example/T4TS.d.ts
+*.ts

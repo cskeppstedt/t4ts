@@ -5,7 +5,7 @@ namespace T4TS
     /// <summary>
     /// Add this attribute to a property to customize the generated interface member
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple=false, Inherited=true)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple=false, Inherited=true)]
     public class TypeScriptMemberAttribute: Attribute
     {
         /// <summary>

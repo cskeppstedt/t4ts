@@ -60,7 +60,6 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>T4TS.d.ts</LastGenOutput>
     </Content>
-    <Content Include="Scripts\lib\jquery-1.8.d.ts" />
     <TypeScriptCompile Include="Scripts\App\Test.ts" />
   </ItemGroup>
   <ItemGroup>
@@ -83,6 +82,7 @@
   <ItemGroup>
     <None Include="T4TS.tt.settings.t4" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

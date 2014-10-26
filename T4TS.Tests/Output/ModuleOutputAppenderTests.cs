@@ -25,16 +25,19 @@ namespace T4TS.Tests
             settings.CompatibilityVersion = new Version(0, 8, 3);
             appender.AppendOutput(module);
             Assert.IsTrue(sb.ToString().StartsWith("module"));
+            Console.WriteLine(sb.ToString());
             sb.Clear();
 
             settings.CompatibilityVersion = new Version(0, 9, 0);
             appender.AppendOutput(module);
             Assert.IsTrue(sb.ToString().StartsWith("declare module"));
+            Console.WriteLine(sb.ToString());
             sb.Clear();
 
             settings.CompatibilityVersion = null;
             appender.AppendOutput(module);
             Assert.IsTrue(sb.ToString().StartsWith("declare module"));
+            Console.WriteLine(sb.ToString());
         }
     }
 }

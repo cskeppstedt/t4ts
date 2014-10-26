@@ -1,5 +1,4 @@
 /// <reference path="../../T4TS.d.ts" />
-/// <reference path="../lib/jquery-1.8.d.ts" />
 
 module App {
     export class Test {

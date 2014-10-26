@@ -46,6 +46,9 @@
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="Moq">
+      <HintPath>..\packages\Moq.4.2.1409.1722\lib\net40\Moq.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core">
@@ -65,7 +68,13 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Output\BaseList.cs" />
     <Compile Include="Output\MemberOutputAppenderTests.cs" />
+    <Compile Include="Output\MockCodeTypes.cs" />
+    <Compile Include="Output\MockCodeElements.cs" />
+    <Compile Include="Output\MockProjectItems.cs" />
+    <Compile Include="Output\MockProjects.cs" />
+    <Compile Include="Output\MockSolution.cs" />
     <Compile Include="Output\ModuleOutputAppenderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -74,10 +83,17 @@
       <Project>{af50a5e0-791d-47d4-91fe-56a7ce4577eb}</Project>
       <Name>T4TS.Attributes</Name>
     </ProjectReference>
+    <ProjectReference Include="..\T4TS.Example.Models\T4TS.Example.Models.csproj">
+      <Project>{93EE0391-DB26-40CC-A613-6CA32E3EEB18}</Project>
+      <Name>T4TS.Example.Models</Name>
+    </ProjectReference>
     <ProjectReference Include="..\T4TS\T4TS.csproj">
       <Project>{2b9cfea6-586a-4e3b-8575-79447d5dc086}</Project>
       <Name>T4TS</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

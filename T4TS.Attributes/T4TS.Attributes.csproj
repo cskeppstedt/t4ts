@@ -37,6 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TypeScriptEnumAttribute.cs" />
     <Compile Include="TypeScriptInterfaceAttribute.cs" />
     <Compile Include="TypeScriptMemberAttribute.cs" />
   </ItemGroup>

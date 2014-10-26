@@ -60,6 +60,64 @@ Project GetProjectContainingT4File(DTE dte) {
     return projectItem.ContainingProject;
 }
 
+    public class EnumOutputAppender : OutputAppender<TypeScriptEnum>
+    {
+        public EnumOutputAppender(StringBuilder output, int baseIndentation, Settings settings)
+            : base(output, baseIndentation, settings)
+        {
+        }
+
+        public override void AppendOutput(TypeScriptEnum tsEnum)
+        {
+            BeginInterface(tsEnum);
+
+            AppendMembers(tsEnum);
+            
+            EndInterface();
+        }
+
+        private void AppendMembers(TypeScriptEnum tsEnum)
+        {
+            var appender = new EnumMemberOutputAppender(Output, BaseIndentation + 4, Settings);
+            foreach (var member in tsEnum.Members)
+                appender.AppendOutput(member);
+        }
+
+        private void BeginInterface(TypeScriptEnum tsEnum)
+        {
+            AppendIndentedLine("/** Generated from " + tsEnum.FullName + " **/");
+
+            AppendIndented("enum " + tsEnum.Name);
+
+            Output.AppendLine(" {");
+        }
+
+        private void EndInterface()
+        {
+            AppendIndentedLine("}");
+        }
+    }
+
+    public class EnumMemberOutputAppender : OutputAppender<TypeScriptEnumMember>
+    {
+        public EnumMemberOutputAppender(StringBuilder output, int baseIndentation, Settings settings)
+            : base(output, baseIndentation, settings)
+        {
+        }
+
+        public override void AppendOutput(TypeScriptEnumMember member)
+        {
+            AppendIndendation();
+
+            Output.AppendFormat("{0} = {1}",
+                member.Name,
+                member.Value
+            );
+            
+            Output.AppendLine(",");
+        }
+    }
+
     public abstract class OutputAppender<TSegment> where TSegment: class
     {
         protected StringBuilder Output { get; private set; }
@@ -204,6 +262,10 @@ Project GetProjectContainingT4File(DTE dte) {
         {
             BeginModule(module);
 
+            var enumAppender = new EnumOutputAppender(Output, BaseIndentation + 4, Settings);
+            foreach (var tsEnum in module.Enums)
+                enumAppender.AppendOutput(tsEnum);
+
             var interfaceAppender = new InterfaceOutputAppender(Output, BaseIndentation + 4, Settings, module.IsGlobal);
             foreach (var tsInterface in module.Interfaces)
                 interfaceAppender.AppendOutput(tsInterface);
@@ -259,11 +321,40 @@ Project GetProjectContainingT4File(DTE dte) {
         }
     }
 
+    public class TypeScriptEnum
+    {
+        public string Name { get; set; }
+        public string FullName { get; set; }
+
+        public List<TypeScriptEnumMember> Members { get; set; }
+        public TypeScriptModule Module { get; set; }
+
+        public TypeScriptEnum()
+        {
+            Members = new List<TypeScriptEnumMember>();
+        }
+    }
+
+    public class TypeScriptEnumAttributeValues
+    {
+        public string Module { get; set; }
+        public string Name { get; set; }
+        public string NamePrefix { get; set; }
+    }
+
     public class TypeScriptInterfaceAttributeValues
     {
         public string Module { get; set; }
         public string Name { get; set; }
         public string NamePrefix { get; set; }
+    }
+
+    public class TypeScriptEnumMember
+    {
+        public string Name { get; set; }
+        public string FullName { get; set; }
+        public int Value { get; set; }
+        public bool Ignore { get; set; }
     }
 
     public class TypeScriptMemberAttributeValues
@@ -278,10 +369,11 @@ Project GetProjectContainingT4File(DTE dte) {
     public class CodeTraverser
     {
         public Solution Solution { get; private set; }
-        public Settings Settings { get; private set; }
+        public static Settings Settings { get; private set; }
 
-        private static readonly string InterfaceAttributeFullName = "T4TS.TypeScriptInterfaceAttribute";
-        private static readonly string MemberAttributeFullName = "T4TS.TypeScriptMemberAttribute";
+        private const string InterfaceAttributeFullName = "T4TS.TypeScriptInterfaceAttribute";
+        private const string MemberAttributeFullName = "T4TS.TypeScriptMemberAttribute";
+        private const string EnumAttributeFullName = "T4TS.TypeScriptEnumAttribute";
 
         public CodeTraverser(Solution solution, Settings settings)
         {
@@ -292,28 +384,44 @@ Project GetProjectContainingT4File(DTE dte) {
                 throw new ArgumentNullException("settings");
 
             Solution = solution;
-            this.Settings = settings;
+            Settings = settings;
         }
 
         public TypeContext BuildContext()
         {
-            var typeContext = new TypeContext(this.Settings);
+            var typeContext = new TypeContext(Settings);
             var partialClasses = new Dictionary<string, CodeClass>();
 
             new SolutionTraverser(this.Solution, (ns) =>
             {
-                new NamespaceTraverser(ns, (codeClass) =>
-                {
-                    CodeAttribute attribute;
-                    if (!TryGetAttribute(codeClass.Attributes, InterfaceAttributeFullName, out attribute))
-                        return;
+                new NamespaceTraverser(ns, 
+                    codeClass =>
+                    {
+                        CodeAttribute attribute;
+                        if (TryGetAttribute(codeClass.Attributes, InterfaceAttributeFullName, out attribute))
+                        {
+                            var values = GetInterfaceValues(codeClass, attribute);
+                            var interfaceType = new InterfaceType(values);
 
-                    var values = GetInterfaceValues(codeClass, attribute);
-                    var interfaceType = new InterfaceType(values);
+                            if (!typeContext.ContainsInterfaceType(codeClass.FullName))
+                                typeContext.AddInterfaceType(codeClass.FullName, interfaceType);
+                        }
+                    },
 
-                    if (!typeContext.ContainsInterfaceType(codeClass.FullName))
-                        typeContext.AddInterfaceType(codeClass.FullName, interfaceType);
-                });
+                    codeEnum =>
+                    {
+                        var s = codeEnum.Name;
+                        CodeAttribute attribute;
+                        if (TryGetAttribute(codeEnum.Attributes, EnumAttributeFullName, out attribute))
+                        {
+                            var values = GetEnumValues(codeEnum, attribute);
+                            var enumType = new EnumType(values);
+
+                            if (!typeContext.ContainsEnumType(codeEnum.FullName))
+                                typeContext.AddEnumType(codeEnum.FullName, enumType);
+                        }
+                    }
+                    );
             });
 
             return typeContext;
@@ -324,29 +432,52 @@ Project GetProjectContainingT4File(DTE dte) {
             var typeContext = BuildContext();
             var byModuleName = new Dictionary<string, TypeScriptModule>();
             var tsMap = new Dictionary<CodeClass, TypeScriptInterface>();
+            var tsEnumMap = new Dictionary<CodeEnum, TypeScriptEnum>();
 
             new SolutionTraverser(this.Solution, (ns) =>
             {
-                new NamespaceTraverser(ns, (codeClass) =>
-                {
-                    InterfaceType interfaceType;
-                    if (!typeContext.TryGetInterfaceType(codeClass.FullName, out interfaceType))
-                        return;
-
-                    var values = interfaceType.AttributeValues;
-                    
-                    TypeScriptModule module;
-                    if (!byModuleName.TryGetValue(values.Module, out module))
+                new NamespaceTraverser(ns, 
+                    codeClass =>
                     {
-                        module = new TypeScriptModule { QualifiedName = values.Module };
-                        byModuleName.Add(values.Module, module);
-                    }
+                        InterfaceType interfaceType;
+                        if (typeContext.TryGetInterfaceType(codeClass.FullName, out interfaceType))
+                        {
+                            var values = interfaceType.AttributeValues;
 
-                    var tsInterface = BuildInterface(codeClass, values, typeContext);
-                    tsMap.Add(codeClass, tsInterface);
-                    tsInterface.Module = module;
-                    module.Interfaces.Add(tsInterface);
-                });
+                            TypeScriptModule module;
+                            if (!byModuleName.TryGetValue(values.Module, out module))
+                            {
+                                module = new TypeScriptModule { QualifiedName = values.Module };
+                                byModuleName.Add(values.Module, module);
+                            }
+
+                            var tsInterface = BuildInterface(codeClass, values, typeContext);
+                            tsMap.Add(codeClass, tsInterface);
+                            tsInterface.Module = module;
+                            module.Interfaces.Add(tsInterface);
+                        }
+                    },
+
+                    codeEnum =>
+                    {
+                        EnumType enumType;
+                        if (typeContext.TryGetEnumType(codeEnum.FullName, out enumType))
+                        {
+                            var values = enumType.AttributeValues;
+
+                            TypeScriptModule module;
+                            if (!byModuleName.TryGetValue(values.Module, out module))
+                            {
+                                module = new TypeScriptModule { QualifiedName = values.Module };
+                                byModuleName.Add(values.Module, module);
+                            }
+
+                            var tsEnum = BuildEnum(codeEnum, values, typeContext);
+                            tsEnumMap.Add(codeEnum, tsEnum);
+                            tsEnum.Module = module;
+                            module.Enums.Add(tsEnum);
+                        }
+                    });
             });
 
             var tsInterfaces = tsMap.Values.ToList();
@@ -379,6 +510,13 @@ Project GetProjectContainingT4File(DTE dte) {
 
             return attributeValues.Name;
         }
+        private string GetEnumName(TypeScriptEnumAttributeValues attributeValues)
+        {
+            if (!string.IsNullOrEmpty(attributeValues.NamePrefix))
+                return attributeValues.NamePrefix + attributeValues.Name;
+
+            return attributeValues.Name;
+        }
 
         private TypeScriptInterface BuildInterface(CodeClass codeClass, TypeScriptInterfaceAttributeValues attributeValues, TypeContext typeContext)
         {
@@ -400,6 +538,23 @@ Project GetProjectContainingT4File(DTE dte) {
             });
 
             return tsInterface;
+        }
+        private TypeScriptEnum BuildEnum(CodeEnum codeEnum, TypeScriptEnumAttributeValues attributeValues, TypeContext typeContext)
+        {
+            var tsEnum = new TypeScriptEnum
+            {
+                FullName = codeEnum.FullName,
+                Name = GetEnumName(attributeValues)
+            };
+
+            new EnumTraverser(codeEnum, (variable, index) =>
+            {
+                TypeScriptEnumMember member;
+                if (TryGetEnumMember(variable, typeContext, index, out member))
+                    tsEnum.Members.Add(member);
+            });
+
+            return tsEnum;
         }
 
         private bool TryGetAttribute(CodeElements attributes, string attributeFullName, out CodeAttribute attribute)
@@ -425,7 +580,7 @@ Project GetProjectContainingT4File(DTE dte) {
 
             foreach (CodeElement baseClass in codeClass.Bases)
             {
-                if (typeContext.IsGenericEnumerable(baseClass.FullName))
+                if (TypeContext.IsGenericEnumerable(baseClass.FullName))
                 {
                     string fullName = typeContext.UnwrapGenericType(baseClass.FullName);
                     indexedType = typeContext.GetTypeScriptType(fullName);
@@ -443,6 +598,17 @@ Project GetProjectContainingT4File(DTE dte) {
             return new TypeScriptInterfaceAttributeValues
             {
                 Name = values.ContainsKey("Name") ? values["Name"] : codeClass.Name,
+                Module = values.ContainsKey("Module") ? values["Module"] : Settings.DefaultModule ?? "T4TS",
+                NamePrefix = values.ContainsKey("NamePrefix") ? values["NamePrefix"] : Settings.DefaultInterfaceNamePrefix ?? string.Empty
+            };
+        }
+        private TypeScriptEnumAttributeValues GetEnumValues(CodeEnum codeEnum, CodeAttribute interfaceAttribute)
+        {
+            var values = GetAttributeValues(interfaceAttribute);
+
+            return new TypeScriptEnumAttributeValues
+            {
+                Name = values.ContainsKey("Name") ? values["Name"] : codeEnum.Name,
                 Module = values.ContainsKey("Module") ? values["Module"] : Settings.DefaultModule ?? "T4TS",
                 NamePrefix = values.ContainsKey("NamePrefix") ? values["NamePrefix"] : Settings.DefaultInterfaceNamePrefix ?? string.Empty
             };
@@ -481,6 +647,32 @@ Project GetProjectContainingT4File(DTE dte) {
             return true;
         }
 
+        private bool TryGetEnumMember(CodeVariable variable, TypeContext typeContext, int index, out TypeScriptEnumMember member)
+        {
+            member = null;
+            if (variable.Access != vsCMAccess.vsCMAccessPublic)
+                return false;
+
+            var values = GetMemberValues(variable, typeContext);
+            member = new TypeScriptEnumMember
+            {
+                Name = values.Name ?? variable.Name,
+                FullName = variable.FullName,
+                Ignore = values.Ignore,
+                Value = variable.InitExpression == null ? index : Int32.Parse(variable.InitExpression.ToString()),
+            };
+
+            if (member.Ignore)
+            {
+                return false;
+            }
+
+            if (values.CamelCase && values.Name == null)
+                member.Name = member.Name.Substring(0, 1).ToLowerInvariant() + member.Name.Substring(1);
+
+            return true;
+        }
+
         private TypeScriptMemberAttributeValues GetMemberValues(CodeProperty property, TypeContext typeContext)
         {
             bool? attributeOptional = null;
@@ -491,6 +683,41 @@ Project GetProjectContainingT4File(DTE dte) {
 
             CodeAttribute attribute;
             if (TryGetAttribute(property.Attributes, MemberAttributeFullName, out attribute))
+            {
+                var values = GetAttributeValues(attribute);
+                if (values.ContainsKey("Optional"))
+                    attributeOptional = values["Optional"] == "true";
+
+                if (values.ContainsKey("CamelCase"))
+                    attributeCamelCase = values["CamelCase"] == "true";
+
+                if (values.ContainsKey("Ignore"))
+                    attributeIgnore = values["Ignore"] == "true";
+
+                values.TryGetValue("Name", out attributeName);
+                values.TryGetValue("Type", out attributeType);
+            }
+
+            return new TypeScriptMemberAttributeValues
+            {
+                Optional = attributeOptional.HasValue ? attributeOptional.Value : Settings.DefaultOptional,
+                Name = attributeName,
+                Type = attributeType,
+                CamelCase = attributeCamelCase ?? Settings.DefaultCamelCaseMemberNames,
+                Ignore = attributeIgnore
+            };
+        }
+
+        private TypeScriptMemberAttributeValues GetMemberValues(CodeVariable variable, TypeContext typeContext)
+        {
+            bool? attributeOptional = null;
+            bool? attributeCamelCase = null;
+            bool attributeIgnore = false;
+            string attributeName = null;
+            string attributeType = null;
+
+            CodeAttribute attribute;
+            if (TryGetAttribute(variable.Attributes, MemberAttributeFullName, out attribute))
             {
                 var values = GetAttributeValues(attribute);
                 if (values.ContainsKey("Optional"))
@@ -569,6 +796,11 @@ Project GetProjectContainingT4File(DTE dte) {
         /// </summary>
         public bool UseNativeDates { get; set; }
 
+        /// <summary>
+        /// List of the project names to process. If null - all the projects will be processed.
+        /// </summary>
+        public string[] ProjectNamesToProcess { get; set; }
+
         public static Settings Parse(Dictionary<string,object> settingsValues)
         {
             // Read settings from T4TS.tt.settings.tt
@@ -579,7 +811,8 @@ Project GetProjectContainingT4File(DTE dte) {
                 DefaultCamelCaseMemberNames = ParseSettingNullableType(settingsValues, "DefaultCamelCaseMemberNames", false),
                 DefaultInterfaceNamePrefix = ParseSettingReferenceType(settingsValues, "DefaultInterfaceNamePrefix", s => s as string, string.Empty),
                 CompatibilityVersion = ParseSettingReferenceType(settingsValues, "CompatibilityVersion", v => v as Version, new Version(0, 9, 1, 1)),
-                UseNativeDates = ParseSettingNullableType(settingsValues, "UseNativeDates", false)
+                UseNativeDates = ParseSettingNullableType(settingsValues, "UseNativeDates", false),
+                ProjectNamesToProcess = ParseSettingReferenceType(settingsValues, "ProjectNamesToProcess", s => s == null ? null : s.ToString().Replace(" ", "").Split(','), null)
             };
         }
 
@@ -617,6 +850,40 @@ Project GetProjectContainingT4File(DTE dte) {
         }
     }
 
+    public class EnumTraverser
+    {
+        public CodeEnum CodeEnum { get; private set; }
+        public Action<CodeVariable, int> WithVariable { get; set; }
+
+        public EnumTraverser(CodeEnum codeEnum, Action<CodeVariable, int> withVariable)
+        {
+            if (codeEnum == null)
+                throw new ArgumentNullException("codeEnum");
+
+            if (withVariable == null)
+                throw new ArgumentNullException("withVariable");
+
+            this.CodeEnum = codeEnum;
+            this.WithVariable = withVariable;
+
+            if (codeEnum.Members != null)
+                Traverse(codeEnum.Members);
+        }
+
+        private void Traverse(CodeElements members)
+        {
+            var index = 0;
+            foreach (var property in members.OfType<CodeVariable>())
+            {
+                WithVariable(property, index);
+                if (property.InitExpression != null)
+                    index = Int32.Parse(property.InitExpression.ToString());
+                index++;
+            }
+                
+        }
+    }
+
     public class ClassTraverser
     {
         public CodeClass CodeClass { get; private set; }
@@ -647,8 +914,9 @@ Project GetProjectContainingT4File(DTE dte) {
     public class NamespaceTraverser
     {
         public Action<CodeClass> WithCodeClass { get; private set; }
+        public Action<CodeEnum> WithCodeEnum { get; private set; }
 
-        public NamespaceTraverser(CodeNamespace ns, Action<CodeClass> withCodeClass)
+        public NamespaceTraverser(CodeNamespace ns, Action<CodeClass> withCodeClass, Action<CodeEnum> withCodeEnum)
         {
             if (ns == null)
                 throw new ArgumentNullException("ns");
@@ -657,6 +925,8 @@ Project GetProjectContainingT4File(DTE dte) {
                 throw new ArgumentNullException("withCodeClass");
             
             WithCodeClass = withCodeClass;
+
+            WithCodeEnum = withCodeEnum;
             
             if (ns.Members != null)
                 Traverse(ns.Members);
@@ -664,6 +934,8 @@ Project GetProjectContainingT4File(DTE dte) {
 
         private void Traverse(CodeElements members)
         {
+            foreach (var codeEnum in members.OfType<CodeEnum>())
+                WithCodeEnum(codeEnum);
             foreach (var codeClass in members.OfType<CodeClass>())
                 WithCodeClass(codeClass);
         }
@@ -693,13 +965,25 @@ Project GetProjectContainingT4File(DTE dte) {
             {
                 if (pi.FileCodeModel != null)
                 {
-                    var codeElements = pi.FileCodeModel.CodeElements;
-                    foreach (var ns in codeElements.OfType<CodeNamespace>())
-                        WithNamespace(ns);
+                    if (CodeTraverser.Settings.ProjectNamesToProcess == null ||
+                        CodeTraverser.Settings.ProjectNamesToProcess.Contains(pi.ContainingProject.Name))
+                    {
+                        var codeElements = pi.FileCodeModel.CodeElements;
+                        foreach (var ns in codeElements.OfType<CodeNamespace>())
+                            WithNamespace(ns);
+                    }
                 }
 
                 if (pi.ProjectItems != null)
                     Traverse(pi.ProjectItems);
+
+                /* LionSoft: Process projects in solution folders */
+                else if (pi.SubProject != null && pi.SubProject.ProjectItems != null)
+                {
+                    Traverse(pi.SubProject.ProjectItems);
+                }
+                /* --- */
+
             }
         }
     }
@@ -708,6 +992,7 @@ Project GetProjectContainingT4File(DTE dte) {
     {
         public string QualifiedName { get; set; }
         public List<TypeScriptInterface> Interfaces { get; set; }
+        public List<TypeScriptEnum> Enums { get; set; }
 
         /// <summary>
         /// Returns true if this is the global namespace (ie. no module name)
@@ -720,6 +1005,7 @@ Project GetProjectContainingT4File(DTE dte) {
         public TypeScriptModule()
         {
             Interfaces = new List<TypeScriptInterface>();
+            Enums = new List<TypeScriptEnum>();
         }
     }
 
@@ -765,6 +1051,54 @@ Project GetProjectContainingT4File(DTE dte) {
         public override string Name
         {
             get { return "boolean"; }
+        }
+    }
+
+    public class EnumType : TypescriptType
+    {
+        public TypeScriptEnumAttributeValues AttributeValues { get; private set; }
+
+        public string QualifedModule 
+        { 
+            get 
+            {
+                if (AttributeValues == null)
+                    return null;
+
+                return AttributeValues.Module; 
+            } 
+        }
+
+        public override string Name
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(AttributeValues.NamePrefix))
+                    return AttributeValues.NamePrefix + AttributeValues.Name;
+
+                return AttributeValues.Name;
+            }
+        }
+
+        public EnumType(TypeScriptEnumAttributeValues values)
+        {
+            AttributeValues = values;
+        }
+
+        public EnumType(string name)
+        {
+            AttributeValues = new TypeScriptEnumAttributeValues
+            {
+                Name = name
+            };
+        }
+
+        public override string ToString()
+        {
+            if (string.IsNullOrWhiteSpace(QualifedModule))
+                return base.ToString();
+
+            return QualifedModule + "." + base.ToString();
         }
     }
 
@@ -855,35 +1189,51 @@ Project GetProjectContainingT4File(DTE dte) {
         public Settings Settings { get; private set; }
         public TypeContext(Settings settings)
         {
-            this.Settings = settings;
+            Settings = settings;
         }
 
-        private static readonly string[] genericCollectionTypeStarts = new string[] {
+        private static readonly string[] _genericCollectionTypeStarts =
+        {
             "System.Collections.Generic.List<",
             "System.Collections.Generic.IList<",
             "System.Collections.Generic.ICollection<"
         };
 
-        private static readonly string nullableTypeStart = "System.Nullable<";
+        private const string NullableTypeStart = "System.Nullable<";
 
         /// <summary>
         /// Lookup table for "interface types", ie. non-builtin types (typically classes or unknown types). Keyed on the FullName of the type.
         /// </summary>
-        private Dictionary<string, InterfaceType> interfaceTypes = new Dictionary<string, InterfaceType>();
+        private readonly Dictionary<string, InterfaceType> _interfaceTypes = new Dictionary<string, InterfaceType>();
+
+        private readonly Dictionary<string, EnumType> _enumTypes = new Dictionary<string, EnumType>();
 
         public void AddInterfaceType(string typeFullName, InterfaceType interfaceType)
         {
-            interfaceTypes.Add(typeFullName, interfaceType);
+            _interfaceTypes.Add(typeFullName, interfaceType);
+        }
+        public void AddEnumType(string typeFullName, EnumType enumType)
+        {
+            _enumTypes.Add(typeFullName, enumType);
         }
 
         public bool TryGetInterfaceType(string typeFullName, out InterfaceType interfaceType)
         {
-            return interfaceTypes.TryGetValue(typeFullName, out interfaceType);
+            return _interfaceTypes.TryGetValue(typeFullName, out interfaceType);
+        }
+
+        public bool TryGetEnumType(string typeFullName, out EnumType enumType)
+        {
+            return _enumTypes.TryGetValue(typeFullName, out enumType);
         }
 
         public bool ContainsInterfaceType(string typeFullName)
         {
-            return interfaceTypes.ContainsKey(typeFullName);
+            return _interfaceTypes.ContainsKey(typeFullName);
+        }
+        public bool ContainsEnumType(string typeFullName)
+        {
+            return _enumTypes.ContainsKey(typeFullName);
         }
 
         public TypescriptType GetTypeScriptType(CodeTypeRef codeType)
@@ -915,7 +1265,7 @@ Project GetProjectContainingT4File(DTE dte) {
         {
             if (codeType.TypeKind == vsCMTypeRef.vsCMTypeRefArray)
             {
-                return new ArrayType()
+                return new ArrayType
                 {
                     ElementType = GetTypeScriptType(codeType.ElementType)
                 };
@@ -924,6 +1274,7 @@ Project GetProjectContainingT4File(DTE dte) {
             return GetTypeScriptType(codeType.AsFullName);
         }
 
+/*
         private ArrayType TryResolveEnumerableType(string typeFullName)
         {
             return new ArrayType
@@ -931,12 +1282,17 @@ Project GetProjectContainingT4File(DTE dte) {
                 ElementType = GetTypeScriptType(typeFullName)
             };
         }
+*/
 
         public TypescriptType GetTypeScriptType(string typeFullName)
         {
             InterfaceType interfaceType;
-            if (interfaceTypes.TryGetValue(typeFullName, out interfaceType))
+            if (_interfaceTypes.TryGetValue(typeFullName, out interfaceType))
                 return interfaceType;
+
+            EnumType enumType;
+            if (_enumTypes.TryGetValue(typeFullName, out enumType))
+                return enumType;
 
             if (IsGenericEnumerable(typeFullName))
             {
@@ -980,6 +1336,9 @@ Project GetProjectContainingT4File(DTE dte) {
                     else
                         return new StringType();
 
+                case "System.Boolean":
+                    return new BoolType();
+
                 default:
                     return new TypescriptType();
             }
@@ -987,7 +1346,7 @@ Project GetProjectContainingT4File(DTE dte) {
 
         private bool IsNullable(string typeFullName)
         {
-            return typeFullName.StartsWith(nullableTypeStart);
+            return typeFullName.StartsWith(NullableTypeStart);
         }
 
         public string UnwrapGenericType(string typeFullName)
@@ -996,9 +1355,9 @@ Project GetProjectContainingT4File(DTE dte) {
             return typeFullName.Substring(firstIndex+1, typeFullName.Length - firstIndex- 2);
         }
 
-        public bool IsGenericEnumerable(string typeFullName)
+        public static bool IsGenericEnumerable(string typeFullName)
         {
-            return genericCollectionTypeStarts.Any(t => typeFullName.StartsWith(t));
+            return _genericCollectionTypeStarts.Any(typeFullName.StartsWith);
         }
     }
 

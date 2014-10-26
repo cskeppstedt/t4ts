@@ -43,6 +43,6 @@ readonly Dictionary<string, object> SettingsValues = new Dictionary<string, obje
     // List of the project names to process divided with comma to process.
     // Type: string, defaults to null if not specified means that the all projects in solution should be processed.
 //    { "ProjectNamesToProcess", null }
-    { "ProjectNamesToProcess", "T4TS.Example, T4TS.Example.Models" }
+    { "ProjectNamesToProcess", "T4TS.Example_, T4TS.Example.Models" }
 };
 #>
