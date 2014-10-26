@@ -29,6 +29,11 @@ namespace T4TS
         public string DefaultInterfaceNamePrefix { get; set; }
 
         /// <summary>
+        /// The default string to prefix enum names with. For instance, you might want to prefix the names with an "E" to get conventional enum names.
+        /// </summary>
+        public string DefaultEnumNamePrefix { get; set; }
+
+        /// <summary>
         /// The version of Typescript that is targeted
         /// </summary>
         public Version CompatibilityVersion { get; set; }

@@ -249,7 +249,7 @@ namespace T4TS
             {
                 Name = values.ContainsKey("Name") ? values["Name"] : codeEnum.Name,
                 Module = values.ContainsKey("Module") ? values["Module"] : Settings.DefaultModule ?? "T4TS",
-                NamePrefix = values.ContainsKey("NamePrefix") ? values["NamePrefix"] : Settings.DefaultInterfaceNamePrefix ?? string.Empty
+                NamePrefix = values.ContainsKey("NamePrefix") ? values["NamePrefix"] : Settings.DefaultEnumNamePrefix ?? string.Empty
             };
         }
 

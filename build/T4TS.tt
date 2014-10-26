@@ -610,7 +610,7 @@ Project GetProjectContainingT4File(DTE dte) {
             {
                 Name = values.ContainsKey("Name") ? values["Name"] : codeEnum.Name,
                 Module = values.ContainsKey("Module") ? values["Module"] : Settings.DefaultModule ?? "T4TS",
-                NamePrefix = values.ContainsKey("NamePrefix") ? values["NamePrefix"] : Settings.DefaultInterfaceNamePrefix ?? string.Empty
+                NamePrefix = values.ContainsKey("NamePrefix") ? values["NamePrefix"] : Settings.DefaultEnumNamePrefix ?? string.Empty
             };
         }
 
@@ -785,6 +785,11 @@ Project GetProjectContainingT4File(DTE dte) {
         /// The default string to prefix interface names with. For instance, you might want to prefix the names with an "I" to get conventional interface names.
         /// </summary>
         public string DefaultInterfaceNamePrefix { get; set; }
+
+        /// <summary>
+        /// The default string to prefix enum names with. For instance, you might want to prefix the names with an "E" to get conventional enum names.
+        /// </summary>
+        public string DefaultEnumNamePrefix { get; set; }
 
         /// <summary>
         /// The version of Typescript that is targeted

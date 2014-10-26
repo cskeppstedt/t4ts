@@ -30,6 +30,12 @@ readonly Dictionary<string, object> SettingsValues = new Dictionary<string, obje
     // Type: string, defaults to "" if not specified.
     { "DefaultInterfaceNamePrefix", null },
 
+    // The default string to prefix enum names with. For instance, you
+    // might want to prefix the names with an "E" to get conventional
+    // enum names.
+    // Type: string, defaults to "" if not specified.
+    { "DefaultEnumNamePrefix", null },
+
     // The version of Typescript that is targeted. This is required to handle
     // breaking changes in the language grammar and/or compiler.
     // Type: System.Version
