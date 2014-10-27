@@ -12,3 +12,4 @@ packages/
 *.user
 /T4TS.Example/T4TS.d.ts
 *.ts
+*.nupkg
