@@ -12,14 +12,12 @@ namespace T4TS
 
         public EnumTraverser(CodeEnum codeEnum, Action<CodeVariable, int> withVariable)
         {
-            if (codeEnum == null)
-                throw new ArgumentNullException("codeEnum");
+            if (codeEnum == null) throw new ArgumentNullException("codeEnum");
 
-            if (withVariable == null)
-                throw new ArgumentNullException("withVariable");
+            if (withVariable == null) throw new ArgumentNullException("withVariable");
 
-            this.CodeEnum = codeEnum;
-            this.WithVariable = withVariable;
+            CodeEnum = codeEnum;
+            WithVariable = withVariable;
 
             if (codeEnum.Members != null)
                 Traverse(codeEnum.Members);

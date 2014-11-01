@@ -90,13 +90,21 @@ namespace T4TS.Tests
     }
 
 
-    class MockCodeProperties : CodeElemens<CodeProperty>
+    class MockCodeProperties : CodeElemens<CodeElement>
     {
         public MockCodeProperties(Type type)
         {
             foreach (var pi in type.GetProperties())
             {
-                Add(new MockCodeProperty(pi).Object);
+                Add((CodeElement)new MockCodeProperty(pi).Object);
+            }
+
+            foreach (var subType in type.GetNestedTypes())
+            {
+                if (subType.IsEnum)
+                    Add((CodeElement)new MockCodeEnum(subType).Object);
+                else if (subType.IsClass)
+                    Add((CodeElement)new MockCodeClass(subType).Object);
             }
         }
     }
@@ -105,6 +113,7 @@ namespace T4TS.Tests
     {
         public MockCodeProperty(PropertyInfo pi) : base(MockBehavior.Strict)
         {
+            As<CodeElement>();
             Setup(x => x.FullName).Returns(pi.Name);
             Setup(x => x.Name).Returns(pi.Name);
             Setup(x => x.Attributes).Returns(new MockAttributes(pi.GetCustomAttributes()));

@@ -14,6 +14,7 @@ namespace T4TS
 
         public List<TypeScriptEnumMember> Members { get; set; }
         public TypeScriptModule Module { get; set; }
+        public TypeScriptInterface Owner { get; set; }
 
         public TypeScriptEnum()
         {
