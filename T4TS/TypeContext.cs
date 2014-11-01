@@ -94,16 +94,6 @@ namespace T4TS
             return GetTypeScriptType(codeType.AsFullName);
         }
 
-/*
-        private ArrayType TryResolveEnumerableType(string typeFullName)
-        {
-            return new ArrayType
-            {
-                ElementType = GetTypeScriptType(typeFullName)
-            };
-        }
-*/
-
         public TypescriptType GetTypeScriptType(string typeFullName)
         {
             InterfaceType interfaceType;

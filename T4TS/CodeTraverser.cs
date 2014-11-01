@@ -26,44 +26,114 @@ namespace T4TS
             Settings = settings;
         }
 
+
+        private void BuildCodeClass(TypeContext typeContext, CodeClass codeClass, CodeClass owner = null)
+        {
+            if (codeClass == null) return;
+            CodeAttribute attribute;
+            InterfaceType interfaceType = null;
+            if (owner != null)
+            {
+                var tsType = typeContext.GetTypeScriptType(owner.FullName);
+                if (tsType != null)
+                    interfaceType = new InterfaceType(codeClass.Name);
+            }
+            if (TryGetAttribute(codeClass.Attributes, InterfaceAttributeFullName, out attribute))
+            {
+                var values = GetInterfaceValues(codeClass, attribute);
+                interfaceType = new InterfaceType(values);
+            }
+            if (interfaceType != null)
+            {
+                if (!typeContext.ContainsInterfaceType(codeClass.FullName))
+                    typeContext.AddInterfaceType(codeClass.FullName, interfaceType);
+                foreach (var subCodeClass in codeClass.Members)
+                {
+                    BuildCodeClass(typeContext, subCodeClass as CodeClass, codeClass);
+                    BuildCodeEnum(typeContext, subCodeClass as CodeEnum, codeClass);
+                }
+            }
+        }
+        private void BuildCodeEnum(TypeContext typeContext, CodeEnum codeEnum, CodeClass owner = null)
+        {
+            if (codeEnum == null) return;
+            CodeAttribute attribute;
+            EnumType enumType = null;
+            if (owner != null)
+            {
+                var tsType = typeContext.GetTypeScriptType(owner.FullName);
+                if (tsType != null)
+                    enumType = new EnumType(codeEnum.Name);
+            }
+            if (TryGetAttribute(codeEnum.Attributes, EnumAttributeFullName, out attribute))
+            {
+                var values = GetEnumValues(codeEnum, attribute);
+                enumType = new EnumType(values);
+            }
+            if (enumType != null)
+            {
+                if (!typeContext.ContainsEnumType(codeEnum.FullName))
+                    typeContext.AddEnumType(codeEnum.FullName, enumType);
+            }
+        }
+
         public TypeContext BuildContext()
         {
             var typeContext = new TypeContext(Settings);
-            var partialClasses = new Dictionary<string, CodeClass>();
 
-            new SolutionTraverser(this.Solution, (ns) =>
+            new SolutionTraverser(Solution, ns => 
             {
-                new NamespaceTraverser(ns, 
-                    codeClass =>
-                    {
-                        CodeAttribute attribute;
-                        if (TryGetAttribute(codeClass.Attributes, InterfaceAttributeFullName, out attribute))
-                        {
-                            var values = GetInterfaceValues(codeClass, attribute);
-                            var interfaceType = new InterfaceType(values);
-
-                            if (!typeContext.ContainsInterfaceType(codeClass.FullName))
-                                typeContext.AddInterfaceType(codeClass.FullName, interfaceType);
-                        }
-                    },
-
-                    codeEnum =>
-                    {
-                        var s = codeEnum.Name;
-                        CodeAttribute attribute;
-                        if (TryGetAttribute(codeEnum.Attributes, EnumAttributeFullName, out attribute))
-                        {
-                            var values = GetEnumValues(codeEnum, attribute);
-                            var enumType = new EnumType(values);
-
-                            if (!typeContext.ContainsEnumType(codeEnum.FullName))
-                                typeContext.AddEnumType(codeEnum.FullName, enumType);
-                        }
-                    }
-                    );
+                new NamespaceTraverser(ns,
+                    codeClass => BuildCodeClass(typeContext, codeClass),
+                    codeEnum => BuildCodeEnum(typeContext, codeEnum)
+                );
             });
 
             return typeContext;
+        }
+
+        private void ProcessCodeClass(TypeContext typeContext, IDictionary<CodeClass, TypeScriptInterface> tsMap, 
+            IDictionary<string, TypeScriptModule> byModuleName, CodeClass codeClass)
+        {
+            InterfaceType interfaceType;
+            if (typeContext.TryGetInterfaceType(codeClass.FullName, out interfaceType))
+            {
+                var values = interfaceType.AttributeValues;
+
+                TypeScriptModule module;
+                if (!byModuleName.TryGetValue(values.Module, out module))
+                {
+                    module = new TypeScriptModule { QualifiedName = values.Module };
+                    byModuleName.Add(values.Module, module);
+                }
+
+                var tsInterface = BuildInterface(codeClass, values, typeContext);
+                tsMap.Add(codeClass, tsInterface);
+                tsInterface.Module = module;
+                module.Interfaces.Add(tsInterface);
+            }
+        }
+
+        private void ProcessCodeEnum(TypeContext typeContext, IDictionary<CodeEnum, TypeScriptEnum> tsEnumMap,
+            IDictionary<string, TypeScriptModule> byModuleName, CodeEnum codeEnum)
+        {
+            EnumType enumType;
+            if (typeContext.TryGetEnumType(codeEnum.FullName, out enumType))
+            {
+                var values = enumType.AttributeValues;
+
+                TypeScriptModule module;
+                if (!byModuleName.TryGetValue(values.Module, out module))
+                {
+                    module = new TypeScriptModule { QualifiedName = values.Module };
+                    byModuleName.Add(values.Module, module);
+                }
+
+                var tsEnum = BuildEnum(codeEnum, values, typeContext);
+                tsEnumMap.Add(codeEnum, tsEnum);
+                tsEnum.Module = module;
+                module.Enums.Add(tsEnum);
+            }
         }
 
         public IEnumerable<TypeScriptModule> GetAllInterfaces()
@@ -73,59 +143,21 @@ namespace T4TS
             var tsMap = new Dictionary<CodeClass, TypeScriptInterface>();
             var tsEnumMap = new Dictionary<CodeEnum, TypeScriptEnum>();
 
-            new SolutionTraverser(this.Solution, (ns) =>
+            new SolutionTraverser(Solution, ns =>
             {
                 new NamespaceTraverser(ns, 
-                    codeClass =>
-                    {
-                        InterfaceType interfaceType;
-                        if (typeContext.TryGetInterfaceType(codeClass.FullName, out interfaceType))
-                        {
-                            var values = interfaceType.AttributeValues;
-
-                            TypeScriptModule module;
-                            if (!byModuleName.TryGetValue(values.Module, out module))
-                            {
-                                module = new TypeScriptModule { QualifiedName = values.Module };
-                                byModuleName.Add(values.Module, module);
-                            }
-
-                            var tsInterface = BuildInterface(codeClass, values, typeContext);
-                            tsMap.Add(codeClass, tsInterface);
-                            tsInterface.Module = module;
-                            module.Interfaces.Add(tsInterface);
-                        }
-                    },
-
-                    codeEnum =>
-                    {
-                        EnumType enumType;
-                        if (typeContext.TryGetEnumType(codeEnum.FullName, out enumType))
-                        {
-                            var values = enumType.AttributeValues;
-
-                            TypeScriptModule module;
-                            if (!byModuleName.TryGetValue(values.Module, out module))
-                            {
-                                module = new TypeScriptModule { QualifiedName = values.Module };
-                                byModuleName.Add(values.Module, module);
-                            }
-
-                            var tsEnum = BuildEnum(codeEnum, values, typeContext);
-                            tsEnumMap.Add(codeEnum, tsEnum);
-                            tsEnum.Module = module;
-                            module.Enums.Add(tsEnum);
-                        }
-                    });
+                    codeClass => ProcessCodeClass(typeContext, tsMap, byModuleName, codeClass),
+                    codeEnum => ProcessCodeEnum(typeContext, tsEnumMap, byModuleName, codeEnum)
+                );
             });
 
             var tsInterfaces = tsMap.Values.ToList();
             tsMap.Keys.ToList().ForEach(codeClass =>
             {
-                CodeElements baseClasses = codeClass.Bases;
+                var baseClasses = codeClass.Bases;
                 if (baseClasses.Count > 0)
                 {
-                    CodeElement baseClass = baseClasses.Item(1);
+                    var baseClass = baseClasses.Item(1);
                     if (baseClass != null)
                     {
                         var parent = tsInterfaces.SingleOrDefault(intf => intf.FullName == baseClass.FullName);
@@ -165,16 +197,49 @@ namespace T4TS
                 Name = GetInterfaceName(attributeValues)
             };
 
+            // Add sub-classes to the interface
+            foreach (var codeSubClass in codeClass.Members.OfType<CodeClass>())
+            {
+                var subAttributeValues = new TypeScriptInterfaceAttributeValues { Name = codeSubClass.Name };
+                InterfaceType interfaceType;
+                if (typeContext.TryGetInterfaceType(codeSubClass.FullName, out interfaceType))
+                {
+                    subAttributeValues = interfaceType.AttributeValues;
+                    subAttributeValues.Module = attributeValues.Module + "." + tsInterface.Name;
+                }
+                    
+                var subInterface = BuildInterface(codeSubClass, subAttributeValues, typeContext);
+                subInterface.Owner = tsInterface;
+                tsInterface.SubClasses.Add(subInterface);
+            }
+
+            // Add sub-enums to the interface
+            foreach (var codeSubEnum in codeClass.Members.OfType<CodeEnum>())
+            {
+                var subAttributeValues = new TypeScriptEnumAttributeValues { Name = codeSubEnum.Name };
+                EnumType enumType;
+                if (typeContext.TryGetEnumType(codeSubEnum.FullName, out enumType))
+                {
+                    subAttributeValues = enumType.AttributeValues;
+                    subAttributeValues.Module = attributeValues.Module + "." + tsInterface.Name;
+                }
+                    
+                var subEnum = BuildEnum(codeSubEnum, subAttributeValues, typeContext);
+                subEnum.Owner = tsInterface;
+                tsInterface.SubEnums.Add(subEnum);
+            }
+
             TypescriptType indexedType;
             if (TryGetIndexedType(codeClass, typeContext, out indexedType))
                 tsInterface.IndexedType = indexedType;
 
-            new ClassTraverser(codeClass, (property) =>
+            new ClassTraverser(codeClass, property =>
             {
                 TypeScriptInterfaceMember member;
                 if (TryGetMember(property, typeContext, out member))
                     tsInterface.Members.Add(member);
             });
+
 
             return tsInterface;
         }
@@ -264,6 +329,7 @@ namespace T4TS
                 return false;
 
             var values = GetMemberValues(property, typeContext);
+
             member = new TypeScriptInterfaceMember
             {
                 Name = values.Name ?? property.Name,

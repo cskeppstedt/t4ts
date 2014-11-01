@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace T4TS
 {
@@ -17,8 +14,8 @@ namespace T4TS
         {
             AppendIndendation();
 
-            bool isOptional = member.Optional || (member.Type is NullableType);
-            string type = member.Type.ToString();
+            var isOptional = member.Optional || (member.Type is NullableType);
+            var type = member.Type.ToString();
 
             if (member.Type is BoolType)
             {

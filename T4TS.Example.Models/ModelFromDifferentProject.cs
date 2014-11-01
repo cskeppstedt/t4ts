@@ -6,6 +6,25 @@ namespace T4TS.Example.Models
     [TypeScriptInterface(Module="External1")]
     public class ModelFromDifferentProject
     {
+        public enum TestEnum
+        {
+            [TypeScriptMember(Name = "TheItem1")]
+            Item1 = 1,
+            Item2 = 2,
+            Item21,
+            Item22,
+            Item23,
+            Item3 = 5,
+            Item4,
+        }
+
+        [TypeScriptInterface(Name = "TestSubClass")]
+        public class SubClass
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
+
         public int Id { get; set; }
         public string Name { get; set; }
 
@@ -29,8 +48,11 @@ namespace T4TS.Example.Models
         public TestEnum? EnumPropNull { get; set; }
 
         public TestEnum[] EnumArray { get; set; }
+
+        public SubClass SubClassRef { get; set; }
     }
 
+/*
     [TypeScriptEnum(Module = "External2")]
     public enum TestEnum
     {
@@ -43,4 +65,5 @@ namespace T4TS.Example.Models
         Item3 = 5,
         Item4,
     }
+*/
 }
