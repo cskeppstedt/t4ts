@@ -1,29 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace T4TS
 {
     public class InterfaceOutputAppender : OutputAppender<TypeScriptInterface>
     {
-        private bool InGlobalModule { get; set; }
-
         public InterfaceOutputAppender(StringBuilder output, int baseIndentation, Settings settings, bool inGlobalModule)
             : base(output, baseIndentation, settings)
         {
-            this.InGlobalModule = inGlobalModule;
+            InGlobalModule = inGlobalModule;
         }
+
+        private bool InGlobalModule { get; set; }
 
         public override void AppendOutput(TypeScriptInterface tsInterface)
         {
-            foreach (var tsSubEnum in tsInterface.SubEnums)
+            foreach (TypeScriptEnum tsSubEnum in tsInterface.SubEnums)
             {
                 AppendOutputSubEnum(tsSubEnum, tsInterface);
             }
 
-            foreach (var tsSubClass in tsInterface.SubClasses)
+            foreach (TypeScriptInterface tsSubClass in tsInterface.SubClasses)
             {
                 AppendOutputSubClass(tsSubClass, tsInterface);
             }
@@ -31,17 +27,18 @@ namespace T4TS
             BeginInterface(tsInterface);
 
             AppendMembers(tsInterface);
-            
+
             if (tsInterface.IndexedType != null)
                 AppendIndexer(tsInterface);
 
             EndInterface();
         }
+
         private void AppendOutputSubClass(TypeScriptInterface tsInterface, TypeScriptInterface owner)
         {
             BeginInterface(tsInterface, owner);
 
-            foreach (var tsSubClass in tsInterface.SubClasses)
+            foreach (TypeScriptInterface tsSubClass in tsInterface.SubClasses)
             {
                 AppendOutput(tsSubClass);
             }
@@ -53,7 +50,7 @@ namespace T4TS
 
             EndInterface(owner);
         }
-        
+
         private void AppendOutputSubEnum(TypeScriptEnum tsEnum, TypeScriptInterface owner)
         {
             var enumAppender = new EnumOutputAppender(Output, BaseIndentation, Settings);
@@ -62,14 +59,14 @@ namespace T4TS
 
         private void AppendMembers(TypeScriptInterface tsInterface, TypeScriptInterface owner = null)
         {
-            var identation = 4;
+            int identation = 4;
             while (owner != null)
             {
                 identation += 4;
                 owner = owner.Owner;
             }
             var appender = new MemberOutputAppender(Output, BaseIndentation + identation, Settings);
-            foreach (var member in tsInterface.Members)
+            foreach (TypeScriptInterfaceMember member in tsInterface.Members)
                 appender.AppendOutput(member);
         }
 
@@ -86,9 +83,9 @@ namespace T4TS
             }
             else
             {
-                var module = owner.Name;
-                var interfaceName = tsInterface.Name;
-                var arr = tsInterface.Name.Split('.');
+                string module = owner.Name;
+                string interfaceName = tsInterface.Name;
+                string[] arr = tsInterface.Name.Split('.');
                 if (arr.Length > 1)
                 {
                     module = arr[0];
@@ -100,7 +97,9 @@ namespace T4TS
             }
 
             if (tsInterface.Parent != null)
-                Output.Append(" extends " + (tsInterface.Parent.Module.IsGlobal ? "" : tsInterface.Parent.Module.QualifiedName + ".") + tsInterface.Parent.Name);
+                Output.Append(" extends " +
+                              (tsInterface.Parent.Module.IsGlobal ? "" : tsInterface.Parent.Module.QualifiedName + ".") +
+                              tsInterface.Parent.Name);
 
             Output.AppendLine(" {");
         }

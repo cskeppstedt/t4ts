@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace T4TS
 {
@@ -20,8 +16,8 @@ namespace T4TS
             Output.AppendFormat("{0} = {1}",
                 member.Name,
                 member.Value
-            );
-            
+                );
+
             Output.AppendLine(",");
         }
     }

@@ -4,12 +4,19 @@ using Moq;
 
 namespace T4TS.Tests
 {
-    class MockProjects : BaseList<Project>, Projects
+    internal class MockProjects : BaseList<Project>, Projects
     {
         #region - Not Implemented Members -
 
-        public Properties Properties { get { throw new NotImplementedException(); } }
-        public new DTE Parent { get { throw new NotImplementedException(); } }
+        public Properties Properties
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public new DTE Parent
+        {
+            get { throw new NotImplementedException(); }
+        }
 
         #endregion
 

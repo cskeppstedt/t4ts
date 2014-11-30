@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace T4TS
+﻿namespace T4TS
 {
     public class TypeScriptInterfaceAttributeValues
     {

@@ -1,15 +1,11 @@
-﻿using System.CodeDom;
-using EnvDTE;
-using System;
+﻿using System;
 using System.Linq;
+using EnvDTE;
 
 namespace T4TS
 {
     public class EnumTraverser
     {
-        public CodeEnum CodeEnum { get; private set; }
-        public Action<CodeVariable, int> WithVariable { get; set; }
-
         public EnumTraverser(CodeEnum codeEnum, Action<CodeVariable, int> withVariable)
         {
             if (codeEnum == null) throw new ArgumentNullException("codeEnum");
@@ -23,17 +19,19 @@ namespace T4TS
                 Traverse(codeEnum.Members);
         }
 
+        public CodeEnum CodeEnum { get; private set; }
+        public Action<CodeVariable, int> WithVariable { get; set; }
+
         private void Traverse(CodeElements members)
         {
-            var index = 0;
-            foreach (var property in members.OfType<CodeVariable>())
+            int index = 0;
+            foreach (CodeVariable property in members.OfType<CodeVariable>())
             {
                 WithVariable(property, index);
                 if (property.InitExpression != null)
                     index = Int32.Parse(property.InitExpression.ToString());
                 index++;
             }
-                
         }
     }
 }

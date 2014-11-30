@@ -1,14 +1,11 @@
-﻿using EnvDTE;
-using System;
+﻿using System;
 using System.Linq;
+using EnvDTE;
 
 namespace T4TS
 {
     public class ClassTraverser
     {
-        public CodeClass CodeClass { get; private set; }
-        public Action<CodeProperty> WithProperty { get; private set; }
-
         public ClassTraverser(CodeClass codeClass, Action<CodeProperty> withProperty)
         {
             if (codeClass == null) throw new ArgumentNullException("codeClass");
@@ -21,9 +18,12 @@ namespace T4TS
                 Traverse(codeClass.Members);
         }
 
+        public CodeClass CodeClass { get; private set; }
+        public Action<CodeProperty> WithProperty { get; private set; }
+
         private void Traverse(CodeElements members)
         {
-            foreach (var property in members.OfType<CodeProperty>())
+            foreach (CodeProperty property in members.OfType<CodeProperty>())
                 WithProperty(property);
         }
     }

@@ -5,8 +5,6 @@ namespace T4TS
 {
     public class SolutionTraverser
     {
-        public Action<CodeNamespace> WithNamespace { get; private set; }
-
         public SolutionTraverser(Solution solution, Action<CodeNamespace> withNamespace)
         {
             if (solution == null)
@@ -20,6 +18,8 @@ namespace T4TS
             if (solution.Projects != null)
                 Traverse(solution.Projects);
         }
+
+        public Action<CodeNamespace> WithNamespace { get; private set; }
 
         private void Traverse(Projects projects)
         {

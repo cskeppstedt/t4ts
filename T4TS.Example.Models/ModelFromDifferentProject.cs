@@ -3,26 +3,23 @@ using System.Collections.Generic;
 
 namespace T4TS.Example.Models
 {
-    [TypeScriptInterface(Module="External1")]
-    public class ModelFromDifferentProject
+    public class BaseModelFromDifferentProject
+    {
+        public int RootProperty { get; set; }
+    }
+
+    [TypeScriptInterface(Module = "External1")]
+    public class ModelFromDifferentProject : BaseModelFromDifferentProject
     {
         public enum TestEnum
         {
-            [TypeScriptMember(Name = "TheItem1")]
-            Item1 = 1,
+            [TypeScriptMember(Name = "TheItem1")] Item1 = 1,
             Item2 = 2,
             Item21,
             Item22,
             Item23,
             Item3 = 5,
             Item4,
-        }
-
-        [TypeScriptInterface(Name = "TestSubClass")]
-        public class SubClass
-        {
-            public int Id { get; set; }
-            public string Name { get; set; }
         }
 
         public int Id { get; set; }
@@ -50,6 +47,13 @@ namespace T4TS.Example.Models
         public TestEnum[] EnumArray { get; set; }
 
         public SubClass SubClassRef { get; set; }
+
+        [TypeScriptInterface(Name = "TestSubClass")]
+        public class SubClass
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+        }
     }
 
 /*

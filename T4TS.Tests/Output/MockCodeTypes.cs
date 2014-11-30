@@ -3,25 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using EnvDTE;
+using EnvDTE80;
 using Moq;
 
 namespace T4TS.Tests
 {
-    class MockCodeTypes : CodeElemens<CodeElement>
+    internal class MockCodeTypes : CodeElemens<CodeElement>
     {
         public MockCodeTypes(params Type[] types)
         {
-            foreach (var type in types)
+            foreach (Type type in types)
             {
                 if (type.IsEnum)
-                    Add((CodeElement)new MockCodeEnum(type).Object);
+                    Add((CodeElement) new MockCodeEnum(type).Object);
                 else
-                    Add((CodeElement)new MockCodeClass(type).Object);
+                    Add((CodeElement) new MockCodeClass(type).Object);
             }
         }
     }
 
-    class MockCodeClass : Mock<CodeClass>
+    internal class MockCodeClass : Mock<CodeClass>
     {
         public MockCodeClass(Type type) : base(MockBehavior.Strict)
         {
@@ -34,7 +35,7 @@ namespace T4TS.Tests
         }
     }
 
-    class MockCodeEnum : Mock<CodeEnum>
+    internal class MockCodeEnum : Mock<CodeEnum>
     {
         public MockCodeEnum(Type type) : base(MockBehavior.Strict)
         {
@@ -47,39 +48,41 @@ namespace T4TS.Tests
         }
     }
 
-    class MockAttributes : CodeElemens<CodeAttribute>
+    internal class MockAttributes : CodeElemens<CodeAttribute>
     {
         public MockAttributes(IEnumerable<Attribute> attributes)
         {
-            foreach (var attr in attributes)
+            foreach (Attribute attr in attributes)
             {
                 Add(new MockCodeAttribute(attr).Object);
             }
         }
     }
-    class MockCodeAttribute : Mock<CodeAttribute>
+
+    internal class MockCodeAttribute : Mock<CodeAttribute>
     {
         public MockCodeAttribute(Attribute attr) : base(MockBehavior.Strict)
         {
+            Setup(x => x.Name).Returns(attr.GetType().Name);
             Setup(x => x.FullName).Returns(attr.GetType().FullName);
             Setup(x => x.Children).Returns(new MockAttributeProperties(attr));
         }
     }
 
-    class MockAttributeProperties : CodeElemens<EnvDTE80.CodeAttributeArgument>
+    internal class MockAttributeProperties : CodeElemens<CodeAttributeArgument>
     {
         public MockAttributeProperties(Attribute attr)
         {
-            foreach (var pi in attr.GetType().GetProperties())
+            foreach (PropertyInfo pi in attr.GetType().GetProperties())
             {
-                var value = pi.GetValue(attr);
+                object value = pi.GetValue(attr);
                 if (value != null)
                     Add(new MockCodeAttributeArgument(pi.Name, value).Object);
             }
         }
     }
 
-    class MockCodeAttributeArgument : Mock<EnvDTE80.CodeAttributeArgument>
+    internal class MockCodeAttributeArgument : Mock<CodeAttributeArgument>
     {
         public MockCodeAttributeArgument(string name, object value) : base(MockBehavior.Strict)
         {
@@ -90,26 +93,26 @@ namespace T4TS.Tests
     }
 
 
-    class MockCodeProperties : CodeElemens<CodeElement>
+    internal class MockCodeProperties : CodeElemens<CodeElement>
     {
         public MockCodeProperties(Type type)
         {
-            foreach (var pi in type.GetProperties())
+            foreach (PropertyInfo pi in type.GetProperties())
             {
-                Add((CodeElement)new MockCodeProperty(pi).Object);
+                Add((CodeElement) new MockCodeProperty(pi).Object);
             }
 
-            foreach (var subType in type.GetNestedTypes())
+            foreach (Type subType in type.GetNestedTypes())
             {
                 if (subType.IsEnum)
-                    Add((CodeElement)new MockCodeEnum(subType).Object);
+                    Add((CodeElement) new MockCodeEnum(subType).Object);
                 else if (subType.IsClass)
-                    Add((CodeElement)new MockCodeClass(subType).Object);
+                    Add((CodeElement) new MockCodeClass(subType).Object);
             }
         }
     }
 
-    class MockCodeProperty : Mock<CodeProperty>
+    internal class MockCodeProperty : Mock<CodeProperty>
     {
         public MockCodeProperty(PropertyInfo pi) : base(MockBehavior.Strict)
         {
@@ -125,7 +128,7 @@ namespace T4TS.Tests
         }
     }
 
-    class PropertyGetterMock : Mock<CodeFunction>
+    internal class PropertyGetterMock : Mock<CodeFunction>
     {
         public PropertyGetterMock(PropertyInfo pi) : base(MockBehavior.Strict)
         {
@@ -134,7 +137,7 @@ namespace T4TS.Tests
         }
     }
 
-    class FieldGetterMock : Mock<CodeFunction>
+    internal class FieldGetterMock : Mock<CodeFunction>
     {
         public FieldGetterMock(FieldInfo fi) : base(MockBehavior.Strict)
         {
@@ -143,11 +146,11 @@ namespace T4TS.Tests
         }
     }
 
-    class CodeTypeRefMock : Mock<CodeTypeRef>
+    internal class CodeTypeRefMock : Mock<CodeTypeRef>
     {
-        public CodeTypeRefMock(Type propertyType): base(MockBehavior.Strict)
+        public CodeTypeRefMock(Type propertyType) : base(MockBehavior.Strict)
         {
-            var fullName = propertyType.FullName;
+            string fullName = propertyType.FullName;
             if (fullName.Contains('`'))
             {
                 fullName = fullName.Split('`')[0] + '<' + propertyType.GetGenericArguments().Single().FullName + '>';
@@ -160,19 +163,19 @@ namespace T4TS.Tests
                 Setup(x => x.TypeKind).Returns(vsCMTypeRef.vsCMTypeRefArray);
                 Setup(x => x.ElementType).Returns(new CodeTypeRefMock(propertyType.GetElementType()).Object);
             }
-            else if (propertyType == typeof(string))
+            else if (propertyType == typeof (string))
             {
                 Setup(x => x.TypeKind).Returns(vsCMTypeRef.vsCMTypeRefString);
             }
-            else if (propertyType == typeof(char))
+            else if (propertyType == typeof (char))
             {
                 Setup(x => x.TypeKind).Returns(vsCMTypeRef.vsCMTypeRefChar);
             }
-            else if (propertyType == typeof(bool))
+            else if (propertyType == typeof (bool))
             {
                 Setup(x => x.TypeKind).Returns(vsCMTypeRef.vsCMTypeRefBool);
             }
-            else if (propertyType == typeof(int))
+            else if (propertyType == typeof (int))
             {
                 Setup(x => x.TypeKind).Returns(vsCMTypeRef.vsCMTypeRefInt);
             }
@@ -184,19 +187,19 @@ namespace T4TS.Tests
     }
 
 
-    class MockCodeVariables : CodeElemens<CodeVariable>
+    internal class MockCodeVariables : CodeElemens<CodeVariable>
     {
         public MockCodeVariables(Type type)
         {
-            foreach (var name in Enum.GetNames(type))
+            foreach (string name in Enum.GetNames(type))
             {
-                var fi = type.GetField(name, BindingFlags.Static | BindingFlags.Public);
+                FieldInfo fi = type.GetField(name, BindingFlags.Static | BindingFlags.Public);
                 Add(new MockCodeVariable(fi).Object);
             }
         }
     }
 
-    class MockCodeVariable: Mock<CodeVariable>
+    internal class MockCodeVariable : Mock<CodeVariable>
     {
         public MockCodeVariable(FieldInfo fi) : base(MockBehavior.Strict)
         {
@@ -204,8 +207,7 @@ namespace T4TS.Tests
             Setup(x => x.Name).Returns(fi.Name);
             Setup(x => x.Attributes).Returns(new MockAttributes(fi.GetCustomAttributes()));
             Setup(x => x.Access).Returns(vsCMAccess.vsCMAccessPublic);
-            Setup(x => x.InitExpression).Returns(((int)fi.GetValue(null)).ToString());
+            Setup(x => x.InitExpression).Returns(((int) fi.GetValue(null)).ToString());
         }
     }
-
 }

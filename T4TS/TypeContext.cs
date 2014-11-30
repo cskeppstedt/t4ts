@@ -1,16 +1,12 @@
-﻿using EnvDTE;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using EnvDTE;
 
 namespace T4TS
 {
     public class TypeContext
     {
-        public Settings Settings { get; private set; }
-        public TypeContext(Settings settings)
-        {
-            Settings = settings;
-        }
+        private const string NullableTypeStart = "System.Nullable<";
 
         private static readonly string[] _genericCollectionTypeStarts =
         {
@@ -19,19 +15,26 @@ namespace T4TS
             "System.Collections.Generic.ICollection<"
         };
 
-        private const string NullableTypeStart = "System.Nullable<";
+        private readonly Dictionary<string, EnumType> _enumTypes = new Dictionary<string, EnumType>();
 
         /// <summary>
-        /// Lookup table for "interface types", ie. non-builtin types (typically classes or unknown types). Keyed on the FullName of the type.
+        ///     Lookup table for "interface types", ie. non-builtin types (typically classes or unknown types). Keyed on the
+        ///     FullName of the type.
         /// </summary>
         private readonly Dictionary<string, InterfaceType> _interfaceTypes = new Dictionary<string, InterfaceType>();
 
-        private readonly Dictionary<string, EnumType> _enumTypes = new Dictionary<string, EnumType>();
+        public TypeContext(Settings settings)
+        {
+            Settings = settings;
+        }
+
+        public Settings Settings { get; private set; }
 
         public void AddInterfaceType(string typeFullName, InterfaceType interfaceType)
         {
             _interfaceTypes.Add(typeFullName, interfaceType);
         }
+
         public void AddEnumType(string typeFullName, EnumType enumType)
         {
             _enumTypes.Add(typeFullName, enumType);
@@ -51,6 +54,7 @@ namespace T4TS
         {
             return _interfaceTypes.ContainsKey(typeFullName);
         }
+
         public bool ContainsEnumType(string typeFullName)
         {
             return _enumTypes.ContainsKey(typeFullName);
@@ -111,7 +115,7 @@ namespace T4TS
                     ElementType = GetTypeScriptType(UnwrapGenericType(typeFullName))
                 };
             }
-            else if (IsNullable(typeFullName))
+            if (IsNullable(typeFullName))
             {
                 return new NullableType
                 {
@@ -143,8 +147,7 @@ namespace T4TS
                 case "System.DateTime":
                     if (Settings.UseNativeDates)
                         return new DateTimeType();
-                    else
-                        return new StringType();
+                    return new StringType();
 
                 case "System.Boolean":
                     return new BoolType();
@@ -162,7 +165,7 @@ namespace T4TS
         public string UnwrapGenericType(string typeFullName)
         {
             int firstIndex = typeFullName.IndexOf('<');
-            return typeFullName.Substring(firstIndex+1, typeFullName.Length - firstIndex- 2);
+            return typeFullName.Substring(firstIndex + 1, typeFullName.Length - firstIndex - 2);
         }
 
         public static bool IsGenericEnumerable(string typeFullName)

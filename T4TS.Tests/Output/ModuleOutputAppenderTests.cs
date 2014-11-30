@@ -1,9 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Text;
-using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace T4TS.Tests
 {
@@ -18,7 +15,7 @@ namespace T4TS.Tests
             {
                 QualifiedName = "Foo"
             };
-            
+
             var settings = new Settings();
             var appender = new ModuleOutputAppender(sb, 0, settings);
 

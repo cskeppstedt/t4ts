@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace T4TS
 {
@@ -18,9 +14,10 @@ namespace T4TS
             BeginInterface(tsEnum);
 
             AppendMembers(tsEnum);
-            
+
             EndInterface();
         }
+
         public void AppendOutputSubEnum(TypeScriptEnum tsEnum, TypeScriptInterface owner)
         {
             BeginInterface(tsEnum, owner);
@@ -32,14 +29,14 @@ namespace T4TS
 
         private void AppendMembers(TypeScriptEnum tsEnum, TypeScriptInterface owner = null)
         {
-            var identation = 4;
+            int identation = 4;
             while (owner != null)
             {
                 identation += 4;
                 owner = owner.Owner;
             }
             var appender = new EnumMemberOutputAppender(Output, BaseIndentation + identation, Settings);
-            foreach (var member in tsEnum.Members)
+            foreach (TypeScriptEnumMember member in tsEnum.Members)
                 appender.AppendOutput(member);
         }
 
@@ -52,9 +49,9 @@ namespace T4TS
             }
             else
             {
-                var module = owner.Name;
-                var enumName = tsEnum.Name;
-                var arr = tsEnum.Name.Split('.');
+                string module = owner.Name;
+                string enumName = tsEnum.Name;
+                string[] arr = tsEnum.Name.Split('.');
                 if (arr.Length > 1)
                 {
                     module = arr[0];
@@ -63,7 +60,6 @@ namespace T4TS
                 AppendIndentedLine("module " + module + " {");
                 AppendIndendation();
                 AppendIndented("enum " + enumName);
-
             }
             Output.AppendLine(" {");
         }
@@ -78,6 +74,5 @@ namespace T4TS
             }
             AppendIndentedLine("}");
         }
-
     }
 }

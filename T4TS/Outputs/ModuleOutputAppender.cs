@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace T4TS
 {
@@ -18,11 +15,11 @@ namespace T4TS
             BeginModule(module);
 
             var enumAppender = new EnumOutputAppender(Output, BaseIndentation + 4, Settings);
-            foreach (var tsEnum in module.Enums)
+            foreach (TypeScriptEnum tsEnum in module.Enums)
                 enumAppender.AppendOutput(tsEnum);
 
             var interfaceAppender = new InterfaceOutputAppender(Output, BaseIndentation + 4, Settings, module.IsGlobal);
-            foreach (var tsInterface in module.Interfaces)
+            foreach (TypeScriptInterface tsInterface in module.Interfaces)
                 interfaceAppender.AppendOutput(tsInterface);
 
             EndModule(module);

@@ -1,37 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace T4TS
+﻿namespace T4TS
 {
     public class InterfaceType : TypescriptType
     {
-        public TypeScriptInterfaceAttributeValues AttributeValues { get; private set; }
-
-        public string QualifedModule 
-        { 
-            get 
-            {
-                if (AttributeValues == null)
-                    return null;
-
-                return AttributeValues.Module; 
-            } 
-        }
-
-        public override string Name
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(AttributeValues.NamePrefix))
-                    return AttributeValues.NamePrefix + AttributeValues.Name;
-
-                return AttributeValues.Name;
-            }
-        }
-
         public InterfaceType(TypeScriptInterfaceAttributeValues values)
         {
             AttributeValues = values;
@@ -43,6 +13,30 @@ namespace T4TS
             {
                 Name = name
             };
+        }
+
+        public TypeScriptInterfaceAttributeValues AttributeValues { get; private set; }
+
+        public string QualifedModule
+        {
+            get
+            {
+                if (AttributeValues == null)
+                    return null;
+
+                return AttributeValues.Module;
+            }
+        }
+
+        public override string Name
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(AttributeValues.NamePrefix))
+                    return AttributeValues.NamePrefix + AttributeValues.Name;
+
+                return AttributeValues.Name;
+            }
         }
 
         public override string ToString()
