@@ -47,7 +47,7 @@ namespace T4TS.Tests
     {
         public new CodeElement Item(object index)
         {
-            throw new NotImplementedException();
+            return (CodeElement)this[(int)index - 1];
         }
     }
 }

@@ -231,7 +231,11 @@ readonly Dictionary&lt;string, object&gt; SettingsValues = new Dictionary&lt;str
 
     // If equals true - classes marked with DataContractAttribute will be processed.
     // Type: bool?, defaults to false if not specified.
-    { "ProcessDataContracts", null }
+    { "ProcessDataContracts", null },
+
+    // If equals true -  - parent classes will be processed even if they weren't marked with TypeScriptInterfaceAttribute or DataContractAttribute.
+    // Type: bool?, defaults to false if not specified.
+    { "ProcessParentClasses", null }
     
 };
 #&gt;</value>

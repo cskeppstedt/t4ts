@@ -26,12 +26,20 @@ namespace T4TS.Tests
     {
         public MockCodeClass(Type type) : base(MockBehavior.Strict)
         {
-            As<CodeElement>();
+            var el = As<CodeElement>();
+            el.Setup(x => x.Name).Returns(type.Name);
+            el.Setup(x => x.FullName).Returns(type.FullName);
+            
+            var bases = new CodeElemens<CodeClass>();
+            if (type.BaseType != null)
+                bases.Add(new MockCodeClass(type.BaseType).Object);
+
             Setup(x => x.Attributes).Returns(new MockAttributes(type.GetCustomAttributes(false).OfType<Attribute>()));
             Setup(x => x.Name).Returns(type.Name);
             Setup(x => x.FullName).Returns(type.FullName);
-            Setup(x => x.Bases).Returns(new CodeElemens<CodeElement>());
+            Setup(x => x.Bases).Returns(bases);
             Setup(x => x.Members).Returns(new MockCodeProperties(type));
+            Setup(x => x.Access).Returns(vsCMAccess.vsCMAccessPublic);
         }
     }
 
@@ -45,6 +53,7 @@ namespace T4TS.Tests
             Setup(x => x.FullName).Returns(type.FullName);
             Setup(x => x.Bases).Returns(new CodeElemens<CodeElement>());
             Setup(x => x.Members).Returns(new MockCodeVariables(type));
+            Setup(x => x.Access).Returns(vsCMAccess.vsCMAccessPublic);
         }
     }
 
@@ -97,7 +106,7 @@ namespace T4TS.Tests
     {
         public MockCodeProperties(Type type)
         {
-            foreach (PropertyInfo pi in type.GetProperties())
+            foreach (PropertyInfo pi in type.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance))
             {
                 Add((CodeElement) new MockCodeProperty(pi).Object);
             }

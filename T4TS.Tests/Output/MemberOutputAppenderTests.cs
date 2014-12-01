@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Xml.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace T4TS.Tests
@@ -10,6 +11,11 @@ namespace T4TS.Tests
     [TestClass]
     public class MemberOutputAppenderTests
     {
+        private void AssertOutputs(string expected, string actual)
+        {
+            Assert.AreEqual(expected.Replace("\r\n", "\n").Trim(), actual.Replace("\r\n", "\n").Trim());
+        }
+
         [TestMethod]
         public void MemberOutputAppenderRespectsCompatibilityVersion()
         {
@@ -71,7 +77,7 @@ namespace T4TS.Tests
             var settings = new Settings { UseNativeDates = true };
             string res = OutputFormatter.GetOutput(GetDataToRender(settings), settings);
             Console.WriteLine(res);
-            Assert.AreEqual(ExpectedResult, res);
+            AssertOutputs(ExpectedResult, res);
         }
 
         [TestMethod]
@@ -80,7 +86,7 @@ namespace T4TS.Tests
             var settings = new Settings { UseNativeDates = true };
             string res = OutputFormatter.GetOutput(GetDataToRenderSubClasses(settings), settings);
             Console.WriteLine(res);
-            Assert.AreEqual(ExpectedSubClassesResult, res);
+            AssertOutputs(ExpectedSubClassesResult, res);
         }
 
         [TestMethod]
@@ -89,13 +95,26 @@ namespace T4TS.Tests
             var settings = new Settings { UseNativeDates = true };
             var res = OutputFormatter.GetOutput(GetDataToRenderDataContract(settings), settings);
             // Test behaviour by default - no process DataContract classes 
-            Assert.AreEqual(OutputHeader, res);
+            AssertOutputs(OutputHeader, res);
             // Test extended behaviour - process DataContract classes 
             settings.ProcessDataContracts = true;
             res = OutputFormatter.GetOutput(GetDataToRenderDataContract(settings), settings);
             Console.WriteLine(res);
-            Assert.AreEqual(ExpectedDataContractResult, res);
+            AssertOutputs(ExpectedDataContractResult, res);
         }
+
+        [TestMethod]
+        public void TestOutputDataInheritance()
+        {
+            var settings = new Settings { UseNativeDates = true };
+            var res = OutputFormatter.GetOutput(GetDataToRenderDataInheritance(settings), settings);
+            AssertOutputs(ExpectedDataNoInheritanceResult, res);
+            settings.ProcessParentClasses = true;
+            res = OutputFormatter.GetOutput(GetDataToRenderDataInheritance(settings), settings);
+            Console.WriteLine(res);
+            AssertOutputs(ExpectedDataInheritanceResult, res);
+        }
+
 
         #region - Test Data -
 
@@ -134,7 +153,6 @@ declare module External1 {
         EnumProp: External2.TestEnum;
         EnumPropNull?: External2.TestEnum;
         EnumArray: External2.TestEnum[];
-        BaseProperty: string;
     }
 }
 
@@ -164,15 +182,9 @@ declare module External2 {
             Item4,
         }
 
-        public class TestBaseClass
-        {
-            public string BaseProperty { get; set; }
-        }
-
-
         [TypeScriptInterface(Module = "External1")]
 
-        public class TestClass : TestBaseClass
+        public class TestClass
         {
             public int Id { get; set; }
             public string Name { get; set; }
@@ -274,7 +286,7 @@ declare module External1 {
 
         #endregion
 
-        #region - Test Data -
+        #region - Test DataContract -
 
         private List<TypeScriptModule> GetDataToRenderDataContract(Settings settings)
         {
@@ -304,6 +316,51 @@ declare module T4TS {
 
             [JsonIgnore]
             public string JsonIgnored { get; set; }
+        }
+
+        #endregion
+
+        #region - Test Data Inheritance -
+
+        private List<TypeScriptModule> GetDataToRenderDataInheritance(Settings settings)
+        {
+            var generator = new CodeTraverser(
+                new MockSolution(
+                    typeof(TestDataParentClass),
+                    typeof(TestDataChildClass)
+                    ).Object, settings);
+            return generator.GetAllInterfaces().ToList();
+        }
+
+        private const string ExpectedDataInheritanceResult = OutputHeader + @"
+declare module T4TS {
+    /** Generated from T4TS.Tests.MemberOutputAppenderTests+TestDataParentClass **/
+    export interface TestDataParentClass {
+        Id: number;
+    }
+    /** Generated from T4TS.Tests.MemberOutputAppenderTests+TestDataChildClass **/
+    export interface TestDataChildClass extends T4TS.TestDataParentClass {
+        Name: string;
+    }
+}
+";
+        private const string ExpectedDataNoInheritanceResult = OutputHeader + @"
+declare module T4TS {
+    /** Generated from T4TS.Tests.MemberOutputAppenderTests+TestDataChildClass **/
+    export interface TestDataChildClass {
+        Name: string;
+    }
+}
+";
+        public abstract class TestDataParentClass
+        {
+            public int Id { get; internal protected set; }
+        }
+
+        [TypeScriptInterface]
+        public class TestDataChildClass : TestDataParentClass
+        {
+            public string Name { get; set; }
         }
 
         #endregion
