@@ -5,21 +5,32 @@ using EnvDTE;
 
 namespace T4TS.Tests
 {
-    class BaseList<TItem> : List<TItem>
+    internal class BaseList<TItem> : List<TItem>
     {
+        public object Parent
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public DTE DTE
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public string Kind
+        {
+            get { throw new NotImplementedException(); }
+        }
+
         public TItem Item(object index)
         {
-            return this[(int)index];
+            return this[(int) index];
         }
 
         public new IEnumerator GetEnumerator()
         {
             return base.GetEnumerator();
         }
-
-        public object Parent { get { throw new NotImplementedException(); } }
-        public DTE DTE { get { throw new NotImplementedException(); } }
-        public string Kind { get { throw new NotImplementedException(); } }
 
         public void Reserved1(object element)
         {
@@ -32,7 +43,7 @@ namespace T4TS.Tests
         }
     }
 
-    class CodeElemens<TItem> : BaseList<TItem>, CodeElements
+    internal class CodeElemens<TItem> : BaseList<TItem>, CodeElements
     {
         public new CodeElement Item(object index)
         {

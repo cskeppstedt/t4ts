@@ -2,18 +2,16 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>LionSoft.T4TS</id>
-        <version>3.0.0</version>
+        <version>3.0.2</version>
         <authors>LionSoft,Christoffer Skeppstedt,Nils Edström</authors>
         <owners>LionSoft,Christoffer Skeppstedt,Nils Edström</owners>
         <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
         <projectUrl>https://github.com/lionsoft/t4ts</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>T4 template to generate TypeScript interface definitions</description>
+        <description>T4 template to generate TypeScript interface definitions. This fork from the original package adds an ability to export enums to the .ts file.</description>
         <summary>
-           This fork from the original package adds an ability to export enums to the .ts file.
+           It allows any class in the solution with the TypeScriptInterface attribute and enum with the TypeScriptEnum attribute to be generated.
         </summary>
-        <releaseNotes>This release contains 2 features, but I thought it was a good one. 
-          It allows any class in the solution with the TypeScriptInterface attribute and enum with the TypeScriptEnum attribute to be generated. Big thanks to vegardlarsen who added this!</releaseNotes>
         <tags>t4 TypeScript</tags>
     </metadata>
     <files>

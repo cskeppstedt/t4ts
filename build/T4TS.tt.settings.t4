@@ -30,12 +30,6 @@ readonly Dictionary<string, object> SettingsValues = new Dictionary<string, obje
     // Type: string, defaults to "" if not specified.
     { "DefaultInterfaceNamePrefix", null },
 
-    // The default string to prefix enum names with. For instance, you
-    // might want to prefix the names with an "E" to get conventional
-    // enum names.
-    // Type: string, defaults to "" if not specified.
-    { "DefaultEnumNamePrefix", null },
-
     // The version of Typescript that is targeted. This is required to handle
     // breaking changes in the language grammar and/or compiler.
     // Type: System.Version
@@ -43,6 +37,16 @@ readonly Dictionary<string, object> SettingsValues = new Dictionary<string, obje
 
     // The default value for DateTime type translation.
     // Type: bool?, defaults to false if not specified.
-    { "UseNativeDates", null }
+    { "UseNativeDates", null },
+    
+    // List of the project names to process divided with comma to process.
+    // Type: string, defaults to null if not specified means that the all projects in solution should be processed.
+    { "ProjectNamesToProcess", null },
+//    { "ProjectNamesToProcess", "T4TS.Example_, T4TS.Example.Models" },
+
+    // If equals true - classes marked with DataContractAttribute will be processed.
+    // Type: bool?, defaults to false if not specified.
+    { "ProcessDataContracts", null }
+    
 };
 #>

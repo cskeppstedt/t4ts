@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using T4TS.Example.Models;
 
-namespace T4TS.Example.Models
+namespace T4TS.Example
 {
     [TypeScriptInterface]
     public class InheritanceTestExternal : ModelFromDifferentProject

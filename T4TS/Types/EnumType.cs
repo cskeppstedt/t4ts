@@ -2,30 +2,6 @@
 {
     public class EnumType : TypescriptType
     {
-        public TypeScriptEnumAttributeValues AttributeValues { get; private set; }
-
-        public string QualifedModule 
-        { 
-            get 
-            {
-                if (AttributeValues == null)
-                    return null;
-
-                return AttributeValues.Module; 
-            } 
-        }
-
-        public override string Name
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(AttributeValues.NamePrefix))
-                    return AttributeValues.NamePrefix + AttributeValues.Name;
-
-                return AttributeValues.Name;
-            }
-        }
-
         public EnumType(TypeScriptEnumAttributeValues values)
         {
             AttributeValues = values;
@@ -37,6 +13,30 @@
             {
                 Name = name
             };
+        }
+
+        public TypeScriptEnumAttributeValues AttributeValues { get; private set; }
+
+        public string QualifedModule
+        {
+            get
+            {
+                if (AttributeValues == null)
+                    return null;
+
+                return AttributeValues.Module;
+            }
+        }
+
+        public override string Name
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(AttributeValues.NamePrefix))
+                    return AttributeValues.NamePrefix + AttributeValues.Name;
+
+                return AttributeValues.Name;
+            }
         }
 
         public override string ToString()

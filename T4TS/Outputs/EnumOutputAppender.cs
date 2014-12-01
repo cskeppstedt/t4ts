@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace T4TS
 {
@@ -18,28 +14,64 @@ namespace T4TS
             BeginInterface(tsEnum);
 
             AppendMembers(tsEnum);
-            
+
             EndInterface();
         }
 
-        private void AppendMembers(TypeScriptEnum tsEnum)
+        public void AppendOutputSubEnum(TypeScriptEnum tsEnum, TypeScriptInterface owner)
         {
-            var appender = new EnumMemberOutputAppender(Output, BaseIndentation + 4, Settings);
-            foreach (var member in tsEnum.Members)
+            BeginInterface(tsEnum, owner);
+
+            AppendMembers(tsEnum, owner);
+
+            EndInterface(owner);
+        }
+
+        private void AppendMembers(TypeScriptEnum tsEnum, TypeScriptInterface owner = null)
+        {
+            int identation = 4;
+            while (owner != null)
+            {
+                identation += 4;
+                owner = owner.Owner;
+            }
+            var appender = new EnumMemberOutputAppender(Output, BaseIndentation + identation, Settings);
+            foreach (TypeScriptEnumMember member in tsEnum.Members)
                 appender.AppendOutput(member);
         }
 
-        private void BeginInterface(TypeScriptEnum tsEnum)
+        private void BeginInterface(TypeScriptEnum tsEnum, TypeScriptInterface owner = null)
         {
             AppendIndentedLine("/** Generated from " + tsEnum.FullName + " **/");
-
-            AppendIndented("enum " + tsEnum.Name);
-
+            if (owner == null)
+            {
+                AppendIndented("enum " + tsEnum.Name);
+            }
+            else
+            {
+                string module = owner.Name;
+                string enumName = tsEnum.Name;
+                string[] arr = tsEnum.Name.Split('.');
+                if (arr.Length > 1)
+                {
+                    module = arr[0];
+                    enumName = arr[1];
+                }
+                AppendIndentedLine("module " + module + " {");
+                AppendIndendation();
+                AppendIndented("enum " + enumName);
+            }
             Output.AppendLine(" {");
         }
 
-        private void EndInterface()
+        private void EndInterface(TypeScriptInterface owner = null)
         {
+            while (owner != null)
+            {
+                AppendIndendation();
+                AppendIndentedLine("}");
+                owner = owner.Owner;
+            }
             AppendIndentedLine("}");
         }
     }

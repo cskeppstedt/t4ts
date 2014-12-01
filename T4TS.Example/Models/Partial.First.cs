@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace T4TS.Example.Models
+﻿namespace T4TS.Example
 {
     partial class Partial
     {

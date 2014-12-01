@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace T4TS.Example.Models
+namespace T4TS.Example
 {
     [TypeScriptInterface(Module = "")]
     public class Barfoo

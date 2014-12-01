@@ -1,18 +1,16 @@
-﻿using EnvDTE;
-using System;
+﻿using System;
 using System.Linq;
+using EnvDTE;
 
 namespace T4TS
 {
     public class ProjectTraverser
     {
-        public Action<CodeNamespace> WithNamespace { get; private set; }
-
         public ProjectTraverser(Project project, Action<CodeNamespace> withNamespace)
         {
             if (project == null)
                 throw new ArgumentNullException("project");
-            
+
             if (withNamespace == null)
                 throw new ArgumentNullException("withNamespace");
 
@@ -21,6 +19,8 @@ namespace T4TS
             if (project.ProjectItems != null)
                 Traverse(project.ProjectItems);
         }
+
+        public Action<CodeNamespace> WithNamespace { get; private set; }
 
         private void Traverse(ProjectItems items)
         {
@@ -31,8 +31,8 @@ namespace T4TS
                     if (CodeTraverser.Settings.ProjectNamesToProcess == null ||
                         CodeTraverser.Settings.ProjectNamesToProcess.Contains(pi.ContainingProject.Name))
                     {
-                        var codeElements = pi.FileCodeModel.CodeElements;
-                        foreach (var ns in codeElements.OfType<CodeNamespace>())
+                        CodeElements codeElements = pi.FileCodeModel.CodeElements;
+                        foreach (CodeNamespace ns in codeElements.OfType<CodeNamespace>())
                             WithNamespace(ns);
                     }
                 }
@@ -40,13 +40,12 @@ namespace T4TS
                 if (pi.ProjectItems != null)
                     Traverse(pi.ProjectItems);
 
-                /* LionSoft: Process projects in solution folders */
+                    /* LionSoft: Process projects in solution folders */
                 else if (pi.SubProject != null && pi.SubProject.ProjectItems != null)
                 {
                     Traverse(pi.SubProject.ProjectItems);
                 }
                 /* --- */
-
             }
         }
     }

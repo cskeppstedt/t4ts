@@ -4,7 +4,7 @@ using Moq;
 
 namespace T4TS.Tests
 {
-    class MockProjectItems : BaseList<ProjectItem>, ProjectItems
+    internal class MockProjectItems : BaseList<ProjectItem>, ProjectItems
     {
         #region - Not Implemented Members -
 
@@ -33,7 +33,10 @@ namespace T4TS.Tests
             throw new NotImplementedException();
         }
 
-        public Project ContainingProject { get { throw new NotImplementedException(); } }
+        public Project ContainingProject
+        {
+            get { throw new NotImplementedException(); }
+        }
 
         #endregion
 
@@ -44,8 +47,8 @@ namespace T4TS.Tests
 
             var projectItem = new Mock<ProjectItem>(MockBehavior.Strict);
             projectItem.Setup(x => x.FileCodeModel).Returns(fileCodeModel.Object);
-            projectItem.Setup(x => x.ProjectItems).Returns((ProjectItems)null);
-            projectItem.Setup(x => x.SubProject).Returns((Project)null);
+            projectItem.Setup(x => x.ProjectItems).Returns((ProjectItems) null);
+            projectItem.Setup(x => x.SubProject).Returns((Project) null);
             Add(projectItem.Object);
         }
     }
