@@ -50,7 +50,12 @@ readonly Dictionary<string, object> SettingsValues = new Dictionary<string, obje
 
     // If equals true -  - parent classes will be processed even if they weren't marked with TypeScriptInterfaceAttribute or DataContractAttribute.
     // Type: bool?, defaults to false if not specified.
-    { "ProcessParentClasses", null }
+    { "ProcessParentClasses", null },
+
+    // Additional list of the additional attribute short names which prevents processing of the members. 
+    // Type: string, defaults to null if not specified means that the the properties marked with JsonIgnoreAttribute will be ignored.
+    { "MemberIgnoreAttributes", null }
+//    { "MemberIgnoreAttributes", "JsonIgnoreAttribute, XmlIgnoreAttribute" }
     
 };
 #>

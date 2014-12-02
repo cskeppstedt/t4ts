@@ -93,14 +93,29 @@ namespace T4TS.Tests
         public void TestOutputDataContract()
         {
             var settings = new Settings { UseNativeDates = true };
-            var res = OutputFormatter.GetOutput(GetDataToRenderDataContract(settings), settings);
+
             // Test behaviour by default - no process DataContract classes 
+            var res = OutputFormatter.GetOutput(GetDataToRenderDataContract(settings), settings);
+            Console.WriteLine(res);
             AssertOutputs(OutputHeader, res);
+
             // Test extended behaviour - process DataContract classes 
             settings.ProcessDataContracts = true;
             res = OutputFormatter.GetOutput(GetDataToRenderDataContract(settings), settings);
             Console.WriteLine(res);
             AssertOutputs(ExpectedDataContractResult, res);
+
+            // Test extended behaviour - process DataContract classes with XmlIgnoreAttribute
+            settings.MemberIgnoreAttributes = new[] { "XmlIgnoreAttribute" };
+            res = OutputFormatter.GetOutput(GetDataToRenderDataContract(settings), settings);
+            Console.WriteLine(res);
+            AssertOutputs(ExpectedDataContractWithXmlIgnoredResult, res);
+
+            // Test extended behaviour - process DataContract classes with XmlIgnoreAttribute and JsonIgnoreAttribute
+            settings.MemberIgnoreAttributes = new[] { "XmlIgnoreAttribute", "JsonIgnoreAttribute" };
+            res = OutputFormatter.GetOutput(GetDataToRenderDataContract(settings), settings);
+            Console.WriteLine(res);
+            AssertOutputs(ExpectedDataContractWithXmlIgnoredAndJsonIgnoredResult, res);
         }
 
         [TestMethod]
@@ -305,9 +320,30 @@ declare module T4TS {
     export interface TestDataClass {
         Id: number;
         Name: string;
+        XmlIgnored: string;
     }
 }
 ";
+        private const string ExpectedDataContractWithXmlIgnoredResult = OutputHeader + @"
+declare module T4TS {
+    /** Generated from T4TS.Tests.MemberOutputAppenderTests+TestDataClass **/
+    export interface TestDataClass {
+        Id: number;
+        Name: string;
+        JsonIgnored: string;
+    }
+}
+";
+        private const string ExpectedDataContractWithXmlIgnoredAndJsonIgnoredResult = OutputHeader + @"
+declare module T4TS {
+    /** Generated from T4TS.Tests.MemberOutputAppenderTests+TestDataClass **/
+    export interface TestDataClass {
+        Id: number;
+        Name: string;
+    }
+}
+";
+
         [DataContract]
         public class TestDataClass
         {
@@ -316,6 +352,9 @@ declare module T4TS {
 
             [JsonIgnore]
             public string JsonIgnored { get; set; }
+
+            [XmlIgnore]
+            public string XmlIgnored { get; set; }
         }
 
         #endregion

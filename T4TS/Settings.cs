@@ -58,6 +58,19 @@ namespace T4TS
         /// </summary>
         public bool ProcessParentClasses { get; set; }
 
+        /// <summary>
+        ///     Additional list of the additional attribute short names which prevents processing of the members. 
+        ///     If null - the properties marked with <see cref="JsonIgnoreAttribute"/> will be ignored.
+        /// </summary>
+        public string[] MemberIgnoreAttributes { get; set; }
+
+
+        public Settings()
+        {
+            DefaultModule = "T4TS";
+            MemberIgnoreAttributes = new[] {"JsonIgnoreAttribute"};
+        }
+
         public static Settings Parse(Dictionary<string, object> settingsValues)
         {
             // Read settings from T4TS.tt.settings.tt
@@ -72,11 +85,11 @@ namespace T4TS
                 ProjectNamesToProcess = ParseSettingReferenceType(settingsValues, "ProjectNamesToProcess", s => s == null ? null : s.ToString().Replace(" ", "").Split(','), null),
                 ProcessDataContracts = ParseSettingNullableType(settingsValues, "ProcessDataContracts", false),
                 ProcessParentClasses = ParseSettingNullableType(settingsValues, "ProcessParentClasses", false),
+                MemberIgnoreAttributes = ParseSettingReferenceType(settingsValues, "MemberIgnoreAttributes", s => s as string, "JsonIgnoreAttribute").Split(','),
             };
         }
 
-        private static T ParseSettingReferenceType<T>(Dictionary<string, object> settingsValues, string key,
-            Func<object, T> convert, T defaultValue) where T : class
+        private static T ParseSettingReferenceType<T>(Dictionary<string, object> settingsValues, string key, Func<object, T> convert, T defaultValue) where T : class
         {
             object val;
             if (settingsValues.TryGetValue(key, out val))
@@ -85,24 +98,18 @@ namespace T4TS
             return defaultValue;
         }
 
-        private static T ParseSettingNullableType<T>(Dictionary<string, object> settingsValues, string key,
-            T defaultValue) where T : struct
+        private static T ParseSettingNullableType<T>(Dictionary<string, object> settingsValues, string key, T defaultValue) where T : struct
         {
             object val;
             if (settingsValues.TryGetValue(key, out val))
             {
-                var nullable = val as T?;
-                if (nullable == null || !nullable.HasValue)
-                    return defaultValue;
-
-                return nullable.Value;
+                return (val as T?) ?? defaultValue;
             }
 
             return defaultValue;
         }
 
-        private static T ParseConfigValueType<T>(Dictionary<string, object> settingsValues, string key,
-            Func<object, T> convert, T defaultValue)
+        private static T ParseConfigValueType<T>(Dictionary<string, object> settingsValues, string key, Func<object, T> convert, T defaultValue)
         {
             object val;
             if (settingsValues.TryGetValue(key, out val))
@@ -110,5 +117,6 @@ namespace T4TS
 
             return defaultValue;
         }
+
     }
 }

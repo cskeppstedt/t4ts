@@ -27,7 +27,6 @@ namespace T4TS
         public Solution Solution { get; private set; }
         public static Settings Settings { get; private set; }
 
-
         private void BuildCodeClass(TypeContext typeContext, CodeClass codeClass, CodeClass owner = null, bool forcedProcessing = false)
         {
             if (codeClass == null) return;
@@ -309,7 +308,10 @@ namespace T4TS
         {
             foreach (CodeAttribute attr in attributes)
             {
-                if ((useShortAttributeName ? attr.Name : attr.FullName) == attributeFullName)
+                var attrName = attr.FullName ?? "";
+                if (useShortAttributeName)
+                    attrName = attrName.Split('.').Last().Split('+').Last();
+                if (attrName == attributeFullName)
                 {
                     attribute = attr;
                     return true;
@@ -375,7 +377,7 @@ namespace T4TS
                 return false;
 
             CodeFunction getter = property.Getter;
-            if (getter == null)
+            if (getter == null || property.Name == "this")
                 return false;
 
             TypeScriptMemberAttributeValues values = GetMemberValues(property, typeContext);
@@ -439,15 +441,12 @@ namespace T4TS
 
             CodeAttribute attribute;
 
-            // By default ignore properties marked with JsonIgnoreAttribute
-            if (TryGetAttribute(property.Attributes, "JsonIgnoreAttribute", out attribute, true))
+            // By default ignore properties marked with MemberIgnoreAttributes
+            if (Settings.MemberIgnoreAttributes.Any(a => TryGetAttribute(property.Attributes, a, out attribute, true)))
             {
                 attributeIgnore = true;
             }
-            if (TryGetAttribute(property.Attributes, "XmlIgnoreAttribute", out attribute, true))
-            {
-                attributeIgnore = true;
-            }
+
             if (TryGetAttribute(property.Attributes, MemberAttributeFullName, out attribute))
             {
                 Dictionary<string, string> values = GetAttributeValues(attribute);
@@ -483,6 +482,13 @@ namespace T4TS
             string attributeType = null;
 
             CodeAttribute attribute;
+
+            // By default ignore properties marked with MemberIgnoreAttributes
+            if (Settings.MemberIgnoreAttributes.Any(a => TryGetAttribute(variable.Attributes, a, out attribute, true)))
+            {
+                attributeIgnore = true;
+            }
+
             if (TryGetAttribute(variable.Attributes, MemberAttributeFullName, out attribute))
             {
                 Dictionary<string, string> values = GetAttributeValues(attribute);
