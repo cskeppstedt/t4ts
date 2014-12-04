@@ -745,8 +745,25 @@ Project GetProjectContainingT4File(DTE dte) {
         {
             foreach (Project project in projects)
             {
-                new ProjectTraverser(project, WithNamespace);
-            }
+        		TraverseProject(project);
+        	}
+        }
+        
+        private void TraverseProject(Project project)
+        {
+        	if (project.Kind == EnvDTE80.ProjectKinds.vsProjectKindSolutionFolder)
+        	{
+        		foreach (ProjectItem projectItem in project.ProjectItems)
+        		{
+        			var childProject = projectItem.SubProject;
+        			if (childProject == null)
+        				continue;
+        
+        			TraverseProject(childProject);
+        		}
+        	}
+        	else
+        		new ProjectTraverser(project, WithNamespace);
         }
     }
 
