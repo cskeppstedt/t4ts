@@ -70,6 +70,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Models\ReservedPropModel.cs" />
     <Compile Include="Models\LocalModel.cs" />
     <Compile Include="Output\MemberOutputAppenderTests.cs" />
     <Compile Include="Output\ModuleOutputAppenderTests.cs" />
