@@ -17,7 +17,7 @@ namespace T4TS
         {
             AppendIndendation();
 
-            bool isOptional = member.Optional || (member.Type is NullableType);
+            bool isOptional = member.Optional;
             string type = member.Type.ToString();
 
             if (member.Type is BoolType)
