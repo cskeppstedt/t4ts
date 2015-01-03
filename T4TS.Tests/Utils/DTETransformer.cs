@@ -170,7 +170,15 @@ namespace T4TS.Tests.Utils
             getter.SetupProperty(x => x.Type, getterType);
             property.SetupProperty(x => x.Access, vsCMAccess.vsCMAccessPublic);
             property.SetupProperty(x => x.Getter, getter.Object);
-            property.SetupProperty(x => x.Name, fromProperty.Name);
+
+            // Super ugly hack. We want the property name to start with a @,
+            // because that's how the DTE version is rendered. However, it looks
+            // like the @ is stripped when we acquire it through reflection.
+            string name = fromProperty.Name;
+            if (PropertyNameIsReserved(name))
+                name = "@" + name;
+
+            property.SetupProperty(x => x.Name, name);
 
             var memberAttribute = fromProperty.GetCustomAttributes<TypeScriptMemberAttribute>().FirstOrDefault();
             var attributes = BuildDteAttributes(memberAttribute);
@@ -179,6 +187,16 @@ namespace T4TS.Tests.Utils
             return property.Object;
         }
 
+        private static bool PropertyNameIsReserved(string name)
+        {
+            switch (name)
+            {
+                case "public": return true;
+                case "readonly": return true;
+                case "class": return true;
+                default: return false;
+            }
+        }
 
         private static CodeTypeRef GetCodeTypeRef(Type fromType)
         {

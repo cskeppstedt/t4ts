@@ -189,9 +189,22 @@ namespace T4TS
                 return false;
 
             var values = GetMemberValues(property, typeContext);
+
+            string name;
+            if (values.Name != null)
+            {
+                name = values.Name;
+            }
+            else
+            {
+                name = property.Name;
+                if (name.StartsWith("@"))
+                    name = name.Substring(1);
+            }
+
             member = new TypeScriptInterfaceMember
             {
-                Name = values.Name ?? property.Name,
+                Name = name,
                 //FullName = property.FullName,
                 Optional = values.Optional,
                 Ignore = values.Ignore,
@@ -201,9 +214,7 @@ namespace T4TS
             };
 
             if (member.Ignore)
-            {
                 return false;
-            }
 
             if (values.CamelCase && values.Name == null)
                 member.Name = member.Name.Substring(0, 1).ToLowerInvariant() + member.Name.Substring(1);
