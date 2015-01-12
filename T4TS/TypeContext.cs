@@ -121,6 +121,7 @@ namespace T4TS
                     return new StringType();
 
                 case "System.DateTime":
+                case "System.DateTimeOffset":
                     if (Settings.UseNativeDates)
                         return new DateTimeType();
                     else
