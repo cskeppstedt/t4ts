@@ -44,21 +44,6 @@ namespace T4TS.Tests.Utils
 
             moqProject.SetupGet(x => x.ProjectItems).Returns(moqProjectItems.Object);
 
-            var projectItem = BuildDteProjectItem(fromClassTypes, projectName, subProjectItems);
-            moqProjectItems.Setup(x => x.GetEnumerator()).Returns(() => new[] { projectItem }.GetEnumerator());
-
-            return moqProject.Object;
-        }
-
-        public static ProjectItem BuildDteProjectItem(IEnumerable<Type> fromClassTypes, string projectItemName, ProjectItems subProjectItems = null)
-        {
-            var moqFileCodeModel = new Mock<FileCodeModel>();
-            var moqProjectItem = new Mock<ProjectItem>();
-            var moqProjCodeElements = new Mock<CodeElements>();
-            var moqMembers = new Mock<CodeElements>();
-
-            var namespaces = new List<CodeNamespace>();
-
             var byNamespace = fromClassTypes
                 .GroupBy(x => x.Namespace)
                 .ToDictionary(
@@ -66,22 +51,42 @@ namespace T4TS.Tests.Utils
                     g => g.ToList()
                 );
 
+            var projectItems = new List<ProjectItem>();
+
             foreach (string namespaceName in byNamespace.Keys)
             {
-                var moqCodeNamespace = new Mock<CodeNamespace>();
-
-                var classes = byNamespace[namespaceName]
-                    .Select(BuildDteClass)
-                    .ToList();
-
-                moqMembers.Setup(x => x.GetEnumerator()).Returns(() => classes.GetEnumerator());
-                moqCodeNamespace.SetupGet(x => x.Members).Returns(moqMembers.Object);
-                moqCodeNamespace.SetupGet(x => x.Name).Returns(namespaceName);
-
-                namespaces.Add(moqCodeNamespace.Object);
+                var projectItem = BuildDteProjectItem(byNamespace[namespaceName], projectName, subProjectItems);
+                projectItems.Add(projectItem);
             }
 
-            moqProjCodeElements.Setup(x => x.GetEnumerator()).Returns(() => namespaces.GetEnumerator());
+            moqProjectItems.Setup(x => x.GetEnumerator()).Returns(() => projectItems.GetEnumerator());
+            
+            return moqProject.Object;
+        }
+
+        public static ProjectItem BuildDteProjectItem(IEnumerable<Type> fromClassTypes, string projectItemName, ProjectItems subProjectItems = null)
+        {
+            var namespaceName = fromClassTypes
+                .Select(t => t.Namespace)
+                .Distinct()
+                .Single();
+
+            var classes = fromClassTypes
+                .Select(BuildDteClass)
+                .ToList();
+
+            var moqFileCodeModel = new Mock<FileCodeModel>();
+            var moqProjectItem = new Mock<ProjectItem>();
+            var moqProjCodeElements = new Mock<CodeElements>();
+
+            var moqMembers = new Mock<CodeElements>();
+            moqMembers.Setup(x => x.GetEnumerator()).Returns(() => classes.GetEnumerator());
+
+            var moqCodeNamespace = new Mock<CodeNamespace>();
+            moqCodeNamespace.SetupGet(x => x.Members).Returns(moqMembers.Object);
+            moqCodeNamespace.SetupGet(x => x.Name).Returns(namespaceName);
+
+            moqProjCodeElements.Setup(x => x.GetEnumerator()).Returns(() => new[] { moqCodeNamespace.Object }.GetEnumerator());
             moqFileCodeModel.SetupGet(x => x.CodeElements).Returns(moqProjCodeElements.Object);
             moqProjectItem.SetupProperty(x => x.Name, projectItemName);
             moqProjectItem.SetupGet(x => x.FileCodeModel).Returns(moqFileCodeModel.Object);
@@ -202,6 +207,7 @@ namespace T4TS.Tests.Utils
         {
             var getterType = new Mock<CodeTypeRef>();
             getterType.SetupGet(x => x.TypeKind).Returns(GetTypeRef(fromType));
+            getterType.SetupGet(x => x.AsFullName).Returns(fromType.FullName);
 
             return getterType.Object;
         }
@@ -223,10 +229,10 @@ namespace T4TS.Tests.Utils
         private static vsCMTypeRef GetTypeRef(Type fromType)
         {
             vsCMTypeRef typeRef;
-            if (!TypeMap.TryGetValue(fromType.FullName, out typeRef))
-                throw new ApplicationException("No type map found for " + fromType.FullName);
+            if (TypeMap.TryGetValue(fromType.FullName, out typeRef))
+                return typeRef;
 
-            return typeRef;
+            return vsCMTypeRef.vsCMTypeRefObject;
         }
     }
 }
