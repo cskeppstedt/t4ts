@@ -70,6 +70,8 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Fixtures\Basic\Test.cs" />
+    <Compile Include="Fixtures\Basic\BasicModel.cs" />
     <Compile Include="Models\ReservedPropModel.cs" />
     <Compile Include="Models\LocalModel.cs" />
     <Compile Include="Output\MemberOutputAppenderTests.cs" />

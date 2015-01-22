@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace T4TS.Tests.Fixtures.Basic
 {
     [TypeScriptInterface]
-    public class Model
+    public class BasicModel
     {
         public int MyProperty { get; set; }
     }

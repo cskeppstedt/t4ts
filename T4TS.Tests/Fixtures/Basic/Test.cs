@@ -14,7 +14,7 @@ namespace T4TS.Tests.Fixtures.Basic
         public void BasicModelHasExpectedOutput()
         {
             // Generated output
-            var solution = DTETransformer.BuildDteSolution(typeof(Model));
+            var solution = DTETransformer.BuildDteSolution(typeof(BasicModel));
             var settings = new Settings();
             var generator = new CodeTraverser(solution, settings);
             var data = generator.GetAllInterfaces().ToList();
@@ -26,8 +26,8 @@ namespace T4TS.Tests.Fixtures.Basic
 ****************************************************************************/
 
 declare module T4TS {
-    /** Generated from T4TS.Tests.Fixtures.Basic.Model **/
-    export interface Model {
+    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel **/
+    export interface BasicModel {
         MyProperty: number;
     }
 }
