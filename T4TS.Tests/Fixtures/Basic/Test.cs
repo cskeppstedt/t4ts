@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using T4TS.Tests.Utils;
 using System.IO;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace T4TS.Tests.Fixtures.Basic
 {
@@ -19,7 +20,7 @@ namespace T4TS.Tests.Fixtures.Basic
             var generator = new CodeTraverser(solution, settings);
             var data = generator.GetAllInterfaces().ToList();
             var generatedOutput = OutputFormatter.GetOutput(data, settings);
-            
+
             const string expectedOutput =
 @"
 /****************************************************************************
@@ -34,7 +35,12 @@ declare module T4TS {
 }
 ";
 
-            Assert.AreEqual(expectedOutput.Trim(), generatedOutput.Trim());
+            Assert.AreEqual(Normalize(expectedOutput), Normalize(generatedOutput));
+        }
+
+        private string Normalize(string input)
+        {
+            return Regex.Replace(input, @"\r\n|\n\r|\n|\r", "\n").Trim();
         }
     }
 }
