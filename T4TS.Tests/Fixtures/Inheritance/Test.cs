@@ -50,7 +50,12 @@ declare module T4TS {
 }
 ";
 
-            Assert.AreEqual(expectedOutput.Trim(), generatedOutput.Trim());
+            Assert.AreEqual(Normalize(expectedOutput), Normalize(generatedOutput));
+        }
+
+        private string Normalize(string input)
+        {
+            return Regex.Replace(input, @"\r\n|\n\r|\n|\r", "\n").Trim();
         }
     }
 }
