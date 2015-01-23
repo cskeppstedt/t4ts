@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
+using System.Text.RegularExpressions;
 using T4TS.Example.Models;
 using T4TS.Tests.Fixtures.Basic;
 using T4TS.Tests.Utils;

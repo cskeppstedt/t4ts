@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using T4TS.Tests.Utils;
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using T4TS.Tests.Utils;
 
 namespace T4TS.Tests.Fixtures.Basic
 {
