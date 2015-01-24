@@ -7,7 +7,7 @@ namespace T4TS.Tests.Fixtures.Basic
     public class Test
     {
         [TestMethod]
-        public void InheritanceModelHasExpectedOutput()
+        public void BasicModelHasExpectedOutput()
         {
             // Expect
             new OutputFor(
