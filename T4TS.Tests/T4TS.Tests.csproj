@@ -72,6 +72,8 @@
   <ItemGroup>
     <Compile Include="Fixtures\Basic\Test.cs" />
     <Compile Include="Fixtures\Basic\BasicModel.cs" />
+    <Compile Include="Fixtures\Partial\PartialModel.cs" />
+    <Compile Include="Fixtures\Partial\Test.cs" />
     <Compile Include="Fixtures\Inheritance\InheritanceModel.cs" />
     <Compile Include="Fixtures\Inheritance\Test.cs" />
     <Compile Include="Fixtures\ExternalProp\ExternalPropModel.cs" />
