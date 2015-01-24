@@ -84,6 +84,7 @@
     <Compile Include="Traversal\ProjectTraversalTests.cs" />
     <Compile Include="Traversal\NamespaceTraverserTests.cs" />
     <Compile Include="Utils\DTETransformer.cs" />
+    <Compile Include="Utils\OutputFor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\T4TS.Attributes\T4TS.Attributes.csproj">
