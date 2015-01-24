@@ -103,18 +103,37 @@ namespace T4TS.Tests.Utils
             moqMember.SetupGet(x => x.Attributes).Returns(classAttributes);
 
             var properties = new List<CodeProperty>(
-                fromClass.GetProperties().Select(BuildDteProperty)
+                fromClass
+                    .GetProperties(BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.Instance)
+                    .Select(BuildDteProperty)
             );
             
             var propertiesMoq = new Mock<CodeElements>();
             propertiesMoq.Setup(x => x.GetEnumerator()).Returns(() => properties.GetEnumerator());
 
+            var bases = GetBaseTypes(fromClass)
+                .Select(BuildDteBase)
+                .ToList();
+
+            var basesMoq = new Mock<CodeElements>();
+            basesMoq.Setup(x => x.GetEnumerator()).Returns(() => bases.GetEnumerator());
+            basesMoq.Setup(x => x.Count).Returns(() => bases.Count);
+            basesMoq.Setup(x => x.Item(It.IsAny<int>()))
+                .Returns((int i) => bases.ElementAtOrDefault(i - 1)); // Item() accessor is not zero-based
+
             moqMember.SetupGet(x => x.Name).Returns(fromClass.Name);
             moqMember.SetupGet(x => x.FullName).Returns(fromClass.FullName);
-            moqMember.SetupGet(x => x.Bases).Returns((CodeElements)null);
+            moqMember.SetupGet(x => x.Bases).Returns(basesMoq.Object);
             moqMember.SetupGet(x => x.Members).Returns(propertiesMoq.Object);
 
             return moqMember.Object;
+        }
+
+        private static CodeElement BuildDteBase(Type withType)
+        {
+            var moqBase = new Mock<CodeElement>();
+            moqBase.SetupGet(x => x.FullName).Returns(withType.FullName);
+            return moqBase.Object;
         }
 
         private static CodeElements BuildDteAttributes<T>(T fromAttribute) where T : Attribute
@@ -233,6 +252,18 @@ namespace T4TS.Tests.Utils
                 return typeRef;
 
             return vsCMTypeRef.vsCMTypeRefObject;
+        }
+
+        private static IEnumerable<Type> GetBaseTypes(Type type)
+        {
+            if (type.BaseType == null)
+                return type.GetInterfaces();
+
+            return Enumerable
+                .Repeat(type.BaseType, 1)
+                .Concat(type.GetInterfaces())
+                .Concat(type.GetInterfaces().SelectMany<Type, Type>(GetBaseTypes))
+                .Concat(GetBaseTypes(type.BaseType));
         }
     }
 }
