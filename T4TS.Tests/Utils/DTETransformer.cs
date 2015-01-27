@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace T4TS.Tests.Utils
@@ -225,10 +226,42 @@ namespace T4TS.Tests.Utils
         private static CodeTypeRef GetCodeTypeRef(Type fromType)
         {
             var getterType = new Mock<CodeTypeRef>();
-            getterType.SetupGet(x => x.TypeKind).Returns(GetTypeRef(fromType));
-            getterType.SetupGet(x => x.AsFullName).Returns(fromType.FullName);
+            var typeRef = GetTypeRef(fromType);
+
+            string typeFullname = GetTypeFullname(fromType.FullName);
+
+            getterType.SetupGet(x => x.TypeKind).Returns(typeRef);
+            getterType.SetupGet(x => x.AsFullName).Returns(typeFullname);
+
+            if (typeRef == vsCMTypeRef.vsCMTypeRefArray)
+            {
+                var elementType = GetCodeTypeRef(fromType.GetElementType());
+                getterType.SetupGet(x => x.ElementType).Returns(elementType);
+            }
 
             return getterType.Object;
+        }
+
+        static readonly string[] collectionTypes = new string[] {
+            "System.Collections.Generic.List",
+            "System.Collections.Generic.IEnumerable",
+            "System.Collections.Generic.IList",
+            "System.Collections.Generic.ICollection"
+        };
+
+        private static string GetTypeFullname(string typeFullname)
+        {
+            string collectionType = collectionTypes.FirstOrDefault(typeFullname.StartsWith);
+
+            if (string.IsNullOrEmpty(collectionType))
+            {
+                return typeFullname;
+            }
+            else
+            {
+                string elementType = Regex.Match(typeFullname, "\\[\\[([^,]+),").Groups[1].Value;
+                return string.Format("{0}<{1}>", collectionType, GetTypeFullname(elementType));
+            }
         }
 
         private static readonly Dictionary<string, vsCMTypeRef> TypeMap = new Dictionary<string, vsCMTypeRef>
@@ -250,6 +283,9 @@ namespace T4TS.Tests.Utils
             vsCMTypeRef typeRef;
             if (TypeMap.TryGetValue(fromType.FullName, out typeRef))
                 return typeRef;
+
+            if (fromType.IsArray)
+                return vsCMTypeRef.vsCMTypeRefArray;
 
             return vsCMTypeRef.vsCMTypeRefObject;
         }
