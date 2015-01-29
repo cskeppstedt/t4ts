@@ -31,6 +31,8 @@ declare module T4TS {
         PrimitiveList: number[];
         InterfaceArray: T4TS.BasicModel[];
         InterfaceList: T4TS.BasicModel[];
+        DeepArray: number[][];
+        DeepList: number[][];
     }
     /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel **/
     export interface BasicModel {
