@@ -255,11 +255,12 @@ namespace T4TS.Tests.Utils
 
             if (string.IsNullOrEmpty(collectionType))
             {
-                return typeFullname;
+                return Regex.Match(typeFullname, "[^,]+").Value;
             }
             else
             {
-                string elementType = Regex.Match(typeFullname, "\\[\\[([^,]+),").Groups[1].Value;
+                var match = Regex.Match(typeFullname, @"\[\[(.*)\]\]");
+                string elementType = match.Groups[1].Value;
                 return string.Format("{0}<{1}>", collectionType, GetTypeFullname(elementType));
             }
         }
