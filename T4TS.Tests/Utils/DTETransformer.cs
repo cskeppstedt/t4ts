@@ -242,18 +242,22 @@ namespace T4TS.Tests.Utils
             return getterType.Object;
         }
 
-        static readonly string[] collectionTypes = new string[] {
+        static readonly string[] wrapTypes = new string[] {
             "System.Collections.Generic.List",
             "System.Collections.Generic.IEnumerable",
             "System.Collections.Generic.IList",
-            "System.Collections.Generic.ICollection"
+            "System.Collections.Generic.ICollection",
+            "System.Nullable"
         };
+
+        private static readonly string nullableTypeStart = "<";
+
 
         private static string GetTypeFullname(string typeFullname)
         {
-            string collectionType = collectionTypes.FirstOrDefault(typeFullname.StartsWith);
+            string wrapType = wrapTypes.FirstOrDefault(typeFullname.StartsWith);
 
-            if (string.IsNullOrEmpty(collectionType))
+            if (string.IsNullOrEmpty(wrapType))
             {
                 return Regex.Match(typeFullname, "[^,]+").Value;
             }
@@ -261,7 +265,7 @@ namespace T4TS.Tests.Utils
             {
                 var match = Regex.Match(typeFullname, @"\[\[(.*)\]\]");
                 string elementType = match.Groups[1].Value;
-                return string.Format("{0}<{1}>", collectionType, GetTypeFullname(elementType));
+                return string.Format("{0}<{1}>", wrapType, GetTypeFullname(elementType));
             }
         }
 
