@@ -17,6 +17,7 @@ namespace T4TS.Tests.Utils
         public OutputFor(params Type[] types)
         {
             this.Types = new ReadOnlyCollection<Type>(types);
+            this.Settings = new Settings();
         }
 
         public OutputFor With(Settings settings)
@@ -34,11 +35,10 @@ namespace T4TS.Tests.Utils
         private string GenerateOutput()
         {
             var solution = DTETransformer.BuildDteSolution(this.Types.ToArray());
-            var settings = new Settings();
-            var generator = new CodeTraverser(solution, settings);
+            var generator = new CodeTraverser(solution, this.Settings);
             var data = generator.GetAllInterfaces().ToList();
 
-            return OutputFormatter.GetOutput(data, settings);
+            return OutputFormatter.GetOutput(data, this.Settings);
         }
 
         static string Normalize(string output)

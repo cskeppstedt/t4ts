@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace T4TS.Tests.Fixtures.Options.Names
+namespace T4TS.Tests.Fixtures.Options.Override
 {
     [TypeScriptInterface(NamePrefix = "Foo")]
     public class InterfaceNamePrefixModel

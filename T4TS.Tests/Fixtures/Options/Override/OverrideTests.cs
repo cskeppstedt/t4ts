@@ -1,13 +1,13 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using T4TS.Tests.Utils;
 
-namespace T4TS.Tests.Fixtures.Options.Names
+namespace T4TS.Tests.Fixtures.Options.Override
 {
     [TestClass]
     public class OverrideTests
     {
         [TestMethod]
-        public void NamesModelHasExpectedOutput()
+        public void OverrideModelsHaveExpectedOutput()
         {
             // Expect
             new OutputFor(
@@ -28,38 +28,38 @@ const string ExpectedOutput = @"
 ****************************************************************************/
 
 declare module SomeModule {
-    /** Generated from T4TS.Tests.Fixtures.Options.Names.ModuleNameOverrideModel **/
+    /** Generated from T4TS.Tests.Fixtures.Options.Override.ModuleNameOverrideModel **/
     export interface ModuleNameOverrideModel {
         SomeThirdProp: string;
     }
 }
 
 declare module T4TS {
-    /** Generated from T4TS.Tests.Fixtures.Options.Names.InterfaceNamePrefixModel **/
+    /** Generated from T4TS.Tests.Fixtures.Options.Override.InterfaceNamePrefixModel **/
     export interface FooInterfaceNamePrefixModel {
         SomeProp: string;
     }
-    /** Generated from T4TS.Tests.Fixtures.Options.Names.InterfaceNameOverrideModel **/
+    /** Generated from T4TS.Tests.Fixtures.Options.Override.InterfaceNameOverrideModel **/
     export interface Bar {
         SomeOtherProp: string;
     }
-    /** Generated from T4TS.Tests.Fixtures.Options.Names.MemberNameOverrideModel **/
+    /** Generated from T4TS.Tests.Fixtures.Options.Override.MemberNameOverrideModel **/
     export interface MemberNameOverrideModel {
         OverriddenName: string;
     }
-    /** Generated from T4TS.Tests.Fixtures.Options.Names.MemberOptionalModel **/
+    /** Generated from T4TS.Tests.Fixtures.Options.Override.MemberOptionalModel **/
     export interface MemberOptionalModel {
         Member?: string;
     }
-    /** Generated from T4TS.Tests.Fixtures.Options.Names.MemberCamelCaseModel **/
+    /** Generated from T4TS.Tests.Fixtures.Options.Override.MemberCamelCaseModel **/
     export interface MemberCamelCaseModel {
         memberName: string;
     }
-    /** Generated from T4TS.Tests.Fixtures.Options.Names.MemberTypeModel **/
+    /** Generated from T4TS.Tests.Fixtures.Options.Override.MemberTypeModel **/
     export interface MemberTypeModel {
         NotANumber: number;
     }
-    /** Generated from T4TS.Tests.Fixtures.Options.Names.MemberIgnoreModel **/
+    /** Generated from T4TS.Tests.Fixtures.Options.Override.MemberIgnoreModel **/
     export interface MemberIgnoreModel {
         NotIgnored: string;
     }
