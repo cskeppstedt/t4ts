@@ -12,10 +12,17 @@ namespace T4TS.Tests.Utils
     class OutputFor
     {
         readonly IReadOnlyCollection<Type> Types;
+        public Settings Settings { get; private set; }
 
         public OutputFor(params Type[] types)
         {
             this.Types = new ReadOnlyCollection<Type>(types);
+        }
+
+        public OutputFor With(Settings settings)
+        {
+            this.Settings = settings;
+            return this;
         }
 
         public void ToEqual(string expectedOutput)
@@ -30,7 +37,7 @@ namespace T4TS.Tests.Utils
             var settings = new Settings();
             var generator = new CodeTraverser(solution, settings);
             var data = generator.GetAllInterfaces().ToList();
-            
+
             return OutputFormatter.GetOutput(data, settings);
         }
 
