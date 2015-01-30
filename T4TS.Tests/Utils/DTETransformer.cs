@@ -133,7 +133,9 @@ namespace T4TS.Tests.Utils
         private static CodeElement BuildDteBase(Type withType)
         {
             var moqBase = new Mock<CodeElement>();
-            moqBase.SetupGet(x => x.FullName).Returns(withType.FullName);
+            string baseTypeFullname = GetTypeFullname(withType.FullName);
+
+            moqBase.SetupGet(x => x.FullName).Returns(baseTypeFullname);
             return moqBase.Object;
         }
 
