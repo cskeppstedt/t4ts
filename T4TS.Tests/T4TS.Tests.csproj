@@ -78,8 +78,8 @@
     <Compile Include="Fixtures\Nullable\Test.cs" />
     <Compile Include="Fixtures\Enumerable\EnumerableModel.cs" />
     <Compile Include="Fixtures\Enumerable\Test.cs" />
-    <Compile Include="Fixtures\Options\Names\NamesModel.cs" />
-    <Compile Include="Fixtures\Options\Names\Test.cs" />
+    <Compile Include="Fixtures\Options\Names\OverrideModels.cs" />
+    <Compile Include="Fixtures\Options\Names\OverrideTests.cs" />
     <Compile Include="Fixtures\Partial\PartialModel.cs" />
     <Compile Include="Fixtures\Partial\Test.cs" />
     <Compile Include="Fixtures\Inheritance\InheritanceModel.cs" />

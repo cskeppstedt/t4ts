@@ -4,7 +4,7 @@ using T4TS.Tests.Utils;
 namespace T4TS.Tests.Fixtures.Options.Names
 {
     [TestClass]
-    public class Test
+    public class OverrideTests
     {
         [TestMethod]
         public void NamesModelHasExpectedOutput()
@@ -13,7 +13,12 @@ namespace T4TS.Tests.Fixtures.Options.Names
             new OutputFor(
                 typeof(InterfaceNamePrefixModel),
                 typeof(InterfaceNameOverrideModel),
-                typeof(ModuleNameOverrideModel)
+                typeof(ModuleNameOverrideModel),
+                typeof(MemberNameOverrideModel),
+                typeof(MemberOptionalModel),
+                typeof(MemberCamelCaseModel),
+                typeof(MemberTypeModel),
+                typeof(MemberIgnoreModel)
             ).ToEqual(ExpectedOutput);
         }
 
@@ -24,7 +29,7 @@ const string ExpectedOutput = @"
 
 declare module SomeModule {
     /** Generated from T4TS.Tests.Fixtures.Options.Names.ModuleNameOverrideModel **/
-    export interface Bar {
+    export interface ModuleNameOverrideModel {
         SomeThirdProp: string;
     }
 }
@@ -37,6 +42,26 @@ declare module T4TS {
     /** Generated from T4TS.Tests.Fixtures.Options.Names.InterfaceNameOverrideModel **/
     export interface Bar {
         SomeOtherProp: string;
+    }
+    /** Generated from T4TS.Tests.Fixtures.Options.Names.MemberNameOverrideModel **/
+    export interface MemberNameOverrideModel {
+        OverriddenName: string;
+    }
+    /** Generated from T4TS.Tests.Fixtures.Options.Names.MemberOptionalModel **/
+    export interface MemberOptionalModel {
+        Member?: string;
+    }
+    /** Generated from T4TS.Tests.Fixtures.Options.Names.MemberCamelCaseModel **/
+    export interface MemberCamelCaseModel {
+        memberName: string;
+    }
+    /** Generated from T4TS.Tests.Fixtures.Options.Names.MemberTypeModel **/
+    export interface MemberTypeModel {
+        NotANumber: number;
+    }
+    /** Generated from T4TS.Tests.Fixtures.Options.Names.MemberIgnoreModel **/
+    export interface MemberIgnoreModel {
+        NotIgnored: string;
     }
 }
 ";
