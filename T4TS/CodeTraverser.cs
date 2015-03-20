@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using EnvDTE;
 using EnvDTE80;
@@ -172,8 +173,10 @@ namespace T4TS
                     CodeElement baseClass = baseClasses.Item(1);
                     if (baseClass != null)
                     {
-                        TypeScriptInterface parent =
-                            tsInterfaces.SingleOrDefault(intf => intf.FullName == baseClass.FullName);
+                        // We must remove all text after < char, to compare generic types.
+                        // It's not really correct, but must work in common cases.
+                        var baseClassNonGenericFullName = baseClass.FullName.Split('<')[0];
+                        TypeScriptInterface parent = tsInterfaces.SingleOrDefault(intf => baseClassNonGenericFullName == intf.FullName.Split('<')[0]);
                         if (parent != null)
                         {
                             tsMap[codeClass].Parent = parent;
@@ -344,8 +347,6 @@ namespace T4TS
         private bool TryGetMember(CodeProperty property, TypeContext typeContext, out TypeScriptInterfaceMember member)
         {
             member = null;
-            if (property.Access != vsCMAccess.vsCMAccessPublic)
-                return false;
 
             CodeFunction getter = property.Getter;
             if (getter == null)
@@ -355,7 +356,7 @@ namespace T4TS
 
             member = new TypeScriptInterfaceMember
             {
-                Name = values.Name ?? property.Name,
+                Name = values.Name,
                 FullName = property.FullName,
                 Optional = values.Optional,
                 Ignore = values.Ignore,
@@ -363,6 +364,15 @@ namespace T4TS
                     ? typeContext.GetTypeScriptType(getter.Type)
                     : new InterfaceType(values.Type)
             };
+
+            if (member.Name == null)
+            {
+                // The property is not explicit marked with TypeScriptMemberAttribute
+                if (property.Access != vsCMAccess.vsCMAccessPublic)
+                    // remove non-public default properties
+                    return false;
+                member.Name = property.Name;
+            }
 
             if (member.Ignore)
             {
@@ -375,21 +385,25 @@ namespace T4TS
             return true;
         }
 
-        private bool TryGetEnumMember(CodeVariable variable, TypeContext typeContext, int index,
-            out TypeScriptEnumMember member)
+        private bool TryGetEnumMember(CodeVariable variable, TypeContext typeContext, int index, out TypeScriptEnumMember member)
         {
-            member = null;
-            if (variable.Access != vsCMAccess.vsCMAccessPublic)
-                return false;
-
             TypeScriptMemberAttributeValues values = GetMemberValues(variable, typeContext);
             member = new TypeScriptEnumMember
             {
-                Name = values.Name ?? variable.Name,
+                Name = values.Name,
                 FullName = variable.FullName,
                 Ignore = values.Ignore,
                 Value = variable.InitExpression == null ? index : Int32.Parse(variable.InitExpression.ToString()),
             };
+
+            if (member.Name == null)
+            {
+                // The property is not explicit marked with TypeScriptMemberAttribute
+                if (variable.Access != vsCMAccess.vsCMAccessPublic)
+                    // remove non-public default properties
+                    return false;
+                member.Name = variable.Name;
+            }
 
             if (member.Ignore)
             {
@@ -429,7 +443,8 @@ namespace T4TS
                 if (values.ContainsKey("Ignore"))
                     attributeIgnore = values["Ignore"] == "true";
 
-                values.TryGetValue("Name", out attributeName);
+                if (!values.TryGetValue("Name", out attributeName))
+                    attributeName = property.Name;
                 values.TryGetValue("Type", out attributeType);
             }
 

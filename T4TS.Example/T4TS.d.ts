@@ -4,7 +4,7 @@
 
 declare module External1 {
     /** Generated from T4TS.Example.Models.ModelFromDifferentProject.TestEnum **/
-    module ModelFromDifferentProject {
+    export module ModelFromDifferentProject {
         enum TestEnum {
             TheItem1 = 1,
             Item2 = 2,
@@ -16,7 +16,7 @@ declare module External1 {
         }
     }
     /** Generated from T4TS.Example.Models.ModelFromDifferentProject.SubClass **/
-    module ModelFromDifferentProject {
+    export module ModelFromDifferentProject {
         export interface TestSubClass {
             Id: number;
             Name: string;
@@ -40,5 +40,39 @@ declare module External1 {
         EnumPropNull?: External1.ModelFromDifferentProject.TestEnum;
         EnumArray: External1.ModelFromDifferentProject.TestEnum[];
         SubClassRef: External1.ModelFromDifferentProject.TestSubClass;
+    }
+}
+
+declare module T4TS {
+    /** Generated from T4TS.Example.Models.EntityObject<TEntityObject> **/
+    export interface EntityObject {
+    }
+    /** Generated from T4TS.Example.Models.EntityObjectId<TEntityObject> **/
+    export interface EntityObjectId extends T4TS.EntityObject {
+        ApiKey: string;
+        UserId: string;
+        Id: string;
+    }
+    /** Generated from T4TS.Example.Models.Device **/
+    export interface Device extends T4TS.EntityObjectId {
+        Name: string;
+    }
+    /** Generated from T4TS.Example.Models.SimpleParentDataTest **/
+    export interface SimpleParentDataTest {
+        ParentPublicStatic: number;
+        ParentPublic: number;
+    }
+    /** Generated from T4TS.Example.Models.SimpleDataTest **/
+    export interface SimpleDataTest extends T4TS.SimpleParentDataTest {
+        Public: number;
+        Internal: number;
+        PublicStatic: number;
+    }
+    /** Generated from T4TS.Example.Models.SimpleTest **/
+    export interface SimpleTest extends T4TS.SimpleParentDataTest {
+        Public: number;
+        Protected: number;
+        Internal: number;
+        PublicStatic: number;
     }
 }

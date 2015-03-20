@@ -66,20 +66,28 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Output\BaseList.cs" />
+    <Compile Include="Mocks\BaseList.cs" />
     <Compile Include="Output\MemberOutputAppenderTests.cs" />
-    <Compile Include="Output\MockCodeTypes.cs" />
-    <Compile Include="Output\MockCodeElements.cs" />
-    <Compile Include="Output\MockProjectItems.cs" />
-    <Compile Include="Output\MockProjects.cs" />
-    <Compile Include="Output\MockSolution.cs" />
+    <Compile Include="Mocks\MockCodeTypes.cs" />
+    <Compile Include="Mocks\MockCodeElements.cs" />
+    <Compile Include="Mocks\MockProjectItems.cs" />
+    <Compile Include="Mocks\MockProjects.cs" />
+    <Compile Include="Mocks\MockSolution.cs" />
     <Compile Include="Output\ModuleOutputAppenderTests.cs" />
+    <Compile Include="Output\TestData\TestInheritedGeneric.cs" />
+    <Compile Include="Output\TestData\TestDataContract.cs" />
+    <Compile Include="Output\TestData\TestSubClasses.cs" />
+    <Compile Include="Output\TestData\TestData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\T4TS.Attributes\T4TS.Attributes.csproj">
       <Project>{af50a5e0-791d-47d4-91fe-56a7ce4577eb}</Project>
       <Name>T4TS.Attributes</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\T4TS.Example.Models\T4TS.Example.Models.csproj">
+      <Project>{93EE0391-DB26-40CC-A613-6CA32E3EEB18}</Project>
+      <Name>T4TS.Example.Models</Name>
     </ProjectReference>
     <ProjectReference Include="..\T4TS\T4TS.csproj">
       <Project>{2b9cfea6-586a-4e3b-8575-79447d5dc086}</Project>
@@ -89,6 +97,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

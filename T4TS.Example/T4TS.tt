@@ -42,6 +42,7 @@ List<TypeScriptModule> GetDataToRender() {
         throw new Exception("Could not find the VS project containing the T4TS file.");
 
     var generator = new CodeTraverser(dte.Solution, GetSettings());
+
     return generator.GetAllInterfaces().ToList();
 }
 

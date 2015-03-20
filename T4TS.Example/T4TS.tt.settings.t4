@@ -47,7 +47,11 @@ readonly Dictionary<string, object> SettingsValues = new Dictionary<string, obje
 
     // If equals true - classes marked with DataContractAttribute will be processed.
     // Type: bool?, defaults to false if not specified.
-    { "ProcessDataContracts", null }
+    { "ProcessDataContracts", true },
+
+    // If equals true - static properties will be processed.
+    // Type: bool?, defaults to false if not specified.
+    { "IncludeStatics", false },
 
 };
 #>

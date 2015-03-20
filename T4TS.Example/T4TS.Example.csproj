@@ -69,6 +69,10 @@
       <Project>{93ee0391-db26-40cc-a613-6ca32e3eeb18}</Project>
       <Name>T4TS.Example.Models</Name>
     </ProjectReference>
+    <ProjectReference Include="..\T4TS\T4TS.csproj">
+      <Project>{2b9cfea6-586a-4e3b-8575-79447d5dc086}</Project>
+      <Name>T4TS</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="T4TS.tt.settings.t4" />

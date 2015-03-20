@@ -57,7 +57,7 @@ namespace T4TS
                     module = arr[0];
                     enumName = arr[1];
                 }
-                AppendIndentedLine("module " + module + " {");
+                AppendIndentedLine("export module " + module + " {");
                 AppendIndendation();
                 AppendIndented("enum " + enumName);
             }

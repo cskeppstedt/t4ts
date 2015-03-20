@@ -6,7 +6,7 @@ using EnvDTE;
 using EnvDTE80;
 using Moq;
 
-namespace T4TS.Tests
+namespace T4TS.Tests.Mocks
 {
     internal class MockCodeTypes : CodeElemens<CodeElement>
     {
@@ -26,12 +26,17 @@ namespace T4TS.Tests
     {
         public MockCodeClass(Type type) : base(MockBehavior.Strict)
         {
-            As<CodeElement>();
+            As<CodeElement>().Setup(x => x.FullName).Returns(type.FullName);
             Setup(x => x.Attributes).Returns(new MockAttributes(type.GetCustomAttributes(false).OfType<Attribute>()));
-            Setup(x => x.Name).Returns(type.Name);
+            Setup(x => x.Name).Returns(type.Name.Split('`')[0]);
             Setup(x => x.FullName).Returns(type.FullName);
-            Setup(x => x.Bases).Returns(new CodeElemens<CodeElement>());
             Setup(x => x.Members).Returns(new MockCodeProperties(type));
+            var bases = new CodeElemens<CodeElement>();
+            if (type.BaseType != null && type.BaseType != typeof(object))
+            {
+                bases.Add((CodeElement)new MockCodeClass(type.BaseType).Object);
+            }
+            Setup(x => x.Bases).Returns(bases);
         }
     }
 
@@ -97,9 +102,10 @@ namespace T4TS.Tests
     {
         public MockCodeProperties(Type type)
         {
-            foreach (PropertyInfo pi in type.GetProperties())
+            foreach (PropertyInfo pi in type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly))
             {
-                Add((CodeElement) new MockCodeProperty(pi).Object);
+                if (pi.DeclaringType == type)
+                    Add((CodeElement) new MockCodeProperty(pi).Object);
             }
 
             foreach (Type subType in type.GetNestedTypes())
@@ -120,7 +126,7 @@ namespace T4TS.Tests
             Setup(x => x.FullName).Returns(pi.Name);
             Setup(x => x.Name).Returns(pi.Name);
             Setup(x => x.Attributes).Returns(new MockAttributes(pi.GetCustomAttributes()));
-            Setup(x => x.Access).Returns(vsCMAccess.vsCMAccessPublic);
+            Setup(x => x.Access).Returns(pi.GetAccessors(false).Length == 0 ? vsCMAccess.vsCMAccessPrivate : vsCMAccess.vsCMAccessPublic);
             if (pi.CanRead)
                 Setup(x => x.Getter).Returns(new PropertyGetterMock(pi).Object);
             else

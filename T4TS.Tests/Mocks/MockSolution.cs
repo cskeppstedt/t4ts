@@ -2,7 +2,7 @@ using System;
 using EnvDTE;
 using Moq;
 
-namespace T4TS.Tests
+namespace T4TS.Tests.Mocks
 {
     internal class MockSolution : Mock<Solution>
     {

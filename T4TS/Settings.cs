@@ -53,6 +53,11 @@ namespace T4TS
         /// </summary>
         public bool ProcessDataContracts { get; set; }
 
+        /// <summary>
+        ///     If equals <c>true</c> - static properties will be processed.
+        /// </summary>
+        public bool IncludeStatics { get; set; }
+
         public static Settings Parse(Dictionary<string, object> settingsValues)
         {
             // Read settings from T4TS.tt.settings.tt
@@ -66,6 +71,7 @@ namespace T4TS
                 UseNativeDates = ParseSettingNullableType(settingsValues, "UseNativeDates", false),
                 ProjectNamesToProcess = ParseSettingReferenceType(settingsValues, "ProjectNamesToProcess", s => s == null ? null : s.ToString().Replace(" ", "").Split(','), null),
                 ProcessDataContracts = ParseSettingNullableType(settingsValues, "ProcessDataContracts", false),
+                IncludeStatics = ParseSettingNullableType(settingsValues, "IncludeStatics", false),
             };
         }
 

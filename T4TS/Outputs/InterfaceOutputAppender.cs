@@ -91,7 +91,7 @@ namespace T4TS
                     module = arr[0];
                     interfaceName = arr[1];
                 }
-                AppendIndentedLine("module " + module + " {");
+                AppendIndentedLine("export module " + module + " {");
                 AppendIndendation();
                 AppendIndented("export interface " + interfaceName);
             }
