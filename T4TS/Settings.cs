@@ -54,9 +54,29 @@ namespace T4TS
         public bool ProcessDataContracts { get; set; }
 
         /// <summary>
-        ///     If equals <c>true</c> - static properties will be processed.
+        ///     If equals <c>true</c> - parent classes will be processed even if they weren't marked with <see cref="TypeScriptInterfaceAttribute"/> or <see cref="DataContractAttribute"/>.
+        /// </summary>
+        public bool ProcessParentClasses { get; set; }
+
+        /// <summary>
+        ///     Additional list of the additional attribute short names which prevents processing of the members. 
+        ///     If null - the properties marked with <see cref="JsonIgnoreAttribute"/> will be ignored.
+        /// </summary>
+        public string[] MemberIgnoreAttributes { get; set; }
+
+
+        /// <summary>
+        ///     If equals <c>true</c> - static properties will be processed. (Not implemented yet).
         /// </summary>
         public bool IncludeStatics { get; set; }
+
+        
+        public Settings()
+        {
+            DefaultModule = "T4TS";
+            MemberIgnoreAttributes = new[] {"JsonIgnoreAttribute"};
+        }
+
 
         public static Settings Parse(Dictionary<string, object> settingsValues)
         {
@@ -71,12 +91,13 @@ namespace T4TS
                 UseNativeDates = ParseSettingNullableType(settingsValues, "UseNativeDates", false),
                 ProjectNamesToProcess = ParseSettingReferenceType(settingsValues, "ProjectNamesToProcess", s => s == null ? null : s.ToString().Replace(" ", "").Split(','), null),
                 ProcessDataContracts = ParseSettingNullableType(settingsValues, "ProcessDataContracts", false),
+                ProcessParentClasses = ParseSettingNullableType(settingsValues, "ProcessParentClasses", false),
+                MemberIgnoreAttributes = ParseSettingReferenceType(settingsValues, "MemberIgnoreAttributes", s => s as string, "JsonIgnoreAttribute").Split(','),
                 IncludeStatics = ParseSettingNullableType(settingsValues, "IncludeStatics", false),
             };
         }
 
-        private static T ParseSettingReferenceType<T>(Dictionary<string, object> settingsValues, string key,
-            Func<object, T> convert, T defaultValue) where T : class
+        private static T ParseSettingReferenceType<T>(Dictionary<string, object> settingsValues, string key, Func<object, T> convert, T defaultValue) where T : class
         {
             object val;
             if (settingsValues.TryGetValue(key, out val))
@@ -85,24 +106,18 @@ namespace T4TS
             return defaultValue;
         }
 
-        private static T ParseSettingNullableType<T>(Dictionary<string, object> settingsValues, string key,
-            T defaultValue) where T : struct
+        private static T ParseSettingNullableType<T>(Dictionary<string, object> settingsValues, string key, T defaultValue) where T : struct
         {
             object val;
             if (settingsValues.TryGetValue(key, out val))
             {
-                var nullable = val as T?;
-                if (nullable == null || !nullable.HasValue)
-                    return defaultValue;
-
-                return nullable.Value;
+                return (val as T?) ?? defaultValue;
             }
 
             return defaultValue;
         }
 
-        private static T ParseConfigValueType<T>(Dictionary<string, object> settingsValues, string key,
-            Func<object, T> convert, T defaultValue)
+        private static T ParseConfigValueType<T>(Dictionary<string, object> settingsValues, string key, Func<object, T> convert, T defaultValue)
         {
             object val;
             if (settingsValues.TryGetValue(key, out val))
@@ -110,5 +125,6 @@ namespace T4TS
 
             return defaultValue;
         }
+
     }
 }

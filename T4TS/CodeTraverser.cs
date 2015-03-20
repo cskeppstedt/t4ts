@@ -28,8 +28,7 @@ namespace T4TS
         public Solution Solution { get; private set; }
         public static Settings Settings { get; private set; }
 
-
-        private void BuildCodeClass(TypeContext typeContext, CodeClass codeClass, CodeClass owner = null)
+        private void BuildCodeClass(TypeContext typeContext, CodeClass codeClass, CodeClass owner = null, bool forcedProcessing = false)
         {
             if (codeClass == null) return;
             CodeAttribute attribute;
@@ -40,6 +39,17 @@ namespace T4TS
                 if (tsType != null)
                     interfaceType = new InterfaceType(codeClass.Name);
             }
+            if (forcedProcessing)
+            {
+                var values = new TypeScriptInterfaceAttributeValues
+                {
+                    Name = codeClass.Name,
+                    Module = Settings.DefaultModule ?? "T4TS",
+                    NamePrefix = Settings.DefaultInterfaceNamePrefix ?? string.Empty
+                };
+                interfaceType = new InterfaceType(values);
+            }
+
             if (TryGetAttribute(codeClass.Attributes, InterfaceAttributeFullName, out attribute))
             {
                 TypeScriptInterfaceAttributeValues values = GetInterfaceValues(codeClass, attribute);
@@ -47,7 +57,7 @@ namespace T4TS
             }
             else if (Settings.ProcessDataContracts && TryGetAttribute(codeClass.Attributes, "System.Runtime.Serialization.DataContractAttribute", out attribute))
             {
-                var values = new TypeScriptInterfaceAttributeValues()
+                var values = new TypeScriptInterfaceAttributeValues
                 {
                     Name = codeClass.Name,
                     Module = Settings.DefaultModule ?? "T4TS",
@@ -57,12 +67,29 @@ namespace T4TS
             }
             if (interfaceType != null)
             {
+                // Process parent classes anyway if it has not TypeScriptAttribute or DataContractAttribute
+                if (Settings.ProcessParentClasses)
+                {
+                    CodeClass parentClass = null;
+                    if (codeClass.Bases.Count > 0)
+                        parentClass = codeClass.Bases.Item(1) as CodeClass;
+                    if (parentClass != null && parentClass.FullName != "System.Object")
+                    {
+                        BuildCodeClass(typeContext, parentClass, null, true);
+                    }
+                }
+
                 if (!typeContext.ContainsInterfaceType(codeClass.FullName))
                     typeContext.AddInterfaceType(codeClass.FullName, interfaceType);
-                foreach (object subCodeClass in codeClass.Members)
+
+                foreach (var subCodeElement in codeClass.Members)
                 {
-                    BuildCodeClass(typeContext, subCodeClass as CodeClass, codeClass);
-                    BuildCodeEnum(typeContext, subCodeClass as CodeEnum, codeClass);
+                    var subCodeClass = subCodeElement as CodeClass;
+                    if (subCodeClass != null && subCodeClass.Access == vsCMAccess.vsCMAccessPublic)
+                        BuildCodeClass(typeContext, subCodeClass, codeClass);
+                    var subCodeEnum = subCodeElement as CodeEnum;
+                    if (subCodeEnum != null && subCodeEnum.Access == vsCMAccess.vsCMAccessPublic)
+                        BuildCodeEnum(typeContext, subCodeEnum, codeClass);
                 }
             }
         }
@@ -216,7 +243,7 @@ namespace T4TS
             };
 
             // Add sub-classes to the interface
-            foreach (CodeClass codeSubClass in codeClass.Members.OfType<CodeClass>())
+            foreach (var codeSubClass in codeClass.Members.OfType<CodeClass>().Where(cc => cc.Access == vsCMAccess.vsCMAccessPublic))
             {
                 var subAttributeValues = new TypeScriptInterfaceAttributeValues {Name = codeSubClass.Name};
                 InterfaceType interfaceType;
@@ -232,7 +259,7 @@ namespace T4TS
             }
 
             // Add sub-enums to the interface
-            foreach (CodeEnum codeSubEnum in codeClass.Members.OfType<CodeEnum>())
+            foreach (CodeEnum codeSubEnum in codeClass.Members.OfType<CodeEnum>().Where(cc => cc.Access == vsCMAccess.vsCMAccessPublic))
             {
                 var subAttributeValues = new TypeScriptEnumAttributeValues {Name = codeSubEnum.Name};
                 EnumType enumType;
@@ -285,7 +312,10 @@ namespace T4TS
         {
             foreach (CodeAttribute attr in attributes)
             {
-                if ((useShortAttributeName ? attr.Name : attr.FullName) == attributeFullName)
+                var attrName = attr.FullName ?? "";
+                if (useShortAttributeName)
+                    attrName = attrName.Split('.').Last().Split('+').Last();
+                if (attrName == attributeFullName)
                 {
                     attribute = attr;
                     return true;
@@ -349,7 +379,7 @@ namespace T4TS
             member = null;
 
             CodeFunction getter = property.Getter;
-            if (getter == null)
+            if (getter == null || property.Name == "this")
                 return false;
 
             TypeScriptMemberAttributeValues values = GetMemberValues(property, typeContext);
@@ -426,11 +456,12 @@ namespace T4TS
 
             CodeAttribute attribute;
 
-            // By default ignore properties marked with JsonIgnoreAttribute
-            if (TryGetAttribute(property.Attributes, "JsonIgnoreAttribute", out attribute, true))
+            // By default ignore properties marked with MemberIgnoreAttributes
+            if (Settings.MemberIgnoreAttributes.Any(a => TryGetAttribute(property.Attributes, a, out attribute, true)))
             {
                 attributeIgnore = true;
             }
+
             if (TryGetAttribute(property.Attributes, MemberAttributeFullName, out attribute))
             {
                 Dictionary<string, string> values = GetAttributeValues(attribute);
@@ -467,6 +498,13 @@ namespace T4TS
             string attributeType = null;
 
             CodeAttribute attribute;
+
+            // By default ignore properties marked with MemberIgnoreAttributes
+            if (Settings.MemberIgnoreAttributes.Any(a => TryGetAttribute(variable.Attributes, a, out attribute, true)))
+            {
+                attributeIgnore = true;
+            }
+
             if (TryGetAttribute(variable.Attributes, MemberAttributeFullName, out attribute))
             {
                 Dictionary<string, string> values = GetAttributeValues(attribute);

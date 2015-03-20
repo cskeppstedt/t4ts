@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>LionSoft.T4TS</id>
-        <version>3.0.5</version>
+        <version>3.0.6</version>
         <authors>LionSoft,Christoffer Skeppstedt,Nils Edström</authors>
         <owners>LionSoft,Christoffer Skeppstedt,Nils Edström</owners>
         <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>

@@ -488,8 +488,7 @@ Project GetProjectContainingT4File(DTE dte) {
         public Solution Solution { get; private set; }
         public static Settings Settings { get; private set; }
 
-
-        private void BuildCodeClass(TypeContext typeContext, CodeClass codeClass, CodeClass owner = null)
+        private void BuildCodeClass(TypeContext typeContext, CodeClass codeClass, CodeClass owner = null, bool forcedProcessing = false)
         {
             if (codeClass == null) return;
             CodeAttribute attribute;
@@ -500,6 +499,17 @@ Project GetProjectContainingT4File(DTE dte) {
                 if (tsType != null)
                     interfaceType = new InterfaceType(codeClass.Name);
             }
+            if (forcedProcessing)
+            {
+                var values = new TypeScriptInterfaceAttributeValues
+                {
+                    Name = codeClass.Name,
+                    Module = Settings.DefaultModule ?? "T4TS",
+                    NamePrefix = Settings.DefaultInterfaceNamePrefix ?? string.Empty
+                };
+                interfaceType = new InterfaceType(values);
+            }
+
             if (TryGetAttribute(codeClass.Attributes, InterfaceAttributeFullName, out attribute))
             {
                 TypeScriptInterfaceAttributeValues values = GetInterfaceValues(codeClass, attribute);
@@ -507,7 +517,7 @@ Project GetProjectContainingT4File(DTE dte) {
             }
             else if (Settings.ProcessDataContracts && TryGetAttribute(codeClass.Attributes, "System.Runtime.Serialization.DataContractAttribute", out attribute))
             {
-                var values = new TypeScriptInterfaceAttributeValues()
+                var values = new TypeScriptInterfaceAttributeValues
                 {
                     Name = codeClass.Name,
                     Module = Settings.DefaultModule ?? "T4TS",
@@ -517,12 +527,29 @@ Project GetProjectContainingT4File(DTE dte) {
             }
             if (interfaceType != null)
             {
+                // Process parent classes anyway if it has not TypeScriptAttribute or DataContractAttribute
+                if (Settings.ProcessParentClasses)
+                {
+                    CodeClass parentClass = null;
+                    if (codeClass.Bases.Count > 0)
+                        parentClass = codeClass.Bases.Item(1) as CodeClass;
+                    if (parentClass != null && parentClass.FullName != "System.Object")
+                    {
+                        BuildCodeClass(typeContext, parentClass, null, true);
+                    }
+                }
+
                 if (!typeContext.ContainsInterfaceType(codeClass.FullName))
                     typeContext.AddInterfaceType(codeClass.FullName, interfaceType);
-                foreach (object subCodeClass in codeClass.Members)
+
+                foreach (var subCodeElement in codeClass.Members)
                 {
-                    BuildCodeClass(typeContext, subCodeClass as CodeClass, codeClass);
-                    BuildCodeEnum(typeContext, subCodeClass as CodeEnum, codeClass);
+                    var subCodeClass = subCodeElement as CodeClass;
+                    if (subCodeClass != null && subCodeClass.Access == vsCMAccess.vsCMAccessPublic)
+                        BuildCodeClass(typeContext, subCodeClass, codeClass);
+                    var subCodeEnum = subCodeElement as CodeEnum;
+                    if (subCodeEnum != null && subCodeEnum.Access == vsCMAccess.vsCMAccessPublic)
+                        BuildCodeEnum(typeContext, subCodeEnum, codeClass);
                 }
             }
         }
@@ -676,7 +703,7 @@ Project GetProjectContainingT4File(DTE dte) {
             };
 
             // Add sub-classes to the interface
-            foreach (CodeClass codeSubClass in codeClass.Members.OfType<CodeClass>())
+            foreach (var codeSubClass in codeClass.Members.OfType<CodeClass>().Where(cc => cc.Access == vsCMAccess.vsCMAccessPublic))
             {
                 var subAttributeValues = new TypeScriptInterfaceAttributeValues {Name = codeSubClass.Name};
                 InterfaceType interfaceType;
@@ -692,7 +719,7 @@ Project GetProjectContainingT4File(DTE dte) {
             }
 
             // Add sub-enums to the interface
-            foreach (CodeEnum codeSubEnum in codeClass.Members.OfType<CodeEnum>())
+            foreach (CodeEnum codeSubEnum in codeClass.Members.OfType<CodeEnum>().Where(cc => cc.Access == vsCMAccess.vsCMAccessPublic))
             {
                 var subAttributeValues = new TypeScriptEnumAttributeValues {Name = codeSubEnum.Name};
                 EnumType enumType;
@@ -745,7 +772,10 @@ Project GetProjectContainingT4File(DTE dte) {
         {
             foreach (CodeAttribute attr in attributes)
             {
-                if ((useShortAttributeName ? attr.Name : attr.FullName) == attributeFullName)
+                var attrName = attr.FullName ?? "";
+                if (useShortAttributeName)
+                    attrName = attrName.Split('.').Last().Split('+').Last();
+                if (attrName == attributeFullName)
                 {
                     attribute = attr;
                     return true;
@@ -809,7 +839,7 @@ Project GetProjectContainingT4File(DTE dte) {
             member = null;
 
             CodeFunction getter = property.Getter;
-            if (getter == null)
+            if (getter == null || property.Name == "this")
                 return false;
 
             TypeScriptMemberAttributeValues values = GetMemberValues(property, typeContext);
@@ -886,11 +916,12 @@ Project GetProjectContainingT4File(DTE dte) {
 
             CodeAttribute attribute;
 
-            // By default ignore properties marked with JsonIgnoreAttribute
-            if (TryGetAttribute(property.Attributes, "JsonIgnoreAttribute", out attribute, true))
+            // By default ignore properties marked with MemberIgnoreAttributes
+            if (Settings.MemberIgnoreAttributes.Any(a => TryGetAttribute(property.Attributes, a, out attribute, true)))
             {
                 attributeIgnore = true;
             }
+
             if (TryGetAttribute(property.Attributes, MemberAttributeFullName, out attribute))
             {
                 Dictionary<string, string> values = GetAttributeValues(attribute);
@@ -927,6 +958,13 @@ Project GetProjectContainingT4File(DTE dte) {
             string attributeType = null;
 
             CodeAttribute attribute;
+
+            // By default ignore properties marked with MemberIgnoreAttributes
+            if (Settings.MemberIgnoreAttributes.Any(a => TryGetAttribute(variable.Attributes, a, out attribute, true)))
+            {
+                attributeIgnore = true;
+            }
+
             if (TryGetAttribute(variable.Attributes, MemberAttributeFullName, out attribute))
             {
                 Dictionary<string, string> values = GetAttributeValues(attribute);
@@ -1025,9 +1063,29 @@ Project GetProjectContainingT4File(DTE dte) {
         public bool ProcessDataContracts { get; set; }
 
         /// <summary>
-        ///     If equals <c>true</c> - static properties will be processed.
+        ///     If equals <c>true</c> - parent classes will be processed even if they weren't marked with <see cref="TypeScriptInterfaceAttribute"/> or <see cref="DataContractAttribute"/>.
+        /// </summary>
+        public bool ProcessParentClasses { get; set; }
+
+        /// <summary>
+        ///     Additional list of the additional attribute short names which prevents processing of the members. 
+        ///     If null - the properties marked with <see cref="JsonIgnoreAttribute"/> will be ignored.
+        /// </summary>
+        public string[] MemberIgnoreAttributes { get; set; }
+
+
+        /// <summary>
+        ///     If equals <c>true</c> - static properties will be processed. (Not implemented yet).
         /// </summary>
         public bool IncludeStatics { get; set; }
+
+        
+        public Settings()
+        {
+            DefaultModule = "T4TS";
+            MemberIgnoreAttributes = new[] {"JsonIgnoreAttribute"};
+        }
+
 
         public static Settings Parse(Dictionary<string, object> settingsValues)
         {
@@ -1042,12 +1100,13 @@ Project GetProjectContainingT4File(DTE dte) {
                 UseNativeDates = ParseSettingNullableType(settingsValues, "UseNativeDates", false),
                 ProjectNamesToProcess = ParseSettingReferenceType(settingsValues, "ProjectNamesToProcess", s => s == null ? null : s.ToString().Replace(" ", "").Split(','), null),
                 ProcessDataContracts = ParseSettingNullableType(settingsValues, "ProcessDataContracts", false),
+                ProcessParentClasses = ParseSettingNullableType(settingsValues, "ProcessParentClasses", false),
+                MemberIgnoreAttributes = ParseSettingReferenceType(settingsValues, "MemberIgnoreAttributes", s => s as string, "JsonIgnoreAttribute").Split(','),
                 IncludeStatics = ParseSettingNullableType(settingsValues, "IncludeStatics", false),
             };
         }
 
-        private static T ParseSettingReferenceType<T>(Dictionary<string, object> settingsValues, string key,
-            Func<object, T> convert, T defaultValue) where T : class
+        private static T ParseSettingReferenceType<T>(Dictionary<string, object> settingsValues, string key, Func<object, T> convert, T defaultValue) where T : class
         {
             object val;
             if (settingsValues.TryGetValue(key, out val))
@@ -1056,24 +1115,18 @@ Project GetProjectContainingT4File(DTE dte) {
             return defaultValue;
         }
 
-        private static T ParseSettingNullableType<T>(Dictionary<string, object> settingsValues, string key,
-            T defaultValue) where T : struct
+        private static T ParseSettingNullableType<T>(Dictionary<string, object> settingsValues, string key, T defaultValue) where T : struct
         {
             object val;
             if (settingsValues.TryGetValue(key, out val))
             {
-                var nullable = val as T?;
-                if (nullable == null || !nullable.HasValue)
-                    return defaultValue;
-
-                return nullable.Value;
+                return (val as T?) ?? defaultValue;
             }
 
             return defaultValue;
         }
 
-        private static T ParseConfigValueType<T>(Dictionary<string, object> settingsValues, string key,
-            Func<object, T> convert, T defaultValue)
+        private static T ParseConfigValueType<T>(Dictionary<string, object> settingsValues, string key, Func<object, T> convert, T defaultValue)
         {
             object val;
             if (settingsValues.TryGetValue(key, out val))
@@ -1081,6 +1134,7 @@ Project GetProjectContainingT4File(DTE dte) {
 
             return defaultValue;
         }
+
     }
 
     public class EnumTraverser
