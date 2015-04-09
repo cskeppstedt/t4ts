@@ -4,7 +4,7 @@ using T4TS.Tests.Utils;
 namespace T4TS.Tests.Fixtures.Options.Default
 {
     [TestClass]
-    public class OverrideTests
+    public class DefaultModuleTest
     {
         [TestMethod]
         public void DefaultModuleSettingHasExpectedOutput()
