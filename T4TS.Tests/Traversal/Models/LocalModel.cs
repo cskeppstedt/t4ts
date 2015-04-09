@@ -4,16 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace T4TS.Tests.Models
+namespace T4TS.Tests.Traversal.Models
 {
     [TypeScriptInterface]
-    public class ReservedPropModel
+    public class LocalModel
     {
-        public string @class { get; set; }
-
-        public string @readonly { get; set; }
+        public int Id { get; set; }
 
         [TypeScriptMember(Optional = true)]
-        public bool @public { get; set; }
+        public string Optional { get; set; }
     }
 }

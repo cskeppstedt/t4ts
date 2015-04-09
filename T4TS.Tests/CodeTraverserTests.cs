@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using T4TS.Example.Models;
-using T4TS.Tests.Models;
+using T4TS.Tests.Traversal.Models;
 using T4TS.Tests.Utils;
 
 namespace T4TS.Tests.Traversal

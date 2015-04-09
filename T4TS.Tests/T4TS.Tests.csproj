@@ -88,8 +88,8 @@
     <Compile Include="Fixtures\Inheritance\Test.cs" />
     <Compile Include="Fixtures\ExternalProp\ExternalPropModel.cs" />
     <Compile Include="Fixtures\ExternalProp\Test.cs" />
-    <Compile Include="Models\ReservedPropModel.cs" />
-    <Compile Include="Models\LocalModel.cs" />
+    <Compile Include="Traversal\Models\ReservedPropModel.cs" />
+    <Compile Include="Traversal\Models\LocalModel.cs" />
     <Compile Include="Output\MemberOutputAppenderTests.cs" />
     <Compile Include="Output\ModuleOutputAppenderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

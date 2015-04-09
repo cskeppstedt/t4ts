@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using T4TS.Tests.Utils;
-using T4TS.Tests.Models;
+using T4TS.Tests.Traversal.Models;
 
 namespace T4TS.Tests.Traversal
 {
