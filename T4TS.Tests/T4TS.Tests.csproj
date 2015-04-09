@@ -78,6 +78,8 @@
     <Compile Include="Fixtures\Nullable\Test.cs" />
     <Compile Include="Fixtures\Enumerable\EnumerableModel.cs" />
     <Compile Include="Fixtures\Enumerable\Test.cs" />
+    <Compile Include="Fixtures\Options\Default\DefaultCamelCaseMemberNamesModel.cs" />
+    <Compile Include="Fixtures\Options\Default\DefaultCamelCaseMemberNamesTest.cs" />
     <Compile Include="Fixtures\Options\Default\DefaultModuleModels.cs" />
     <Compile Include="Fixtures\Options\Default\DefaultModuleTest.cs" />
     <Compile Include="Fixtures\Options\Override\OverrideModels.cs" />
