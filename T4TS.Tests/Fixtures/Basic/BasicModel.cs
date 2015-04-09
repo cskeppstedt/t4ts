@@ -10,5 +10,6 @@ namespace T4TS.Tests.Fixtures.Basic
     public class BasicModel
     {
         public int MyProperty { get; set; }
+        public DateTime SomeDateTime { get; set; }
     }
 }

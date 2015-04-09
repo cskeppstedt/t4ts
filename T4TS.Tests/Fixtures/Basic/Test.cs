@@ -24,6 +24,7 @@ declare module T4TS {
     /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel **/
     export interface BasicModel {
         MyProperty: number;
+        SomeDateTime: string;
     }
 }
 ";
