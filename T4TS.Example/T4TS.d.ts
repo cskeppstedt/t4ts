@@ -9,6 +9,7 @@
         Complex: T4TS.OverridenName;
         Name: string;
         DateTime: string;
+        DateTimeOffset: string;
     }
 // -- End global interfaces
 
