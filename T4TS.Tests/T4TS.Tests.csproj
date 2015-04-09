@@ -80,6 +80,8 @@
     <Compile Include="Fixtures\Enumerable\Test.cs" />
     <Compile Include="Fixtures\Options\Default\DefaultInterfaceNamePrefixModel.cs" />
     <Compile Include="Fixtures\Options\Default\DefaultInterfaceNamePrefixTest.cs" />
+    <Compile Include="Fixtures\Options\Default\DefaultOptionalModels.cs" />
+    <Compile Include="Fixtures\Options\Default\DefaultOptionalTest.cs" />
     <Compile Include="Fixtures\Options\Default\DefaultCamelCaseMemberNamesModel.cs" />
     <Compile Include="Fixtures\Options\Default\DefaultCamelCaseMemberNamesTest.cs" />
     <Compile Include="Fixtures\Options\Default\DefaultModuleModels.cs" />
