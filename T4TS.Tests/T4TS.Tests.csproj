@@ -70,8 +70,34 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Models\ReservedPropModel.cs" />
-    <Compile Include="Models\LocalModel.cs" />
+    <Compile Include="Fixtures\Basic\Test.cs" />
+    <Compile Include="Fixtures\Basic\BasicModel.cs" />
+    <Compile Include="Fixtures\Indexed\IndexedModel.cs" />
+    <Compile Include="Fixtures\Indexed\Test.cs" />
+    <Compile Include="Fixtures\Nullable\NullableModel.cs" />
+    <Compile Include="Fixtures\Nullable\Test.cs" />
+    <Compile Include="Fixtures\Enumerable\EnumerableModel.cs" />
+    <Compile Include="Fixtures\Enumerable\Test.cs" />
+    <Compile Include="Fixtures\Options\Default\DefaultInterfaceNamePrefixModel.cs" />
+    <Compile Include="Fixtures\Options\Default\DefaultInterfaceNamePrefixTest.cs" />
+    <Compile Include="Fixtures\Options\Default\UseNativeDatesModel.cs" />
+    <Compile Include="Fixtures\Options\Default\UseNativeDatesTest.cs" />
+    <Compile Include="Fixtures\Options\Default\DefaultOptionalModels.cs" />
+    <Compile Include="Fixtures\Options\Default\DefaultOptionalTest.cs" />
+    <Compile Include="Fixtures\Options\Default\DefaultCamelCaseMemberNamesModel.cs" />
+    <Compile Include="Fixtures\Options\Default\DefaultCamelCaseMemberNamesTest.cs" />
+    <Compile Include="Fixtures\Options\Default\DefaultModuleModels.cs" />
+    <Compile Include="Fixtures\Options\Default\DefaultModuleTest.cs" />
+    <Compile Include="Fixtures\Options\Override\OverrideModels.cs" />
+    <Compile Include="Fixtures\Options\Override\OverrideTests.cs" />
+    <Compile Include="Fixtures\Partial\PartialModel.cs" />
+    <Compile Include="Fixtures\Partial\Test.cs" />
+    <Compile Include="Fixtures\Inheritance\InheritanceModel.cs" />
+    <Compile Include="Fixtures\Inheritance\Test.cs" />
+    <Compile Include="Fixtures\ExternalProp\ExternalPropModel.cs" />
+    <Compile Include="Fixtures\ExternalProp\Test.cs" />
+    <Compile Include="Traversal\Models\ReservedPropModel.cs" />
+    <Compile Include="Traversal\Models\LocalModel.cs" />
     <Compile Include="Output\MemberOutputAppenderTests.cs" />
     <Compile Include="Output\ModuleOutputAppenderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -80,6 +106,7 @@
     <Compile Include="Traversal\ProjectTraversalTests.cs" />
     <Compile Include="Traversal\NamespaceTraverserTests.cs" />
     <Compile Include="Utils\DTETransformer.cs" />
+    <Compile Include="Utils\OutputFor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\T4TS.Attributes\T4TS.Attributes.csproj">

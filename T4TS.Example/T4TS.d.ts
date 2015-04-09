@@ -25,8 +25,8 @@ declare module Fooz {
         OverrideAll?: any;
         AGuid: string;
         Recursive: Fooz.IFoobar;
-        NullableInt?: number;
-        NullableDouble?: number;
+        NullableInt: number;
+        NullableDouble: number;
         NestedObjectArr: Barfoo[];
         NestedObjectList: Barfoo[];
         TwoDimensions: string[][];
@@ -75,6 +75,57 @@ declare module T4TS {
     /** Generated from T4TS.Example.Models.Partial **/
     export interface Partial {
         FromSecondClass: string;
-        AlsoSecondClass?: any;
+        AlsoSecondClass: any;
+    }
+    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel **/
+    export interface BasicModel {
+        MyProperty: number;
+    }
+    /** Generated from T4TS.Tests.Fixtures.Enumerable.EnumerableModel **/
+    export interface EnumerableModel {
+        NormalProperty: number;
+        PrimitiveArray: number[];
+        PrimitiveList: number[];
+        InterfaceArray: T4TS.BasicModel[];
+        InterfaceList: T4TS.BasicModel[];
+        DeepArray: number[][];
+        DeepList: number[][];
+    }
+    /** Generated from T4TS.Tests.Fixtures.ExternalProp.ExternalPropModel **/
+    export interface ExternalPropModel {
+        Basic: T4TS.BasicModel;
+        External: External.ModelFromDifferentProject;
+    }
+    /** Generated from T4TS.Tests.Fixtures.Inheritance.InheritanceModel **/
+    export interface InheritanceModel extends T4TS.OtherInheritanceModel {
+        OnInheritanceModel: T4TS.BasicModel;
+    }
+    /** Generated from T4TS.Tests.Fixtures.Inheritance.OtherInheritanceModel **/
+    export interface OtherInheritanceModel extends External.ModelFromDifferentProject {
+        OnOtherInheritanceModel: T4TS.BasicModel;
+    }
+    /** Generated from T4TS.Tests.Fixtures.Nullable.NullableModel **/
+    export interface NullableModel {
+        NullableInt: number;
+        NullableDouble: number;
+    }
+    /** Generated from T4TS.Tests.Fixtures.Partial.PartialModel **/
+    export interface PartialModel extends External.ModelFromDifferentProject {
+        OnPartialModel: T4TS.BasicModel;
+    }
+    /** Generated from T4TS.Tests.Fixtures.Partial.PartialModel **/
+    export interface PartialModel extends External.ModelFromDifferentProject {
+        OnOtherPartialModel: T4TS.BasicModel;
+    }
+    /** Generated from T4TS.Tests.Models.LocalModel **/
+    export interface LocalModel {
+        Id: number;
+        Optional?: string;
+    }
+    /** Generated from T4TS.Tests.Models.ReservedPropModel **/
+    export interface ReservedPropModel {
+        class: string;
+        readonly: string;
+        public?: boolean;
     }
 }

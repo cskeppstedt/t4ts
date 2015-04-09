@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using T4TS.Tests.Utils;
-using T4TS.Tests.Models;
+using T4TS.Tests.Traversal.Models;
 using T4TS.Example.Models;
 using EnvDTE;
 using Moq;
@@ -21,7 +21,7 @@ namespace T4TS.Tests.Traversal
             }, projectName: "proj");
 
             int callCount = 0;
-            var expectedNames = new string[] { "T4TS.Tests.Models", "T4TS.Example.Models" };
+            var expectedNames = new string[] { "T4TS.Tests.Traversal.Models", "T4TS.Example.Models" };
 
             new ProjectTraverser(proj, (ns) => { Assert.AreEqual(expectedNames[callCount++], ns.Name); });
 
@@ -45,7 +45,7 @@ namespace T4TS.Tests.Traversal
             }, projectName: "proj", subProjectItems: moqSubProjectItems.Object);
 
             int callCount = 0;
-            var expectedNames = new string[] { "T4TS.Tests.Models", "T4TS.Example.Models" };
+            var expectedNames = new string[] { "T4TS.Tests.Traversal.Models", "T4TS.Example.Models" };
             
             new ProjectTraverser(proj, (ns) => { Assert.AreEqual(expectedNames[callCount++], ns.Name); });
 
