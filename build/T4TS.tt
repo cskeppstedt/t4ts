@@ -989,6 +989,7 @@ Project GetProjectContainingT4File(DTE dte) {
                     return new StringType();
 
                 case "System.DateTime":
+                case "System.DateTimeOffset":
                     if (Settings.UseNativeDates)
                         return new DateTimeType();
                     else
