@@ -26,6 +26,7 @@ declare module T4TS {
     /** Generated from T4TS.Tests.Fixtures.Options.Default.UseNativeDatesModel **/
     export interface UseNativeDatesModel {
         SomeDateTime: Date;
+        SomeDateTimeOffset: Date;
     }
 }
 ";

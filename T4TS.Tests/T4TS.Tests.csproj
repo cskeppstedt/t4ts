@@ -105,6 +105,7 @@
     <Compile Include="Traversal\ClassTraversalTests.cs" />
     <Compile Include="Traversal\ProjectTraversalTests.cs" />
     <Compile Include="Traversal\NamespaceTraverserTests.cs" />
+    <Compile Include="TypeContext\TypeContextTests.cs" />
     <Compile Include="Utils\DTETransformer.cs" />
     <Compile Include="Utils\OutputFor.cs" />
   </ItemGroup>

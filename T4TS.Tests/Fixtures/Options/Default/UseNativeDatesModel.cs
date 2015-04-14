@@ -10,5 +10,6 @@ namespace T4TS.Tests.Fixtures.Options.Default
     public class UseNativeDatesModel
     {
         public DateTime SomeDateTime { get; set; }
+        public DateTimeOffset SomeDateTimeOffset { get; set; }
     }
 }
