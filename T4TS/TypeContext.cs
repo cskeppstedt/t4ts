@@ -15,7 +15,8 @@ namespace T4TS
         private static readonly string[] genericCollectionTypeStarts = new string[] {
             "System.Collections.Generic.List<",
             "System.Collections.Generic.IList<",
-            "System.Collections.Generic.ICollection<"
+            "System.Collections.Generic.ICollection<",
+            "System.Collections.Generic.IEnumerable<"
         };
 
         private static readonly string nullableTypeStart = "System.Nullable<";
