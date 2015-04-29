@@ -165,6 +165,7 @@ declare module T4TS {
     /** Generated from T4TS.Tests.Fixtures.Options.Default.UseNativeDatesModel **/
     export interface UseNativeDatesModel {
         SomeDateTime: string;
+        SomeDateTimeOffset: string;
     }
     /** Generated from T4TS.Tests.Fixtures.Options.Override.InterfaceNamePrefixModel **/
     export interface FooInterfaceNamePrefixModel {
