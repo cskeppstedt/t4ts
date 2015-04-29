@@ -15,7 +15,8 @@ namespace T4TS
         private static readonly string[] genericCollectionTypeStarts = new string[] {
             "System.Collections.Generic.List<",
             "System.Collections.Generic.IList<",
-            "System.Collections.Generic.ICollection<"
+            "System.Collections.Generic.ICollection<",
+            "System.Collections.Generic.IEnumerable<"
         };
 
         private static readonly string nullableTypeStart = "System.Nullable<";
@@ -74,6 +75,7 @@ namespace T4TS
                     ElementType = GetTypeScriptType(codeType.ElementType)
                 };
             }
+            
 
             return GetTypeScriptType(codeType.AsFullName);
         }
@@ -98,12 +100,29 @@ namespace T4TS
                     WrappedType = GetTypeScriptType(UnwrapGenericType(typeFullName))
                 };
             }
-
+            var realType = TypeFullNameParser.Parse(typeFullName);
+            if (realType.FullName == "System.Collections.Generic.IEnumerable")
+            {
+                return new ArrayType()
+                {
+                    ElementType = GetTypeScriptType(realType.TypeArgumentFullNames[0].FullName)
+                };
+            }
+            else if(realType.FullName == "System.Collections.Generic.Dictionary" ||
+                realType.FullName == "System.Collections.Generic.IDictionary")
+            {
+                return new DictionaryType()
+                {
+                    KeyType = GetTypeScriptType(realType.TypeArgumentFullNames[0].FullName),
+                    ElementType = GetTypeScriptType(realType.TypeArgumentFullNames[1].FullName)
+                };
+            }
             switch (typeFullName)
             {
                 case "System.Guid":
                     return new GuidType();
-
+                case "System.Boolean":
+                    return new BoolType();
                 case "System.Double":
                 case "System.Int16":
                 case "System.Int32":
