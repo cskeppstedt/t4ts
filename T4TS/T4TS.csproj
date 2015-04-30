@@ -60,6 +60,7 @@
     <Compile Include="Traversal\ProjectTraverser.cs" />
     <Compile Include="Outputs\TypeScriptModule.cs" />
     <Compile Include="Traversal\SolutionTraverser.cs" />
+    <Compile Include="TypeFullName.cs" />
     <Compile Include="TypeFullNameParser.cs" />
     <Compile Include="Types\ArrayType.cs" />
     <Compile Include="Types\BoolType.cs" />

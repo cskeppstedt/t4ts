@@ -8,13 +8,13 @@ namespace T4TS
 {
     class TypeFullNameParser
     {
-        private static TypeFullNameResult ParseCSharp(string fullNameFromType)
+        private static TypeFullName ParseCSharp(string fullNameFromType)
         {
             string fullName = fullNameFromType.Substring(0, fullNameFromType.IndexOf("<"));
             string restPart = fullNameFromType.Substring(fullNameFromType.IndexOf("<"));
             int openBraceCount = 0;
             int count = 0;
-            List<TypeFullNameResult> typeArguments = new List<TypeFullNameResult>();
+            List<TypeFullName> typeArguments = new List<TypeFullName>();
             List<char> chars = new List<char>();
             foreach (var c in restPart)
             {
@@ -42,9 +42,9 @@ namespace T4TS
                 }
                 count++;
             }
-            return new TypeFullNameResult() { FullName = fullName, TypeArgumentFullNames =typeArguments.ToArray() };
+            return new TypeFullName(fullName, typeArguments.ToArray());
         }
-        public static TypeFullNameResult Parse(string fullNameFromType)
+        public static TypeFullName Parse(string fullNameFromType)
         {
             
             if (fullNameFromType.Contains("<"))
@@ -53,7 +53,7 @@ namespace T4TS
             {
                 if (fullNameFromType.Contains(","))
                     return Parse(fullNameFromType.Substring(0, fullNameFromType.IndexOf(",")));
-                return new TypeFullNameResult() { FullName = fullNameFromType };
+                return new TypeFullName(fullNameFromType);
             }
 
             string fullName = fullNameFromType.Substring(0, fullNameFromType.IndexOf("`"));
@@ -61,7 +61,7 @@ namespace T4TS
             restPart = restPart.Substring(0, restPart.Length - 1);
             int openBraceCount = 0;
             int count = 0;
-            List<TypeFullNameResult> typeArguments = new List<TypeFullNameResult>();
+            List<TypeFullName> typeArguments = new List<TypeFullName>();
             List<char> chars = new List<char>();
             foreach (var c in restPart)
             {
@@ -85,14 +85,9 @@ namespace T4TS
                 }
                 count++;
             }
-            return new TypeFullNameResult() { FullName = fullName, TypeArgumentFullNames = typeArguments.ToArray() };
+            return new TypeFullName(fullName, typeArguments.ToArray());
             //System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]] 
             //System.Collections.Generic.Dictionary`2[[System.Collections.Generic.List`1[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]
         }
-    }
-    public class TypeFullNameResult
-    {
-        public string FullName { get; set; }
-        public TypeFullNameResult[] TypeArgumentFullNames { get; set; }
     }
 }
