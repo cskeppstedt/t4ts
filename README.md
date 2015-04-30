@@ -1,9 +1,6 @@
 T4TS
 ====
 
-This is a fork of T4TS, original location is here: [https://github.com/cskeppstedt/t4ts](https://github.com/cskeppstedt/t4ts)
-It does not contain much changes yet, but more is yet to come
-
 T4 template to generate TypeScript interface definitions.
 
 Usage
