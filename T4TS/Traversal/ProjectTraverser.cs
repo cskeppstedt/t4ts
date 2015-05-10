@@ -39,6 +39,8 @@ namespace T4TS
 
                 if (pi.ProjectItems != null)
                     Traverse(pi.ProjectItems);
+                else if (pi.SubProject != null && pi.SubProject.ProjectItems != null)
+                    Traverse(pi.SubProject.ProjectItems);
             }
         }
     }
