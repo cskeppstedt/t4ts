@@ -100,16 +100,17 @@ namespace T4TS
                     WrappedType = GetTypeScriptType(UnwrapGenericType(typeFullName))
                 };
             }
+
             var realType = TypeFullNameParser.Parse(typeFullName);
-            if (realType.FullName == "System.Collections.Generic.IEnumerable")
+
+            if (realType.IsEnumerable())
             {
                 return new ArrayType()
                 {
                     ElementType = GetTypeScriptType(realType.TypeArgumentFullNames[0].FullName)
                 };
             }
-            else if(realType.FullName == "System.Collections.Generic.Dictionary" ||
-                realType.FullName == "System.Collections.Generic.IDictionary")
+            else if(realType.IsDictionary())
             {
                 return new DictionaryType()
                 {
@@ -117,6 +118,7 @@ namespace T4TS
                     ElementType = GetTypeScriptType(realType.TypeArgumentFullNames[1].FullName)
                 };
             }
+
             switch (typeFullName)
             {
                 case "System.Guid":
