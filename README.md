@@ -77,7 +77,7 @@ Specifications
    * `Nullable<T>` **=>** `T?`
    * A class marked with `[TypeScriptInterface]` **=>** lookup the generated TypeScript name
    * Otherwise **=>** `any`
-   * For `Collection<T>`, `List<T>`, `IList<T>` and `T[]` **=>** lookup type for `T` as above, and return `T[]`.
+   * For `IEnumerable<T>`, `Collection<T>`, `List<T>`, `IList<T>` and `T[]` **=>** lookup type for `T` as above, and return `T[]`.
 
  * Inheritance of interfaces is supported. If `Bar` inherits `Foo` in C# and both are marked with the `TypeScriptInterfaceAttribute`, the generated interface would be `interface Bar extends Foo {...`.
 
