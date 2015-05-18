@@ -72,6 +72,8 @@
   <ItemGroup>
     <Compile Include="Fixtures\Basic\Test.cs" />
     <Compile Include="Fixtures\Basic\BasicModel.cs" />
+    <Compile Include="Fixtures\Dictionary\DictionaryModel.cs" />
+    <Compile Include="Fixtures\Dictionary\Test.cs" />
     <Compile Include="Fixtures\Indexed\IndexedModel.cs" />
     <Compile Include="Fixtures\Indexed\Test.cs" />
     <Compile Include="Fixtures\Nullable\NullableModel.cs" />
