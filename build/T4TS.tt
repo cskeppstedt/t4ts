@@ -772,6 +772,97 @@ Project GetProjectContainingT4File(DTE dte) {
         }
     }
 
+    class TypeFullNameParser
+    {
+        private static TypeFullNameResult ParseCSharp(string fullNameFromType)
+        {
+            string fullName = fullNameFromType.Substring(0, fullNameFromType.IndexOf("<"));
+            string restPart = fullNameFromType.Substring(fullNameFromType.IndexOf("<"));
+            int openBraceCount = 0;
+            int count = 0;
+            List<TypeFullNameResult> typeArguments = new List<TypeFullNameResult>();
+            List<char> chars = new List<char>();
+            foreach (var c in restPart)
+            {
+                if ((c != '<' && c != '>' && c != ',') || openBraceCount > 1)
+                {
+                        chars.Add(c);
+                }
+                if(c == ',' && openBraceCount==1)
+                {
+                    typeArguments.Add(Parse(new String(chars.ToArray()).Trim()));
+                    chars.Clear();
+                }
+                if (c == '<')
+                {
+                    openBraceCount++;
+                }
+                else if (c == '>')
+                {
+                    openBraceCount--;
+                    if (openBraceCount == 0)
+                    {
+                        typeArguments.Add(Parse(new String(chars.ToArray()).Trim()));
+                        chars.Clear();
+                    }
+                }
+                count++;
+            }
+            return new TypeFullNameResult() { FullName = fullName, TypeArgumentFullNames =typeArguments.ToArray() };
+        }
+        public static TypeFullNameResult Parse(string fullNameFromType)
+        {
+            
+            if (fullNameFromType.Contains("<"))
+                return ParseCSharp(fullNameFromType);
+            if (!fullNameFromType.Contains("`"))
+            {
+                if (fullNameFromType.Contains(","))
+                    return Parse(fullNameFromType.Substring(0, fullNameFromType.IndexOf(",")));
+                return new TypeFullNameResult() { FullName = fullNameFromType };
+            }
+
+            string fullName = fullNameFromType.Substring(0, fullNameFromType.IndexOf("`"));
+            string restPart = fullNameFromType.Substring(fullNameFromType.IndexOf("[") + 1);
+            restPart = restPart.Substring(0, restPart.Length - 1);
+            int openBraceCount = 0;
+            int count = 0;
+            List<TypeFullNameResult> typeArguments = new List<TypeFullNameResult>();
+            List<char> chars = new List<char>();
+            foreach (var c in restPart)
+            {
+                if ((c != '[' && c != ']') || openBraceCount > 1)
+                {
+                    if (c != ',' || openBraceCount != 0)
+                        chars.Add(c);
+                }
+                if (c == '[')
+                {
+                    openBraceCount++;
+                }
+                else if (c == ']')
+                {
+                    openBraceCount--;
+                    if (openBraceCount == 0)
+                    {
+                        typeArguments.Add(Parse(new String(chars.ToArray())));
+                        chars.Clear();
+                    }
+                }
+                count++;
+            }
+            return new TypeFullNameResult() { FullName = fullName, TypeArgumentFullNames = typeArguments.ToArray() };
+            //System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]] 
+            //System.Collections.Generic.Dictionary`2[[System.Collections.Generic.List`1[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]
+        }
+    }
+
+    public class TypeFullNameResult
+    {
+        public string FullName { get; set; }
+        public TypeFullNameResult[] TypeArgumentFullNames { get; set; }
+    }
+
     public class ArrayType: TypescriptType
     {
         public TypescriptType ElementType { get; set; }
@@ -787,6 +878,17 @@ Project GetProjectContainingT4File(DTE dte) {
         public override string Name
         {
             get { return "boolean"; }
+        }
+    }
+
+    public class DictionaryType : TypescriptType
+    {
+        public TypescriptType KeyType { get; set; }
+        public TypescriptType ElementType { get; set; }
+
+        public override string ToString()
+        {
+            return "{ [name: NameType]: ValueType}".Replace("NameType", KeyType.ToString()).Replace("ValueType", ElementType.ToString());
         }
     }
 
@@ -883,7 +985,8 @@ Project GetProjectContainingT4File(DTE dte) {
         private static readonly string[] genericCollectionTypeStarts = new string[] {
             "System.Collections.Generic.List<",
             "System.Collections.Generic.IList<",
-            "System.Collections.Generic.ICollection<"
+            "System.Collections.Generic.ICollection<",
+            "System.Collections.Generic.IEnumerable<"
         };
 
         private static readonly string nullableTypeStart = "System.Nullable<";
@@ -942,6 +1045,7 @@ Project GetProjectContainingT4File(DTE dte) {
                     ElementType = GetTypeScriptType(codeType.ElementType)
                 };
             }
+            
 
             return GetTypeScriptType(codeType.AsFullName);
         }
@@ -966,12 +1070,29 @@ Project GetProjectContainingT4File(DTE dte) {
                     WrappedType = GetTypeScriptType(UnwrapGenericType(typeFullName))
                 };
             }
-
+            var realType = TypeFullNameParser.Parse(typeFullName);
+            if (realType.FullName == "System.Collections.Generic.IEnumerable")
+            {
+                return new ArrayType()
+                {
+                    ElementType = GetTypeScriptType(realType.TypeArgumentFullNames[0].FullName)
+                };
+            }
+            else if(realType.FullName == "System.Collections.Generic.Dictionary" ||
+                realType.FullName == "System.Collections.Generic.IDictionary")
+            {
+                return new DictionaryType()
+                {
+                    KeyType = GetTypeScriptType(realType.TypeArgumentFullNames[0].FullName),
+                    ElementType = GetTypeScriptType(realType.TypeArgumentFullNames[1].FullName)
+                };
+            }
             switch (typeFullName)
             {
                 case "System.Guid":
                     return new GuidType();
-
+                case "System.Boolean":
+                    return new BoolType();
                 case "System.Double":
                 case "System.Int16":
                 case "System.Int32":

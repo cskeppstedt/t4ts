@@ -9,6 +9,8 @@
         Complex: T4TS.OverridenName;
         Name: string;
         DateTime: string;
+        NestedObjectList: Barfoo[];
+        AnDictionary: { [name: string]: any};
     }
 // -- End global interfaces
 
@@ -89,7 +91,7 @@ declare module T4TS {
     /** Generated from T4TS.Example.Models.Partial **/
     export interface Partial {
         FromSecondClass: string;
-        AlsoSecondClass: any;
+        AlsoSecondClass: boolean;
     }
     /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel **/
     export interface BasicModel {
@@ -165,6 +167,7 @@ declare module T4TS {
     /** Generated from T4TS.Tests.Fixtures.Options.Default.UseNativeDatesModel **/
     export interface UseNativeDatesModel {
         SomeDateTime: string;
+        SomeDateTimeOffset: string;
     }
     /** Generated from T4TS.Tests.Fixtures.Options.Override.InterfaceNamePrefixModel **/
     export interface FooInterfaceNamePrefixModel {

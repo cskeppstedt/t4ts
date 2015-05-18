@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 
 namespace T4TS.Tests
 {
@@ -79,6 +80,30 @@ namespace T4TS.Tests
                 var resolvedType = context.GetTypeScriptType(type.FullName);
                 Assert.IsInstanceOfType(resolvedType, expectedType);
             }
+        }
+
+        [TestMethod]
+        public void ShouldSupportIEnumerableTypes()
+        {
+            var context = new TypeContext(new Settings());
+
+            var resolvedType = context.GetTypeScriptType(typeof(IEnumerable<String>).FullName);
+            Assert.IsInstanceOfType(resolvedType, typeof(ArrayType));
+
+            resolvedType = context.GetTypeScriptType("System.Collections.Generic.IEnumerable<System.String>");
+            Assert.IsInstanceOfType(resolvedType, typeof(ArrayType));
+        }
+
+        [TestMethod]
+        public void ShouldSupportDicionaryTypes()
+        {
+            var context = new TypeContext(new Settings());
+
+            var resolvedType = context.GetTypeScriptType(typeof(Dictionary<String, float>).FullName);
+            Assert.IsInstanceOfType(resolvedType, typeof(DictionaryType));
+
+            resolvedType = context.GetTypeScriptType("System.Collections.Generic.Dictionary<System.String, System.Float>");
+            Assert.IsInstanceOfType(resolvedType, typeof(DictionaryType));
         }
     }
 }
