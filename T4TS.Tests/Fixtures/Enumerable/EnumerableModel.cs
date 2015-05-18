@@ -18,5 +18,6 @@ namespace T4TS.Tests.Fixtures.Enumerable
         public List<BasicModel> InterfaceList { get; set; }
         public int[][] DeepArray { get; set; }
         public List<List<int>> DeepList { get; set; }
+        public IEnumerable<string> Generic { get; set; }
     }
 }

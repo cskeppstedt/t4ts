@@ -33,6 +33,7 @@ declare module T4TS {
         InterfaceList: T4TS.BasicModel[];
         DeepArray: number[][];
         DeepList: number[][];
+        Generic: string[];
     }
     /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel **/
     export interface BasicModel {
