@@ -198,13 +198,14 @@ namespace T4TS.Tests.Utils
             property.SetupProperty(x => x.Access, vsCMAccess.vsCMAccessPublic);
             property.SetupProperty(x => x.Getter, getter.Object);
 
+            
             // Super ugly hack. We want the property name to start with a @,
             // because that's how the DTE version is rendered. However, it looks
             // like the @ is stripped when we acquire it through reflection.
             string name = fromProperty.Name;
             if (PropertyNameIsReserved(name))
                 name = "@" + name;
-
+            
             property.SetupProperty(x => x.Name, name);
 
             var memberAttribute = fromProperty.GetCustomAttributes<TypeScriptMemberAttribute>().FirstOrDefault();
@@ -249,6 +250,8 @@ namespace T4TS.Tests.Utils
             "System.Collections.Generic.IEnumerable",
             "System.Collections.Generic.IList",
             "System.Collections.Generic.ICollection",
+            "System.Collections.Generic.Dictionary",
+            "System.Collections.Generic.IDictionary",
             "System.Nullable"
         };
 
@@ -258,15 +261,24 @@ namespace T4TS.Tests.Utils
         private static string GetTypeFullname(string typeFullname)
         {
             string wrapType = wrapTypes.FirstOrDefault(typeFullname.StartsWith);
-
+            
             if (string.IsNullOrEmpty(wrapType))
             {
                 return Regex.Match(typeFullname, "[^,]+").Value;
+            }
+            else if (wrapType == "System.Collections.Generic.Dictionary" || wrapType == "System.Collections.Generic.IDictionary")
+            {
+                var match = Regex.Match(typeFullname, @"\[\[([^\]]+)\],\[([^\]]+)\]\]");
+                string keyType = match.Groups[1].Value;
+                string valType = match.Groups[2].Value;
+
+                return string.Format("{0}<{1},{2}>", wrapType, GetTypeFullname(keyType), GetTypeFullname(valType));
             }
             else
             {
                 var match = Regex.Match(typeFullname, @"\[\[(.*)\]\]");
                 string elementType = match.Groups[1].Value;
+
                 return string.Format("{0}<{1}>", wrapType, GetTypeFullname(elementType));
             }
         }
