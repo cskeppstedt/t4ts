@@ -5,10 +5,10 @@
 // -- Begin global interfaces
     /** Generated from T4TS.Example.Models.Barfoo **/
     interface Barfoo {
-        number: number;
-        complex: T4TS.OverridenName;
-        name: string;
-        dateTime: Date;
+        Number: number;
+        Complex: T4TS.OverridenName;
+        Name: string;
+        DateTime: string;
         aValue: { [name: string]: any};
     }
 // -- End global interfaces
@@ -16,7 +16,7 @@
 declare module External {
     /** Generated from T4TS.Example.Models.ModelFromDifferentProject **/
     export interface ModelFromDifferentProject {
-        id: number;
+        Id: number;
     }
 }
 
@@ -24,60 +24,60 @@ declare module Fooz {
     /** Generated from T4TS.Example.Models.Foobar **/
     export interface IFoobar {
         OverrideAll?: any;
-        aGuid: string;
-        recursive: Fooz.IFoobar;
-        nullableInt: number;
-        nullableDouble: number;
-        nestedObjectArr: Barfoo[];
-        nestedObjectList: Barfoo[];
-        twoDimensions: string[][];
-        threeDimensions: Barfoo[][][];
+        AGuid: string;
+        Recursive: Fooz.IFoobar;
+        NullableInt: number;
+        NullableDouble: number;
+        NestedObjectArr: Barfoo[];
+        NestedObjectList: Barfoo[];
+        TwoDimensions: string[][];
+        ThreeDimensions: Barfoo[][][];
         camelCasePlease: number;
-        doNotIgnoreMe: number;
+        DoNotIgnoreMe: number;
     }
 }
 
 declare module Override {
     /** Generated from T4TS.Tests.Fixtures.Options.Default.DefaultModuleOverrideModel **/
     export interface DefaultModuleOverrideModel {
-        someProp: string;
+        SomeProp: string;
     }
 }
 
 declare module SomeModule {
     /** Generated from T4TS.Tests.Fixtures.Options.Override.ModuleNameOverrideModel **/
     export interface ModuleNameOverrideModel {
-        someThirdProp: string;
+        SomeThirdProp: string;
     }
 }
 
 declare module T4TS {
     /** Generated from T4TS.Example.Models.SomeEntity **/
     export interface someEntity extends externalJSModule.Entity {
-        number: number;
-        name: string;
-        dateTime: Date;
+        Number: number;
+        Name: string;
+        DateTime: string;
         aValue: { [name: string]: any};
     }
     /** Generated from T4TS.Example.Models.InheritanceTest1 **/
     export interface InheritanceTest1 extends Barfoo {
-        someString: string;
-        recursive: Fooz.IFoobar;
+        SomeString: string;
+        Recursive: Fooz.IFoobar;
     }
     /** Generated from T4TS.Example.Models.InheritanceTest2 **/
     export interface InheritanceTest2 extends T4TS.InheritanceTest1 {
-        someString2: string;
-        recursive2: Fooz.IFoobar;
+        SomeString2: string;
+        Recursive2: Fooz.IFoobar;
     }
     /** Generated from T4TS.Example.Models.InheritanceTest3 **/
     export interface InheritanceTest3 extends T4TS.OverridenName {
-        someString3: string;
-        recursive3: Fooz.IFoobar;
+        SomeString3: string;
+        Recursive3: Fooz.IFoobar;
     }
     /** Generated from T4TS.Example.Models.InheritanceTest4 **/
     export interface InheritanceTest4 {
-        someString4: string;
-        recursive4: Fooz.IFoobar;
+        SomeString4: string;
+        Recursive4: Fooz.IFoobar;
     }
     /** Generated from T4TS.Example.Models.InheritanceTestExternal **/
     export interface InheritanceTestExternal extends External.ModelFromDifferentProject {
@@ -85,73 +85,73 @@ declare module T4TS {
     /** Generated from T4TS.Example.Models.Inherited **/
     export interface OverridenName {
         OtherName?: string;
-        integers: number[];
-        doubles: number[];
-        twoDimList: number[][];
+        Integers: number[];
+        Doubles: number[];
+        TwoDimList: number[][];
         [index: number]: Barfoo;
     }
     /** Generated from T4TS.Example.Models.Partial **/
     export interface Partial {
-        fromFirstClass: string;
+        FromFirstClass: string;
     }
     /** Generated from T4TS.Example.Models.Partial **/
     export interface Partial {
-        fromSecondClass: string;
-        alsoSecondClass: boolean;
+        FromSecondClass: string;
+        AlsoSecondClass: boolean;
     }
     /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel **/
     export interface BasicModel {
-        myProperty: number;
-        someDateTime: Date;
+        MyProperty: number;
+        SomeDateTime: string;
     }
     /** Generated from T4TS.Tests.Fixtures.Dictionary.DictionaryModel **/
     export interface DictionaryModel {
-        intKey: { [name: number]: T4TS.BasicModel};
-        stringKey: { [name: string]: T4TS.BasicModel};
+        IntKey: { [name: number]: T4TS.BasicModel};
+        StringKey: { [name: string]: T4TS.BasicModel};
         [index: number]: T4TS.BasicModel;
     }
     /** Generated from T4TS.Tests.Fixtures.Enumerable.EnumerableModel **/
     export interface EnumerableModel {
-        normalProperty: number;
-        primitiveArray: number[];
-        primitiveList: number[];
-        interfaceArray: T4TS.BasicModel[];
-        interfaceList: T4TS.BasicModel[];
-        deepArray: number[][];
-        deepList: number[][];
-        generic: string[];
+        NormalProperty: number;
+        PrimitiveArray: number[];
+        PrimitiveList: number[];
+        InterfaceArray: T4TS.BasicModel[];
+        InterfaceList: T4TS.BasicModel[];
+        DeepArray: number[][];
+        DeepList: number[][];
+        Generic: string[];
     }
     /** Generated from T4TS.Tests.Fixtures.ExternalProp.ExternalPropModel **/
     export interface ExternalPropModel {
-        basic: T4TS.BasicModel;
-        external: External.ModelFromDifferentProject;
+        Basic: T4TS.BasicModel;
+        External: External.ModelFromDifferentProject;
     }
     /** Generated from T4TS.Tests.Fixtures.Indexed.IndexedComplexModel **/
     export interface IndexedComplexModel {
-        someProp: number;
+        SomeProp: number;
         [index: number]: T4TS.BasicModel;
     }
     /** Generated from T4TS.Tests.Fixtures.Indexed.IndexedPrimitiveModel **/
     export interface IndexedPrimitiveModel {
-        someProp: number;
+        SomeProp: number;
         [index: number]: string;
     }
     /** Generated from T4TS.Tests.Fixtures.Inheritance.InheritanceModel **/
     export interface InheritanceModel extends T4TS.OtherInheritanceModel {
-        onInheritanceModel: T4TS.BasicModel;
+        OnInheritanceModel: T4TS.BasicModel;
     }
     /** Generated from T4TS.Tests.Fixtures.Inheritance.OtherInheritanceModel **/
     export interface OtherInheritanceModel extends External.ModelFromDifferentProject {
-        onOtherInheritanceModel: T4TS.BasicModel;
+        OnOtherInheritanceModel: T4TS.BasicModel;
     }
     /** Generated from T4TS.Tests.Fixtures.Nullable.NullableModel **/
     export interface NullableModel {
-        nullableInt: number;
-        nullableDouble: number;
+        NullableInt: number;
+        NullableDouble: number;
     }
     /** Generated from T4TS.Tests.Fixtures.Options.Default.DefaultCamelCaseMemberNamesModel **/
     export interface DefaultCamelCaseMemberNamesModel {
-        someProp: string;
+        SomeProp: string;
     }
     /** Generated from T4TS.Tests.Fixtures.Options.Default.DefaultCamelCaseMemberNamesOverrideModel **/
     export interface DefaultCamelCaseMemberNamesOverrideModel {
@@ -159,7 +159,7 @@ declare module T4TS {
     }
     /** Generated from T4TS.Tests.Fixtures.Options.Default.DefaultInterfaceNamePrefixModel **/
     export interface DefaultInterfaceNamePrefixModel {
-        someProp: string;
+        SomeProp: string;
     }
     /** Generated from T4TS.Tests.Fixtures.Options.Default.DefaultInterfaceNamePrefixOverrideModel **/
     export interface PrefixOverrideDefaultInterfaceNamePrefixOverrideModel {
@@ -167,28 +167,28 @@ declare module T4TS {
     }
     /** Generated from T4TS.Tests.Fixtures.Options.Default.DefaultModuleModel **/
     export interface DefaultModuleModel {
-        someProp: string;
+        SomeProp: string;
     }
     /** Generated from T4TS.Tests.Fixtures.Options.Default.DefaultOptionalModel **/
     export interface DefaultOptionalModel {
-        someProp: string;
+        SomeProp: string;
     }
     /** Generated from T4TS.Tests.Fixtures.Options.Default.DefaultOptionalOverrideModel **/
     export interface DefaultOptionalOverrideModel {
-        someProp: string;
+        SomeProp: string;
     }
     /** Generated from T4TS.Tests.Fixtures.Options.Default.UseNativeDatesModel **/
     export interface UseNativeDatesModel {
-        someDateTime: Date;
-        someDateTimeOffset: Date;
+        SomeDateTime: string;
+        SomeDateTimeOffset: string;
     }
     /** Generated from T4TS.Tests.Fixtures.Options.Override.InterfaceNamePrefixModel **/
     export interface FooInterfaceNamePrefixModel {
-        someProp: string;
+        SomeProp: string;
     }
     /** Generated from T4TS.Tests.Fixtures.Options.Override.InterfaceNameOverrideModel **/
     export interface Bar {
-        someOtherProp: string;
+        SomeOtherProp: string;
     }
     /** Generated from T4TS.Tests.Fixtures.Options.Override.MemberNameOverrideModel **/
     export interface MemberNameOverrideModel {
@@ -196,7 +196,7 @@ declare module T4TS {
     }
     /** Generated from T4TS.Tests.Fixtures.Options.Override.MemberOptionalModel **/
     export interface MemberOptionalModel {
-        member?: string;
+        Member?: string;
     }
     /** Generated from T4TS.Tests.Fixtures.Options.Override.MemberCamelCaseModel **/
     export interface MemberCamelCaseModel {
@@ -204,24 +204,24 @@ declare module T4TS {
     }
     /** Generated from T4TS.Tests.Fixtures.Options.Override.MemberTypeModel **/
     export interface MemberTypeModel {
-        notANumber: number;
+        NotANumber: number;
     }
     /** Generated from T4TS.Tests.Fixtures.Options.Override.MemberIgnoreModel **/
     export interface MemberIgnoreModel {
-        notIgnored: string;
+        NotIgnored: string;
     }
     /** Generated from T4TS.Tests.Fixtures.Partial.PartialModel **/
     export interface PartialModel extends External.ModelFromDifferentProject {
-        onPartialModel: T4TS.BasicModel;
+        OnPartialModel: T4TS.BasicModel;
     }
     /** Generated from T4TS.Tests.Fixtures.Partial.PartialModel **/
     export interface PartialModel extends External.ModelFromDifferentProject {
-        onOtherPartialModel: T4TS.BasicModel;
+        OnOtherPartialModel: T4TS.BasicModel;
     }
     /** Generated from T4TS.Tests.Traversal.Models.LocalModel **/
     export interface LocalModel {
-        id: number;
-        optional?: string;
+        Id: number;
+        Optional?: string;
     }
     /** Generated from T4TS.Tests.Traversal.Models.ReservedPropModel **/
     export interface ReservedPropModel {
