@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\Inheritance by Existent External Type.cs" />
     <Compile Include="Models\Barfoo.cs" />
     <Compile Include="Models\Foobar.cs" />
     <Compile Include="Models\InheritanceTest1.cs" />
@@ -61,6 +62,7 @@
       <LastGenOutput>T4TS.d.ts</LastGenOutput>
     </Content>
     <Content Include="Scripts\lib\jquery-1.8.d.ts" />
+    <TypeScriptCompile Include="Scripts\App\Existent External Module.d.ts" />
     <TypeScriptCompile Include="Scripts\App\Test.ts" />
   </ItemGroup>
   <ItemGroup>

@@ -24,5 +24,13 @@ namespace T4TS
         /// If specified, the interface name will be prefixed with this string.
         /// </summary>
         public string NamePrefix { get; set; }
+
+        /// <summary>
+        /// If specified, this interface will be extended by a external type that 
+        /// is part of another framework and does not require the existent module and 
+        /// type to be generated.
+        /// </summary>
+        public string ExistentExternalTypeName { get; set; }
+
     }
 }

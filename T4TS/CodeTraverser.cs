@@ -115,7 +115,8 @@ namespace T4TS
             var tsInterface = new TypeScriptInterface
             {
                 FullName = codeClass.FullName,
-                Name = GetInterfaceName(attributeValues)
+                Name = GetInterfaceName(attributeValues),
+                ExistentExternalTypeName = attributeValues.ExistentExternalTypeName
             };
 
             TypescriptType indexedType;
@@ -174,7 +175,8 @@ namespace T4TS
             {
                 Name = values.ContainsKey("Name") ? values["Name"] : codeClass.Name,
                 Module = values.ContainsKey("Module") ? values["Module"] : Settings.DefaultModule ?? "T4TS",
-                NamePrefix = values.ContainsKey("NamePrefix") ? values["NamePrefix"] : Settings.DefaultInterfaceNamePrefix ?? string.Empty
+                NamePrefix = values.ContainsKey("NamePrefix") ? values["NamePrefix"] : Settings.DefaultInterfaceNamePrefix ?? string.Empty,
+                ExistentExternalTypeName = values.ContainsKey("ExistentExternalTypeName") ? values["ExistentExternalTypeName"] : string.Empty
             };
         }
 
