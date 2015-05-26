@@ -11,7 +11,7 @@ namespace T4TS
     {
         public string Name { get; set; }
         public string FullName { get; set; }
-        public string ExistentExternalTypeName { get; set; }
+        public string Extends { get; set; }
 
         public List<TypeScriptInterfaceMember> Members { get; set; }
         public TypescriptType IndexedType { get; set; }

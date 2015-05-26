@@ -30,7 +30,7 @@ namespace T4TS
         /// is part of another framework and does not require the existent module and 
         /// type to be generated.
         /// </summary>
-        public string ExistentExternalTypeName { get; set; }
+        public string Extends { get; set; }
 
     }
 }

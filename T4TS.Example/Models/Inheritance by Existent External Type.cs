@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace T4TS.Example.Models
 {
-    [TypeScriptInterface(Name = "someEntity", ExistentExternalTypeName = "externalJSModule.Entity")]
+    [TypeScriptInterface(Name = "someEntity", Extends = "externalJSModule.Entity")]
     public class SomeEntity
     {
         public int Number { get; set; }
