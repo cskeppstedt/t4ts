@@ -47,6 +47,7 @@
     <Compile Include="Models\InheritanceTest4.cs" />
     <Compile Include="Models\InheritanceTestExternal.cs" />
     <Compile Include="Models\Inherited.cs" />
+    <Compile Include="Models\InheritsPartialModelByEF.cs" />
     <Compile Include="Models\Partial.First.cs" />
     <Compile Include="Models\Partial.Second.cs" />
     <Compile Include="Models\TestClass.cs" />
