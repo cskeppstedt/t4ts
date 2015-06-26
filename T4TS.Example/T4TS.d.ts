@@ -97,6 +97,17 @@ declare module T4TS {
         TwoDimList: number[][];
         [index: number]: Barfoo;
     }
+    /** Generated from T4TS.Example.Models.PartialModelByEF **/
+    export interface PartialModelByEF {
+        SomeId: number;
+    }
+    /** Generated from T4TS.Example.Models.PartialModelByEF **/
+    export interface PartialModelByEF {
+    }
+    /** Generated from T4TS.Example.Models.InheritsPartialModelByEF **/
+    export interface InheritsPartialModelByEF extends T4TS.PartialModelByEF {
+        NewProperty: string;
+    }
     /** Generated from T4TS.Example.Models.Partial **/
     export interface Partial {
         FromFirstClass: string;
@@ -111,6 +122,12 @@ declare module T4TS {
         MyProperty: number;
         SomeDateTime: string;
     }
+    /** Generated from T4TS.Tests.Fixtures.Dictionary.DictionaryModel **/
+    export interface DictionaryModel {
+        IntKey: { [name: number]: T4TS.BasicModel};
+        StringKey: { [name: string]: T4TS.BasicModel};
+        [index: number]: T4TS.BasicModel;
+    }
     /** Generated from T4TS.Tests.Fixtures.Enumerable.EnumerableModel **/
     export interface EnumerableModel {
         NormalProperty: number;
@@ -120,6 +137,7 @@ declare module T4TS {
         InterfaceList: T4TS.BasicModel[];
         DeepArray: number[][];
         DeepList: number[][];
+        Generic: string[];
     }
     /** Generated from T4TS.Tests.Fixtures.ExternalProp.ExternalPropModel **/
     export interface ExternalPropModel {

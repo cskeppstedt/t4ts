@@ -358,7 +358,9 @@ Project GetProjectContainingT4File(DTE dte) {
                     CodeElement baseClass = baseClasses.Item(1);
                     if (baseClass != null)
                     {
-                        var parent = tsInterfaces.SingleOrDefault(intf => intf.FullName == baseClass.FullName);
+                        ///since this is traversing project files, a class's base class can be defined in multiple files, if that is a partial class.
+                        ///SingleOrDefault fails if it finds multiple files ==> That's why use FirstOrDefault
+                        var parent = tsInterfaces.FirstOrDefault(intf => intf.FullName == baseClass.FullName);
                         if (parent != null)
                         {
                             tsMap[codeClass].Parent = parent;
