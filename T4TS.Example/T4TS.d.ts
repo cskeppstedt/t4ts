@@ -18,8 +18,20 @@
 
 // -- Begin global interfaces
     /** Generated from T4TS.Example.Models.Barfoo **/
+    /**  <summary>
+    * Barfoo has some comments!
+    * <example>var bar = new Barfoo();</example>
+    * </summary> */
     interface Barfoo {
+        /**  <summary>
+        * Well, this is a number
+        * And has multiple lines of comment
+        * "Nicely" formated
+        * </summary> */
         Number: number;
+        /**  <summary>
+        * Okay, this has a single line of comment
+        * </summary> */
         Complex: T4TS.OverridenName;
         Name: string;
         DateTime: string;
@@ -111,6 +123,12 @@ declare module T4TS {
         MyProperty: number;
         SomeDateTime: string;
     }
+    /** Generated from T4TS.Tests.Fixtures.Dictionary.DictionaryModel **/
+    export interface DictionaryModel {
+        IntKey: { [name: number]: T4TS.BasicModel};
+        StringKey: { [name: string]: T4TS.BasicModel};
+        [index: number]: T4TS.BasicModel;
+    }
     /** Generated from T4TS.Tests.Fixtures.Enumerable.EnumerableModel **/
     export interface EnumerableModel {
         NormalProperty: number;
@@ -120,6 +138,7 @@ declare module T4TS {
         InterfaceList: T4TS.BasicModel[];
         DeepArray: number[][];
         DeepList: number[][];
+        Generic: string[];
     }
     /** Generated from T4TS.Tests.Fixtures.ExternalProp.ExternalPropModel **/
     export interface ExternalPropModel {

@@ -38,6 +38,10 @@ namespace T4TS
         private void BeginInterface(TypeScriptInterface tsInterface)
         {
             AppendIndentedLine("/** Generated from " + tsInterface.FullName + " **/");
+			
+            //replace NewLine characters, so multiline comments will align nicely, and don't stick to the begining of the lines...
+            if(!string.IsNullOrWhiteSpace(tsInterface.Comment)) { AppendIndentedLine("/**  " + tsInterface.Comment.Replace(Environment.NewLine, Environment.NewLine + new string(' ', BaseIndentation) + "* ") + " */"); }
+            if(!string.IsNullOrWhiteSpace(tsInterface.DocComment)) { AppendIndentedLine("/**  " + tsInterface.DocComment.Replace(Environment.NewLine, Environment.NewLine + new string(' ', BaseIndentation) + "* ") + " */"); }
 
             if (InGlobalModule)
                 AppendIndented("interface " + tsInterface.Name);
