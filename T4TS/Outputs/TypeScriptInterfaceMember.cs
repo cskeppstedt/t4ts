@@ -15,7 +15,8 @@ namespace T4TS
         public string DocComment {
           get { return _docComment; }
           set {
-            if(value == null) { _docComment = null; }
+            _docComment = value;
+            if(value == null) { return; }
             //strip the '<doc> </doc>' xml tags
             if(value.StartsWith("<doc>") && value.EndsWith("</doc>")) {
               _docComment = value.Substring(5, value.Length - 11).Trim();
