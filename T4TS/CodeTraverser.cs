@@ -115,7 +115,9 @@ namespace T4TS
             var tsInterface = new TypeScriptInterface
             {
                 FullName = codeClass.FullName,
-                Name = GetInterfaceName(attributeValues)
+                Name = GetInterfaceName(attributeValues),
+                Comment = codeClass.Comment,
+                DocComment = codeClass.DocComment
             };
 
             TypescriptType indexedType;
@@ -210,7 +212,9 @@ namespace T4TS
                 Ignore = values.Ignore,
                 Type = (string.IsNullOrWhiteSpace(values.Type))
                     ? typeContext.GetTypeScriptType(getter.Type)
-                    : new InterfaceType(values.Type)
+                    : new InterfaceType(values.Type),
+                Comment = property.Comment,
+                DocComment = property.DocComment
             };
 
             if (member.Ignore)
