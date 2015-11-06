@@ -39,7 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\Inheritance by Existent External Type.cs" />
+    <Compile Include="Models\ExtendsExplicit.cs" />
     <Compile Include="Models\Barfoo.cs" />
     <Compile Include="Models\Foobar.cs" />
     <Compile Include="Models\InheritanceTest1.cs" />
