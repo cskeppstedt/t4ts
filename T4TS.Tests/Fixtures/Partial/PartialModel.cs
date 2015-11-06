@@ -18,4 +18,10 @@ namespace T4TS.Tests.Fixtures.Partial
     {
         public BasicModel OnOtherPartialModel { get; set; }
     }
+
+    [TypeScriptInterface]
+    public partial class InheritsFromPartialModel : PartialModel
+    {
+        public string NewProperty { get; set; }
+    }
 }

@@ -90,6 +90,17 @@ declare module T4TS {
         TwoDimList: number[][];
         [index: number]: Barfoo;
     }
+    /** Generated from T4TS.Example.Models.PartialModelByEF **/
+    export interface PartialModelByEF {
+        SomeId: number;
+    }
+    /** Generated from T4TS.Example.Models.PartialModelByEF **/
+    export interface PartialModelByEF {
+    }
+    /** Generated from T4TS.Example.Models.InheritsPartialModelByEF **/
+    export interface InheritsPartialModelByEF extends T4TS.PartialModelByEF {
+        NewProperty: string;
+    }
     /** Generated from T4TS.Example.Models.Partial **/
     export interface Partial {
         FromFirstClass: string;

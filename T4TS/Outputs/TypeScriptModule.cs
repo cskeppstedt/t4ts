@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace T4TS
 {
+    [System.Diagnostics.DebuggerDisplay("TSModule {QualifiedName}")]
     public class TypeScriptModule
     {
         public string QualifiedName { get; set; }

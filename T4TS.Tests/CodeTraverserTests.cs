@@ -23,6 +23,30 @@ namespace T4TS.Tests.Traversal
         }
 
         [TestMethod]
+        public void ShouldWorkIfSolutionContainsPartialClasses() {
+          //this may not make much sense, but this is my best guess at mimicking partial classes...
+          //Actually traceing out all the TypeScriptInterfaces in the T4TS.Example solution contains these:
+          //  ...
+          //T4TS.Example.Models.PartialModelByEF 
+          //T4TS.Example.Models.PartialModelByEF 
+          //T4TS.Example.Models.InheritsPartialModelByEF 
+          //T4TS.Example.Models.Partial 
+          //T4TS.Example.Models.Partial 
+          //  ...
+
+          var solution = DTETransformer.BuildDteSolution(
+              typeof(T4TS.Tests.Fixtures.Partial.PartialModel),
+              typeof(T4TS.Tests.Fixtures.Partial.PartialModel),
+              typeof(T4TS.Tests.Fixtures.Partial.InheritsFromPartialModel)
+          );
+
+          var codeTraverser = new CodeTraverser(solution, new Settings());
+          var allModules = codeTraverser.GetAllInterfaces();
+          Assert.AreEqual(1, allModules.Count());
+          Assert.AreEqual(3, allModules.First().Interfaces.Count());
+        }
+
+        [TestMethod]
         public void ShouldHandleReservedPropNames()
         {
             var solution = DTETransformer.BuildDteSolution(typeof(ReservedPropModel));

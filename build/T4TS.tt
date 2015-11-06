@@ -142,7 +142,9 @@ Project GetProjectContainingT4File(DTE dte) {
             else
                 AppendIndented("export interface " + tsInterface.Name);
 
-            if (tsInterface.Parent != null)
+            if (!string.IsNullOrEmpty(tsInterface.Extends))
+                Output.Append(" extends " + tsInterface.Extends);
+            else if (tsInterface.Parent != null)
                 Output.Append(" extends " + (tsInterface.Parent.Module.IsGlobal ? "" : tsInterface.Parent.Module.QualifiedName + ".") + tsInterface.Parent.Name);
 
             Output.AppendLine(" {");
@@ -264,6 +266,7 @@ Project GetProjectContainingT4File(DTE dte) {
         public string Module { get; set; }
         public string Name { get; set; }
         public string NamePrefix { get; set; }
+        public string Extends { get; set; }
     }
 
     public class TypeScriptMemberAttributeValues
@@ -358,7 +361,9 @@ Project GetProjectContainingT4File(DTE dte) {
                     CodeElement baseClass = baseClasses.Item(1);
                     if (baseClass != null)
                     {
-                        var parent = tsInterfaces.SingleOrDefault(intf => intf.FullName == baseClass.FullName);
+                        ///since this is traversing project files, a class's base class can be defined in multiple files, if that is a partial class.
+                        ///SingleOrDefault fails if it finds multiple files ==> That's why use FirstOrDefault
+                        var parent = tsInterfaces.FirstOrDefault(intf => intf.FullName == baseClass.FullName);
                         if (parent != null)
                         {
                             tsMap[codeClass].Parent = parent;
@@ -385,7 +390,8 @@ Project GetProjectContainingT4File(DTE dte) {
             var tsInterface = new TypeScriptInterface
             {
                 FullName = codeClass.FullName,
-                Name = GetInterfaceName(attributeValues)
+                Name = GetInterfaceName(attributeValues),
+                Extends = attributeValues.Extends
             };
 
             TypescriptType indexedType;
@@ -444,7 +450,8 @@ Project GetProjectContainingT4File(DTE dte) {
             {
                 Name = values.ContainsKey("Name") ? values["Name"] : codeClass.Name,
                 Module = values.ContainsKey("Module") ? values["Module"] : Settings.DefaultModule ?? "T4TS",
-                NamePrefix = values.ContainsKey("NamePrefix") ? values["NamePrefix"] : Settings.DefaultInterfaceNamePrefix ?? string.Empty
+                NamePrefix = values.ContainsKey("NamePrefix") ? values["NamePrefix"] : Settings.DefaultInterfaceNamePrefix ?? string.Empty,
+                Extends = values.ContainsKey("Extends") ? values["Extends"] : string.Empty
             };
         }
 
@@ -722,10 +729,13 @@ Project GetProjectContainingT4File(DTE dte) {
 
                 if (pi.ProjectItems != null)
                     Traverse(pi.ProjectItems);
+                else if (pi.SubProject != null && pi.SubProject.ProjectItems != null)
+                    Traverse(pi.SubProject.ProjectItems);
             }
         }
     }
 
+    [System.Diagnostics.DebuggerDisplay("TSModule {QualifiedName}")]
     public class TypeScriptModule
     {
         public string QualifiedName { get; set; }
@@ -772,27 +782,109 @@ Project GetProjectContainingT4File(DTE dte) {
         }
     }
 
+    public class TypeFullName
+    {
+        public string FullName { get; private set; }
+        public TypeFullName[] TypeArgumentFullNames { get; private set; }
+
+        public TypeFullName(string name, params TypeFullName[] arguments)
+        {
+            this.FullName = name;
+            this.TypeArgumentFullNames = arguments;
+        }
+
+        public bool IsEnumerable()
+        {
+            return this.FullName == "System.Collections.Generic.IEnumerable";
+        }
+
+        public bool IsDictionary()
+        {
+            switch(this.FullName)
+            {
+                case "System.Collections.Generic.Dictionary":
+                case "System.Collections.Generic.IDictionary":
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        public static TypeFullName FromString(string name)
+        {
+            return TypeFullNameParser.Parse(name);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == this)
+                return true;
+
+            if (obj == null)
+                return false;
+
+            if (obj is TypeFullName)
+                return obj.ToString() == this.ToString();
+            
+            return base.Equals(obj);
+        }
+
+        public override int GetHashCode()
+        {
+            int hashCode = 17;
+
+            if (this.TypeArgumentFullNames != null)
+                hashCode = (hashCode * 23) + this.TypeArgumentFullNames.GetHashCode();
+
+            if (this.FullName != null)
+                hashCode = (hashCode * 29) + this.FullName.GetHashCode();
+
+            return hashCode;
+        }
+
+        public override string ToString()
+        {
+            if (TypeArgumentFullNames == null || TypeArgumentFullNames.Length == 0)
+                return FullName;
+
+            string nameWithGenerics = FullName + "<";
+            foreach (var arg in TypeArgumentFullNames)
+                nameWithGenerics += arg.ToString() + ",";
+            
+            if (nameWithGenerics.EndsWith(","))
+                nameWithGenerics = nameWithGenerics.Substring(0, nameWithGenerics.Length - 1);
+            
+            return nameWithGenerics + ">";
+        }
+    }
+
     class TypeFullNameParser
     {
-        private static TypeFullNameResult ParseCSharp(string fullNameFromType)
+        private static TypeFullName ParseCSharp(string fullNameFromType)
         {
             string fullName = fullNameFromType.Substring(0, fullNameFromType.IndexOf("<"));
             string restPart = fullNameFromType.Substring(fullNameFromType.IndexOf("<"));
+
             int openBraceCount = 0;
             int count = 0;
-            List<TypeFullNameResult> typeArguments = new List<TypeFullNameResult>();
-            List<char> chars = new List<char>();
+
+            var typeArguments = new List<TypeFullName>();
+            var chars = new List<char>();
+
             foreach (var c in restPart)
             {
                 if ((c != '<' && c != '>' && c != ',') || openBraceCount > 1)
                 {
-                        chars.Add(c);
+                    chars.Add(c);
                 }
-                if(c == ',' && openBraceCount==1)
+
+                if (c == ',' && openBraceCount == 1)
                 {
                     typeArguments.Add(Parse(new String(chars.ToArray()).Trim()));
                     chars.Clear();
                 }
+
                 if (c == '<')
                 {
                     openBraceCount++;
@@ -800,35 +892,44 @@ Project GetProjectContainingT4File(DTE dte) {
                 else if (c == '>')
                 {
                     openBraceCount--;
+
                     if (openBraceCount == 0)
                     {
                         typeArguments.Add(Parse(new String(chars.ToArray()).Trim()));
                         chars.Clear();
                     }
                 }
+
                 count++;
             }
-            return new TypeFullNameResult() { FullName = fullName, TypeArgumentFullNames =typeArguments.ToArray() };
+
+            return new TypeFullName(fullName, typeArguments.ToArray());
         }
-        public static TypeFullNameResult Parse(string fullNameFromType)
+
+        public static TypeFullName Parse(string fullNameFromType)
         {
-            
             if (fullNameFromType.Contains("<"))
                 return ParseCSharp(fullNameFromType);
+
             if (!fullNameFromType.Contains("`"))
             {
                 if (fullNameFromType.Contains(","))
                     return Parse(fullNameFromType.Substring(0, fullNameFromType.IndexOf(",")));
-                return new TypeFullNameResult() { FullName = fullNameFromType };
+
+                return new TypeFullName(fullNameFromType);
             }
 
             string fullName = fullNameFromType.Substring(0, fullNameFromType.IndexOf("`"));
             string restPart = fullNameFromType.Substring(fullNameFromType.IndexOf("[") + 1);
+
             restPart = restPart.Substring(0, restPart.Length - 1);
+
             int openBraceCount = 0;
             int count = 0;
-            List<TypeFullNameResult> typeArguments = new List<TypeFullNameResult>();
-            List<char> chars = new List<char>();
+
+            var typeArguments = new List<TypeFullName>();
+            var chars = new List<char>();
+
             foreach (var c in restPart)
             {
                 if ((c != '[' && c != ']') || openBraceCount > 1)
@@ -836,6 +937,7 @@ Project GetProjectContainingT4File(DTE dte) {
                     if (c != ',' || openBraceCount != 0)
                         chars.Add(c);
                 }
+
                 if (c == '[')
                 {
                     openBraceCount++;
@@ -843,24 +945,19 @@ Project GetProjectContainingT4File(DTE dte) {
                 else if (c == ']')
                 {
                     openBraceCount--;
+
                     if (openBraceCount == 0)
                     {
                         typeArguments.Add(Parse(new String(chars.ToArray())));
                         chars.Clear();
                     }
                 }
+
                 count++;
             }
-            return new TypeFullNameResult() { FullName = fullName, TypeArgumentFullNames = typeArguments.ToArray() };
-            //System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]] 
-            //System.Collections.Generic.Dictionary`2[[System.Collections.Generic.List`1[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]
-        }
-    }
 
-    public class TypeFullNameResult
-    {
-        public string FullName { get; set; }
-        public TypeFullNameResult[] TypeArgumentFullNames { get; set; }
+            return new TypeFullName(fullName, typeArguments.ToArray());
+        }
     }
 
     public class ArrayType: TypescriptType
@@ -1070,16 +1167,17 @@ Project GetProjectContainingT4File(DTE dte) {
                     WrappedType = GetTypeScriptType(UnwrapGenericType(typeFullName))
                 };
             }
+
             var realType = TypeFullNameParser.Parse(typeFullName);
-            if (realType.FullName == "System.Collections.Generic.IEnumerable")
+
+            if (realType.IsEnumerable())
             {
                 return new ArrayType()
                 {
                     ElementType = GetTypeScriptType(realType.TypeArgumentFullNames[0].FullName)
                 };
             }
-            else if(realType.FullName == "System.Collections.Generic.Dictionary" ||
-                realType.FullName == "System.Collections.Generic.IDictionary")
+            else if(realType.IsDictionary())
             {
                 return new DictionaryType()
                 {
@@ -1087,6 +1185,7 @@ Project GetProjectContainingT4File(DTE dte) {
                     ElementType = GetTypeScriptType(realType.TypeArgumentFullNames[1].FullName)
                 };
             }
+
             switch (typeFullName)
             {
                 case "System.Guid":
@@ -1138,10 +1237,12 @@ Project GetProjectContainingT4File(DTE dte) {
         }
     }
 
+    [System.Diagnostics.DebuggerDisplay("TypeScriptInterface {FullName}")]    
     public class TypeScriptInterface
     {
         public string Name { get; set; }
         public string FullName { get; set; }
+        public string Extends { get; set; }
 
         public List<TypeScriptInterfaceMember> Members { get; set; }
         public TypescriptType IndexedType { get; set; }
