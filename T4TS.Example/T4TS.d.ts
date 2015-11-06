@@ -52,7 +52,7 @@ declare module SomeModule {
 }
 
 declare module T4TS {
-    /** Generated from T4TS.Example.Models.SomeEntity **/
+    /** Generated from T4TS.Example.Models.ExtendsExplicit **/
     export interface someEntity extends externalJSModule.Entity {
         Number: number;
         Name: string;
@@ -120,6 +120,10 @@ declare module T4TS {
         DeepArray: number[][];
         DeepList: number[][];
         Generic: string[];
+    }
+    /** Generated from T4TS.Tests.Fixtures.ExtendsExplicit.ExtendsExplicitModel **/
+    export interface ExtendsExplicitModel extends SomeFooBar {
+        Basic: T4TS.BasicModel;
     }
     /** Generated from T4TS.Tests.Fixtures.ExternalProp.ExternalPropModel **/
     export interface ExternalPropModel {
