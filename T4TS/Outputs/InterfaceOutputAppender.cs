@@ -44,7 +44,9 @@ namespace T4TS
             else
                 AppendIndented("export interface " + tsInterface.Name);
 
-            if (tsInterface.Parent != null)
+            if (!string.IsNullOrEmpty(tsInterface.Extends))
+                Output.Append(" extends " + tsInterface.Extends);
+            else if (tsInterface.Parent != null)
                 Output.Append(" extends " + (tsInterface.Parent.Module.IsGlobal ? "" : tsInterface.Parent.Module.QualifiedName + ".") + tsInterface.Parent.Name);
 
             Output.AppendLine(" {");
