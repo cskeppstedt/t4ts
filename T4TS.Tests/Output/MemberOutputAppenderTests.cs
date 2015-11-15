@@ -65,7 +65,7 @@ namespace T4TS.Tests
         [TestMethod]
         public void TestOutput()
         {
-            var settings = new Settings { UseNativeDates = true };
+            var settings = new Settings { UseNativeDates = "Date" };
             string res = OutputFormatter.GetOutput(GetDataToRender(settings), settings);
             Console.WriteLine(res);
             Assert.AreEqual(ExpectedResult, res);
@@ -74,7 +74,7 @@ namespace T4TS.Tests
         [TestMethod]
         public void TestOutputSubClasses()
         {
-            var settings = new Settings { UseNativeDates = true };
+            var settings = new Settings { UseNativeDates = "Date" };
             string res = OutputFormatter.GetOutput(GetDataToRenderSubClasses(settings), settings);
             Console.WriteLine(res);
             Assert.AreEqual(ExpectedSubClassesResult, res);
@@ -83,7 +83,7 @@ namespace T4TS.Tests
         [TestMethod]
         public void TestOutputDataContract()
         {
-            var settings = new Settings { UseNativeDates = true };
+            var settings = new Settings { UseNativeDates = "Date" };
             var res = OutputFormatter.GetOutput(GetDataToRenderDataContract(settings), settings);
             // Test behaviour by default - no process DataContract classes 
             Assert.AreEqual(OutputHeader, res);
@@ -97,7 +97,7 @@ namespace T4TS.Tests
         [TestMethod]
         public void TestInheritedGeneric()
         {
-            var settings = new Settings { UseNativeDates = true, ProcessDataContracts = true };
+            var settings = new Settings { UseNativeDates = "Date", ProcessDataContracts = true };
             string res = OutputFormatter.GetOutput(GetInheritedGenericDataToRender(settings), settings);
             Console.WriteLine(res);
             Assert.AreEqual(ExpectedInheritedGenericResult, res);

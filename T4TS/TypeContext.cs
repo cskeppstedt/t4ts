@@ -12,7 +12,8 @@ namespace T4TS
         {
             "System.Collections.Generic.List<",
             "System.Collections.Generic.IList<",
-            "System.Collections.Generic.ICollection<"
+            "System.Collections.Generic.ICollection<",
+            "System.Collections.Generic.ISet<"
         };
 
         private readonly Dictionary<string, EnumType> _enumTypes = new Dictionary<string, EnumType>();
@@ -145,8 +146,9 @@ namespace T4TS
                     return new StringType();
 
                 case "System.DateTime":
-                    if (Settings.UseNativeDates)
-                        return new DateTimeType();
+                case "System.TimeSpan":
+                    if (Settings.UseNativeDates != "false" && Settings.UseNativeDates != null && Settings.UseNativeDates != "")
+                        return new DateTimeType(Settings.UseNativeDates);
                     return new StringType();
 
                 case "System.Boolean":

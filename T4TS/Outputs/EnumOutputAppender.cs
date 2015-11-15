@@ -45,7 +45,7 @@ namespace T4TS
             AppendIndentedLine("/** Generated from " + tsEnum.FullName + " **/");
             if (owner == null)
             {
-                AppendIndented("enum " + tsEnum.Name);
+                AppendIndented("const enum " + tsEnum.Name);
             }
             else
             {
@@ -59,7 +59,7 @@ namespace T4TS
                 }
                 AppendIndentedLine("export module " + module + " {");
                 AppendIndendation();
-                AppendIndented("enum " + enumName);
+                AppendIndented("const enum " + enumName);
             }
             Output.AppendLine(" {");
         }

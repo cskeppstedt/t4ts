@@ -39,9 +39,9 @@ namespace T4TS
         public Version CompatibilityVersion { get; set; }
 
         /// <summary>
-        ///     If true translates System.DateTime to native date
+        ///     If not empty translates System.DateTime to this type name
         /// </summary>
-        public bool UseNativeDates { get; set; }
+        public string UseNativeDates { get; set; }
 
         /// <summary>
         ///     List of the project names to process. If null - all the projects will be processed.
@@ -88,7 +88,7 @@ namespace T4TS
                 DefaultCamelCaseMemberNames = ParseSettingNullableType(settingsValues, "DefaultCamelCaseMemberNames", false),
                 DefaultInterfaceNamePrefix = ParseSettingReferenceType(settingsValues, "DefaultInterfaceNamePrefix", s => s as string, string.Empty),
                 CompatibilityVersion = ParseSettingReferenceType(settingsValues, "CompatibilityVersion", v => v as Version, new Version(0, 9, 1, 1)),
-                UseNativeDates = ParseSettingNullableType(settingsValues, "UseNativeDates", false),
+                UseNativeDates = ParseSettingReferenceType(settingsValues, "UseNativeDates", s => s as string, ""),
                 ProjectNamesToProcess = ParseSettingReferenceType(settingsValues, "ProjectNamesToProcess", s => s == null ? null : s.ToString().Replace(" ", "").Split(','), null),
                 ProcessDataContracts = ParseSettingNullableType(settingsValues, "ProcessDataContracts", false),
                 ProcessParentClasses = ParseSettingNullableType(settingsValues, "ProcessParentClasses", false),

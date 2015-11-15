@@ -203,7 +203,7 @@ namespace T4TS
                         // We must remove all text after < char, to compare generic types.
                         // It's not really correct, but must work in common cases.
                         var baseClassNonGenericFullName = baseClass.FullName.Split('<')[0];
-                        TypeScriptInterface parent = tsInterfaces.SingleOrDefault(intf => baseClassNonGenericFullName == intf.FullName.Split('<')[0]);
+                        TypeScriptInterface parent = tsInterfaces.FirstOrDefault(intf => baseClassNonGenericFullName == intf.FullName.Split('<')[0]);
                         if (parent != null)
                         {
                             tsMap[codeClass].Parent = parent;
@@ -310,18 +310,24 @@ namespace T4TS
 
         private bool TryGetAttribute(CodeElements attributes, string attributeFullName, out CodeAttribute attribute, bool useShortAttributeName = false)
         {
-            foreach (CodeAttribute attr in attributes)
+            try
             {
-                var attrName = attr.FullName ?? "";
-                if (useShortAttributeName)
-                    attrName = attrName.Split('.').Last().Split('+').Last();
-                if (attrName == attributeFullName)
+                foreach (CodeAttribute attr in attributes)
                 {
-                    attribute = attr;
-                    return true;
+                    var attrName = attr.FullName ?? "";
+                    if (useShortAttributeName)
+                        attrName = attrName.Split('.').Last().Split('+').Last();
+                    if (attrName == attributeFullName)
+                    {
+                        attribute = attr;
+                        return true;
+                    }
                 }
             }
-
+            catch
+            {
+                
+            }
             attribute = null;
             return false;
         }
@@ -418,13 +424,20 @@ namespace T4TS
         private bool TryGetEnumMember(CodeVariable variable, TypeContext typeContext, int index, out TypeScriptEnumMember member)
         {
             TypeScriptMemberAttributeValues values = GetMemberValues(variable, typeContext);
-            member = new TypeScriptEnumMember
+            try
             {
-                Name = values.Name,
-                FullName = variable.FullName,
-                Ignore = values.Ignore,
-                Value = variable.InitExpression == null ? index : Int32.Parse(variable.InitExpression.ToString()),
-            };
+                member = new TypeScriptEnumMember
+                {
+                    Name = values.Name,
+                    FullName = variable.FullName,
+                    Ignore = values.Ignore,
+                    Value = variable.InitExpression == null ? index : Int32.Parse(variable.InitExpression.ToString()),
+                };
+            }
+            catch (Exception e)
+            {
+                throw new Exception(string.Format("{0}: {1}", variable.FullName, e.Message), e);
+            }
 
             if (member.Name == null)
             {
