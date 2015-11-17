@@ -1,8 +1,9 @@
-﻿using System;
+﻿using EnvDTE;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using T4TS.Tests.Utils;
-using EnvDTE;
+using System;
 using System.Collections;
+using System.Linq;
+using T4TS.Tests.Mocks;
 
 namespace T4TS.Tests.Traversal
 {
@@ -22,11 +23,11 @@ namespace T4TS.Tests.Traversal
         [TestMethod]
         public void ShouldVisitEachCodeClass()
         {
-            var project = DTETransformer.BuildDteProject(new Type[]
+            var project = new MockProjects(null, new Type[]
             {
                 typeof(M),
                 typeof(N)
-            }, projectName: "NamespaceTraverserTests");
+            }).Single();
 
             int callCount = 0;
             var expectedNames = new string[] { "M", "N" };

@@ -1,10 +1,12 @@
-﻿using System;
+﻿using EnvDTE;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using T4TS.Tests.Utils;
-using T4TS.Tests.Traversal.Models;
-using T4TS.Example.Models;
-using EnvDTE;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using T4TS.Example.Models;
+using T4TS.Tests.Mocks;
+using T4TS.Tests.Traversal.Models;
 
 namespace T4TS.Tests.Traversal
 {
@@ -14,42 +16,46 @@ namespace T4TS.Tests.Traversal
         [TestMethod]
         public void ShouldVisitEachNamespace()
         {
-            var proj = DTETransformer.BuildDteProject(new Type[]
+            var proj = new MockProjects(subProjectItems: null, types: new Type[]
             {
                 typeof(LocalModel),
                 typeof(ModelFromDifferentProject)
-            }, projectName: "proj");
+            }).Single();
 
-            int callCount = 0;
-            var expectedNames = new string[] { "T4TS.Tests.Traversal.Models", "T4TS.Example.Models" };
+            var expectedNames = new List<string> { "T4TS.Tests.Traversal.Models", "T4TS.Example.Models" };
+            var actualNames   = new List<string>();
 
-            new ProjectTraverser(proj, (ns) => { Assert.AreEqual(expectedNames[callCount++], ns.Name); });
+            new ProjectTraverser(proj, (ns) => {
+                actualNames.Add(ns.Name);
+            });
 
-            Assert.AreEqual(2, callCount);
+            CollectionAssert.AreEqual(expectedNames, actualNames);
         }
 
         [TestMethod]
         public void ShouldVisitSubProjectItems()
         {
-            var subProjItem = DTETransformer.BuildDteProjectItem(new Type[]
+            var subProjItem = new MockProjectItems(subProjectItems: null, types: new Type[]
             {
                 typeof(ModelFromDifferentProject)
-            }, projectItemName: "subProj");
+            }).Single();
 
             var moqSubProjectItems = new Mock<ProjectItems>();
             moqSubProjectItems.Setup(x => x.GetEnumerator()).Returns(() => new[] { subProjItem }.GetEnumerator());
 
-            var proj = DTETransformer.BuildDteProject(new Type[]
+            var proj = new MockProjects(subProjectItems: moqSubProjectItems.Object, types: new Type[]
             {
                 typeof(LocalModel)
-            }, projectName: "proj", subProjectItems: moqSubProjectItems.Object);
+            }).Single();
 
-            int callCount = 0;
-            var expectedNames = new string[] { "T4TS.Tests.Traversal.Models", "T4TS.Example.Models" };
-            
-            new ProjectTraverser(proj, (ns) => { Assert.AreEqual(expectedNames[callCount++], ns.Name); });
+            var expectedNames = new List<string> { "T4TS.Tests.Traversal.Models", "T4TS.Example.Models" };
+            var actualNames   = new List<string>();
 
-            Assert.AreEqual(2, callCount);
+            new ProjectTraverser(proj, (ns) => {
+                actualNames.Add(ns.Name);
+            });
+
+            CollectionAssert.AreEqual(expectedNames, actualNames);
         }
     }
 }
