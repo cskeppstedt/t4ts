@@ -100,6 +100,12 @@
     <Compile Include="Fixtures\Inheritance\Test.cs" />
     <Compile Include="Fixtures\ExternalProp\ExternalPropModel.cs" />
     <Compile Include="Fixtures\ExternalProp\Test.cs" />
+    <Compile Include="Mocks\BaseList.cs" />
+    <Compile Include="Mocks\MockCodeElements.cs" />
+    <Compile Include="Mocks\MockCodeTypes.cs" />
+    <Compile Include="Mocks\MockProjectItems.cs" />
+    <Compile Include="Mocks\MockProjects.cs" />
+    <Compile Include="Mocks\MockSolution.cs" />
     <Compile Include="Traversal\Models\ReservedPropModel.cs" />
     <Compile Include="Traversal\Models\LocalModel.cs" />
     <Compile Include="Output\MemberOutputAppenderTests.cs" />
@@ -111,6 +117,7 @@
     <Compile Include="Traversal\NamespaceTraverserTests.cs" />
     <Compile Include="TypeContext\TypeContextTests.cs" />
     <Compile Include="Utils\DTETransformer.cs" />
+    <Compile Include="Utils\NamespaceUtil.cs" />
     <Compile Include="Utils\OutputFor.cs" />
   </ItemGroup>
   <ItemGroup>
