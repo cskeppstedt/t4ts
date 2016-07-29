@@ -1,7 +1,5 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using T4TS.Tests.Utils;
-using T4TS.Tests.Traversal.Models;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using T4TS.Tests.Mocks;
 
 namespace T4TS.Tests.Traversal
 {
@@ -18,7 +16,7 @@ namespace T4TS.Tests.Traversal
         [TestMethod]
         public void ShouldVisitEachProperty()
         {
-            var codeClass = DTETransformer.BuildDteClass(typeof(M));
+            var codeClass = new MockCodeClass(typeof(M)).Object;
             int callCount = 0;
             
             var expectedNames = new string[] {"A","B","C"};

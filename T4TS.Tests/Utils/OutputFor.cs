@@ -6,13 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using T4TS.Tests.Mocks;
 
 namespace T4TS.Tests.Utils
 {
     class OutputFor
     {
         readonly IReadOnlyCollection<Type> Types;
-        public Settings Settings { get; private set; }
+        Settings Settings;
 
         public OutputFor(params Type[] types)
         {
@@ -34,7 +35,7 @@ namespace T4TS.Tests.Utils
 
         private string GenerateOutput()
         {
-            var solution = DTETransformer.BuildDteSolution(this.Types.ToArray());
+            var solution = new MockSolution(this.Types.ToArray()).Object;
             var generator = new CodeTraverser(solution, this.Settings);
             var data = generator.GetAllInterfaces().ToList();
 

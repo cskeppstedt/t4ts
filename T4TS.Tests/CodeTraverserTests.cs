@@ -1,8 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using T4TS.Example.Models;
+using T4TS.Tests.Mocks;
 using T4TS.Tests.Traversal.Models;
-using T4TS.Tests.Utils;
 
 namespace T4TS.Tests.Traversal
 {
@@ -12,11 +12,11 @@ namespace T4TS.Tests.Traversal
         [TestMethod]
         public void ShouldBuildInterfacesFromMarkedClassesOnly()
         {
-            var solution = DTETransformer.BuildDteSolution(
+            var solution = new MockSolution(
                 typeof(LocalModel),                 // has the TypeScriptInterface attribute
                 typeof(ModelFromDifferentProject),  // has the TypeScriptInterface attribute
                 typeof(string)                      // has no TypeScriptInterface attribute
-            );
+            ).Object;
 
             var codeTraverser = new CodeTraverser(solution, new Settings());
             Assert.AreEqual(2, codeTraverser.GetAllInterfaces().Count());
@@ -34,11 +34,11 @@ namespace T4TS.Tests.Traversal
           //T4TS.Example.Models.Partial 
           //  ...
 
-          var solution = DTETransformer.BuildDteSolution(
+          var solution = new MockSolution(
               typeof(T4TS.Tests.Fixtures.Partial.PartialModel),
               typeof(T4TS.Tests.Fixtures.Partial.PartialModel),
               typeof(T4TS.Tests.Fixtures.Partial.InheritsFromPartialModel)
-          );
+          ).Object;
 
           var codeTraverser = new CodeTraverser(solution, new Settings());
           var allModules = codeTraverser.GetAllInterfaces();
@@ -49,7 +49,7 @@ namespace T4TS.Tests.Traversal
         [TestMethod]
         public void ShouldHandleReservedPropNames()
         {
-            var solution = DTETransformer.BuildDteSolution(typeof(ReservedPropModel));
+            var solution = new MockSolution(typeof(ReservedPropModel)).Object;
             var codeTraverser = new CodeTraverser(solution, new Settings());
             
             var modules = codeTraverser.GetAllInterfaces();
