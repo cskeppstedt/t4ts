@@ -1,7 +1,14 @@
-T4TS
+T4TS (not worked on)
 ====
 
-T4 template to generate TypeScript interface definitions.
+This project is inactive
+----
+
+I am no longer working on this project. Since it's been a long while since I was active on the .NET platform, I am unable to keep up with new versions of .NET to maintain the project. Thanks to all that have been contributing, it's been fun!
+
+Build status
+----
+[![Build status](https://ci.appveyor.com/api/projects/status/s7mxgiqykroujn8e/branch/master)](https://ci.appveyor.com/project/cskeppstedt/t4ts/branch/master)
 
 Usage
 ----
@@ -122,8 +129,4 @@ License
 [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
 Thanks to [T4MVC](http://t4mvc.codeplex.com/), which has been the inspiration. I also learned how to use the .tt-stuff from reading the source, and using part of the source code from T4MVC.
-
-Build status
-----
-[![Build status](https://ci.appveyor.com/api/projects/status/s7mxgiqykroujn8e/branch/master)](https://ci.appveyor.com/project/cskeppstedt/t4ts/branch/master)
 
