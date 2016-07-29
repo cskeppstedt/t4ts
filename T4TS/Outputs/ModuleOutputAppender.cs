@@ -34,8 +34,10 @@ namespace T4TS
             {
                 if (Settings.CompatibilityVersion != null && Settings.CompatibilityVersion < new Version(0, 9, 0))
                     Output.Append("module ");
-                else
+                else if (Settings.CompatibilityVersion == null || Settings.CompatibilityVersion < new Version(1, 5, 0))
                     Output.Append("declare module ");
+                else
+                    Output.Append("declare namespace ");
 
                 Output.Append(module.QualifiedName);
                 Output.AppendLine(" {");
