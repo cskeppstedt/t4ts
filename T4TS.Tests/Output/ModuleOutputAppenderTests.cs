@@ -45,6 +45,24 @@ namespace T4TS.Tests
             appender.AppendOutput(module);
             Assert.IsTrue(sb.ToString().StartsWith("declare module "));
         }
+        
+        [TestMethod]
+        public void TypescriptVersion150YieldsDeclareNamespace()
+        {
+            var sb = new StringBuilder();
+            var module = new TypeScriptModule
+            {
+                QualifiedName = "Foo"
+            };
+
+            var appender = new ModuleOutputAppender(sb, 0, new Settings
+            {
+                CompatibilityVersion = new Version(1, 5, 0)
+            });
+
+            appender.AppendOutput(module);
+            Assert.IsTrue(sb.ToString().StartsWith("declare namespace "));
+        }
 
         [TestMethod]
         public void DefaultTypescriptVersionYieldsDeclareModule()
