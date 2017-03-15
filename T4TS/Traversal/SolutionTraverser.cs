@@ -23,9 +23,46 @@ namespace T4TS
 
         private void Traverse(Projects projects)
         {
-            foreach (Project project in projects)
+            var item = projects.GetEnumerator();
+			
+            while (item.MoveNext())
             {
-                new ProjectTraverser(project, WithNamespace);
+                var project = item.Current as Project;
+                if (project == null)
+                {
+                    continue;
+                }
+
+                if (project.Kind == EnvDTE80.ProjectKinds.vsProjectKindSolutionFolder)
+                {
+                    GetSolutionFolderProjects(project);
+                }
+                else
+                {
+                    new ProjectTraverser(project, WithNamespace);
+                }
+            }
+        }
+
+        private void GetSolutionFolderProjects(Project solutionFolder)
+        {
+            for (var i = 1; i <= solutionFolder.ProjectItems.Count; i++)
+            {
+                var subProject = solutionFolder.ProjectItems.Item(i).SubProject;
+                if (subProject == null)
+                {
+                    continue;
+                }
+
+                // If this is another solution folder, do a recursive call, otherwise add
+                if (subProject.Kind == EnvDTE80.ProjectKinds.vsProjectKindSolutionFolder)
+                {
+                   GetSolutionFolderProjects(subProject);
+                }
+                else
+                {
+                    new ProjectTraverser(subProject, WithNamespace);
+                }
             }
         }
     }
