@@ -130,8 +130,23 @@
 &lt;#@ import namespace="EnvDTE" #&gt;
 &lt;#@ import namespace="Microsoft.VisualStudio.Shell.Interop" #&gt;
 &lt;#@ import namespace="Microsoft.VisualStudio.TextTemplating" #&gt;
+&lt;#@ import namespace="System.IO" #&gt;
 &lt;#@ Include File="T4TS.tt.settings.t4" #&gt;&lt;#= 
-    OutputFormatter.GetOutput(GetDataToRender(), GetSettings()) #&gt;&lt;#+ 
+	ProduceOutput()
+#&gt;&lt;#+ 
+
+string ProduceOutput()
+{
+    var settings = GetSettings();
+    var output =  OutputFormatter.GetOutput(GetDataToRender(), settings);
+    
+    if (!string.IsNullOrWhiteSpace(settings.OutputFile))
+    {
+        File.WriteAllText(Path.Combine(Path.GetDirectoryName(this.Host.TemplateFile), settings.OutputFile), output); 
+    }
+
+    return output;
+}
 
 Settings settings = null;
 Settings GetSettings()
@@ -178,8 +193,7 @@ Project GetProjectContainingT4File(DTE dte) {
     projectItem.Document.Saved = false;
 
     return projectItem.ContainingProject;
-}
-</value>
+}</value>
     <comment>The text to place in the beginning of T4TS.tt, before all code definitions.</comment>
   </data>
   <data name="TemplateSettings" xml:space="preserve">
@@ -222,7 +236,12 @@ readonly Dictionary&lt;string, object&gt; SettingsValues = new Dictionary&lt;str
 
     // The default value for DateTime type translation.
     // Type: bool?, defaults to false if not specified.
-    { "UseNativeDates", null }
+    { "UseNativeDates", null },
+
+
+    // If specified the relative path to an extra output file that doesn't need to be in your project 
+    // Type: string, defaults to "" if not specified
+    { "OutputFile", "" }
 };
 #&gt;</value>
     <comment>The contents of the generated template settings file T4TS.tt.settings.t4</comment>
