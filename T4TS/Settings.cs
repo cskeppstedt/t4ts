@@ -38,6 +38,11 @@ namespace T4TS
         /// </summary>
         public bool UseNativeDates { get; set; }
 
+        /// <summary>
+        /// Allows to produce an extra output in the desired location relative to the project folder
+        /// </summary>
+        public string OutputFile { get; set; }
+
         public static Settings Parse(Dictionary<string,object> settingsValues)
         {
             // Read settings from T4TS.tt.settings.tt
@@ -48,7 +53,8 @@ namespace T4TS
                 DefaultCamelCaseMemberNames = ParseSettingNullableType(settingsValues, "DefaultCamelCaseMemberNames", false),
                 DefaultInterfaceNamePrefix = ParseSettingReferenceType(settingsValues, "DefaultInterfaceNamePrefix", s => s as string, string.Empty),
                 CompatibilityVersion = ParseSettingReferenceType(settingsValues, "CompatibilityVersion", v => v as Version, new Version(0, 9, 1, 1)),
-                UseNativeDates = ParseSettingNullableType(settingsValues, "UseNativeDates", false)
+                UseNativeDates = ParseSettingNullableType(settingsValues, "UseNativeDates", false),
+                OutputFile = ParseSettingReferenceType(settingsValues, "OutputFile", s => s as string, string.Empty)
             };
         }
 

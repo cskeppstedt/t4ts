@@ -37,6 +37,11 @@ readonly Dictionary<string, object> SettingsValues = new Dictionary<string, obje
 
     // The default value for DateTime type translation.
     // Type: bool?, defaults to false if not specified.
-    { "UseNativeDates", null }
+    { "UseNativeDates", null },
+
+
+    // If specified the relative path to an extra output file that doesn't need to be in your project 
+    // Type: string, defaults to "" if not specified
+    { "OutputFile", "" }
 };
 #>
