@@ -1,10 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using T4TS.Example.Models;
-using T4TS.Tests.Traversal.Models;
+using T4TS.Tests.Models;
 using T4TS.Tests.Utils;
 
-namespace T4TS.Tests.Traversal
+namespace T4TS.Tests
 {
     [TestClass]
     public class CodeTraverserTests
@@ -24,26 +24,28 @@ namespace T4TS.Tests.Traversal
 
         [TestMethod]
         public void ShouldWorkIfSolutionContainsPartialClasses() {
-          //this may not make much sense, but this is my best guess at mimicking partial classes...
-          //Actually traceing out all the TypeScriptInterfaces in the T4TS.Example solution contains these:
-          //  ...
-          //T4TS.Example.Models.PartialModelByEF 
-          //T4TS.Example.Models.PartialModelByEF 
-          //T4TS.Example.Models.InheritsPartialModelByEF 
-          //T4TS.Example.Models.Partial 
-          //T4TS.Example.Models.Partial 
-          //  ...
+            //this may not make much sense, but this is my best guess at mimicking partial classes...
+            //Actually traceing out all the TypeScriptInterfaces in the T4TS.Example solution contains these:
+            //  ...
+            //T4TS.Example.Models.PartialModelByEF 
+            //T4TS.Example.Models.PartialModelByEF 
+            //T4TS.Example.Models.InheritsPartialModelByEF 
+            //T4TS.Example.Models.Partial 
+            //T4TS.Example.Models.Partial 
+            //  ...
 
-          var solution = DTETransformer.BuildDteSolution(
-              typeof(T4TS.Tests.Fixtures.Partial.PartialModel),
-              typeof(T4TS.Tests.Fixtures.Partial.PartialModel),
-              typeof(T4TS.Tests.Fixtures.Partial.InheritsFromPartialModel)
-          );
+            var solution = DTETransformer.BuildDteSolution(
+                typeof(T4TS.Tests.Fixtures.Partial.PartialModel),
+                typeof(T4TS.Tests.Fixtures.Partial.PartialModel),
+                typeof(T4TS.Tests.Fixtures.Partial.InheritsFromPartialModel)
+            );
 
-          var codeTraverser = new CodeTraverser(solution, new Settings());
-          var allModules = codeTraverser.GetAllInterfaces();
-          Assert.AreEqual(1, allModules.Count());
-          Assert.AreEqual(3, allModules.First().Interfaces.Count());
+            var codeTraverser = new CodeTraverser(solution, new Settings());
+            var allModules = codeTraverser.GetAllInterfaces();
+            Assert.AreEqual(1, allModules.Count());
+
+            // TODO: verify that the interface contains members from both partial classes
+            Assert.AreEqual(2, allModules.First().Interfaces.Count());
         }
 
         [TestMethod]

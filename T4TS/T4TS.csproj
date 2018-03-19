@@ -45,6 +45,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Builders\AttributeInterfaceBuilder.cs" />
+    <Compile Include="Builders\CodeClassBuilder.cs" />
     <Compile Include="Outputs\OutputAppender.cs" />
     <Compile Include="Outputs\InterfaceOutputAppender.cs" />
     <Compile Include="Outputs\MemberOutputAppender.cs" />
@@ -55,17 +57,15 @@
     <Compile Include="CodeTraverser.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Traversal\ClassTraverser.cs" />
-    <Compile Include="Traversal\NamespaceTraverser.cs" />
-    <Compile Include="Traversal\ProjectTraverser.cs" />
+    <Compile Include="Traversal.cs" />
     <Compile Include="Outputs\TypeScriptModule.cs" />
-    <Compile Include="Traversal\SolutionTraverser.cs" />
     <Compile Include="TypeFullName.cs" />
     <Compile Include="TypeFullNameParser.cs" />
     <Compile Include="Types\ArrayType.cs" />
     <Compile Include="Types\BoolType.cs" />
     <Compile Include="Types\DictionaryType.cs" />
     <Compile Include="Types\InterfaceType.cs" />
+    <Compile Include="Types\LiteralType.cs" />
     <Compile Include="Types\NullableType.cs" />
     <Compile Include="Types\NumberType.cs" />
     <Compile Include="Types\DateTimeType.cs" />

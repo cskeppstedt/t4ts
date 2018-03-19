@@ -6,10 +6,17 @@ namespace T4TS
 {
     public class TypeContext
     {
-        public Settings Settings { get; private set; }
-        public TypeContext(Settings settings)
+        private bool useNativeDates;
+
+        private IDictionary<string, TypeScriptModule> modulesByName =
+            new Dictionary<string, TypeScriptModule>();
+        private IDictionary<string, TypeScriptInterface> interfacesByFullName =
+            new Dictionary<string, TypeScriptInterface>();
+
+
+        public TypeContext(bool useNativeDates)
         {
-            this.Settings = settings;
+            this.useNativeDates = useNativeDates;
         }
 
         private static readonly string[] genericCollectionTypeStarts = new string[] {
@@ -20,27 +27,64 @@ namespace T4TS
         };
 
         private static readonly string nullableTypeStart = "System.Nullable<";
-
-        /// <summary>
-        /// Lookup table for "interface types", ie. non-builtin types (typically classes or unknown types). Keyed on the FullName of the type.
-        /// </summary>
-        private Dictionary<string, InterfaceType> interfaceTypes = new Dictionary<string, InterfaceType>();
-
-        public void AddInterfaceType(string typeFullName, InterfaceType interfaceType)
+        
+        public TypeScriptInterface GetOrCreateInterface(
+            string moduleName,
+            string fullName,
+            out bool created)
         {
-            interfaceTypes.Add(typeFullName, interfaceType);
+            TypeScriptInterface result = this.GetOrCreateInterface(
+                fullName,
+                out created);
+
+            bool moduleCreated;
+            TypeScriptModule module = this.GetOrCreateModule(
+                moduleName,
+                out moduleCreated);
+            if (result.Module == null)
+            {
+                module.Interfaces.Add(result);
+                result.Module = module;
+            }
+            else if (result.Module.QualifiedName != moduleName)
+            {
+                throw new System.InvalidOperationException(
+                    "Interface was registered with multiple module names " + fullName);
+            }
+            return result;
         }
 
-        public bool TryGetInterfaceType(string typeFullName, out InterfaceType interfaceType)
+        public TypeScriptInterface GetOrCreateInterface(
+            string fullName,
+            out bool created)
         {
-            return interfaceTypes.TryGetValue(typeFullName, out interfaceType);
+            TypeScriptInterface result;
+            if (this.interfacesByFullName.TryGetValue(
+                fullName,
+                out result))
+            {
+                created = false;
+            }
+            else
+            {
+                result = new TypeScriptInterface()
+                {
+                    FullName = fullName
+                };
+                this.interfacesByFullName.Add(
+                    fullName,
+                    result);
+                created = true;
+            }
+            return result;
         }
 
-        public bool ContainsInterfaceType(string typeFullName)
+        public IEnumerable<TypeScriptModule> GetModules()
         {
-            return interfaceTypes.ContainsKey(typeFullName);
+            return this.modulesByName.Values
+                .OrderBy((module) => module.QualifiedName);
         }
-
+        
         public TypescriptType GetTypeScriptType(CodeTypeRef codeType)
         {
             switch (codeType.TypeKind)
@@ -65,6 +109,30 @@ namespace T4TS
                     return TryResolveType(codeType);
             }
         }
+        private TypeScriptModule GetOrCreateModule(
+            string name,
+            out bool created)
+        {
+            TypeScriptModule result;
+            if (this.modulesByName.TryGetValue(
+                name,
+                out result))
+            {
+                created = false;
+            }
+            else
+            {
+                result = new TypeScriptModule()
+                {
+                    QualifiedName = name
+                };
+                this.modulesByName.Add(
+                    name,
+                    result);
+                created = true;
+            }
+            return result;
+        }
 
         private TypescriptType TryResolveType(CodeTypeRef codeType)
         {
@@ -82,75 +150,93 @@ namespace T4TS
 
         public TypescriptType GetTypeScriptType(string typeFullName)
         {
-            InterfaceType interfaceType;
-            if (interfaceTypes.TryGetValue(typeFullName, out interfaceType))
-                return interfaceType;
+            TypescriptType result;
 
-            if (IsGenericEnumerable(typeFullName))
+            TypeScriptInterface interfaceType;
+            if (this.interfacesByFullName.TryGetValue(
+                typeFullName,
+                out interfaceType))
             {
-                return new ArrayType
+                result = new InterfaceType(interfaceType);
+            }
+            else
+            { 
+                if (IsGenericEnumerable(typeFullName))
                 {
-                    ElementType = GetTypeScriptType(UnwrapGenericType(typeFullName))
-                };
-            }
-            else if (IsNullable(typeFullName))
-            {
-                return new NullableType
+                    return new ArrayType
+                    {
+                        ElementType = GetTypeScriptType(UnwrapGenericType(typeFullName))
+                    };
+                }
+                else if (IsNullable(typeFullName))
                 {
-                    WrappedType = GetTypeScriptType(UnwrapGenericType(typeFullName))
-                };
-            }
+                    return new NullableType
+                    {
+                        WrappedType = GetTypeScriptType(UnwrapGenericType(typeFullName))
+                    };
+                }
 
-            var realType = TypeFullNameParser.Parse(typeFullName);
+                var realType = TypeFullNameParser.Parse(typeFullName);
 
-            if (realType.IsEnumerable())
-            {
-                return new ArrayType()
+                if (realType.IsEnumerable())
                 {
-                    ElementType = GetTypeScriptType(realType.TypeArgumentFullNames[0].FullName)
-                };
-            }
-            else if(realType.IsDictionary())
-            {
-                return new DictionaryType()
+                    return new ArrayType()
+                    {
+                        ElementType = GetTypeScriptType(realType.TypeArgumentFullNames[0].FullName)
+                    };
+                }
+                else if(realType.IsDictionary())
                 {
-                    KeyType = GetTypeScriptType(realType.TypeArgumentFullNames[0].FullName),
-                    ElementType = GetTypeScriptType(realType.TypeArgumentFullNames[1].FullName)
-                };
+                    return new DictionaryType()
+                    {
+                        KeyType = GetTypeScriptType(realType.TypeArgumentFullNames[0].FullName),
+                        ElementType = GetTypeScriptType(realType.TypeArgumentFullNames[1].FullName)
+                    };
+                }
+
+                switch (typeFullName)
+                {
+                    case "System.Guid":
+                        result = new GuidType();
+                        break;
+                    case "System.Boolean":
+                        result = new BoolType();
+                        break;
+                    case "System.Double":
+                    case "System.Int16":
+                    case "System.Int32":
+                    case "System.Int64":
+                    case "System.UInt16":
+                    case "System.UInt32":
+                    case "System.UInt64":
+                    case "System.Decimal":
+                    case "System.Byte":
+                    case "System.SByte":
+                    case "System.Single":
+                        result = new NumberType();
+                        break;
+
+                    case "System.String":
+                        result = new StringType();
+                        break;
+
+                    case "System.DateTime":
+                    case "System.DateTimeOffset":
+                        if (this.useNativeDates)
+                            result = new DateTimeType();
+                        else
+                            result = new StringType();
+                        break;
+                    default:
+                        bool interfaceCreated;
+                        interfaceType = this.GetOrCreateInterface(
+                            typeFullName,
+                            out interfaceCreated);
+                        result = new InterfaceType(interfaceType);
+                        break;
+                }
             }
-
-            switch (typeFullName)
-            {
-                case "System.Guid":
-                    return new GuidType();
-                case "System.Boolean":
-                    return new BoolType();
-                case "System.Double":
-                case "System.Int16":
-                case "System.Int32":
-                case "System.Int64":
-                case "System.UInt16":
-                case "System.UInt32":
-                case "System.UInt64":
-                case "System.Decimal":
-                case "System.Byte":
-                case "System.SByte":
-                case "System.Single":
-                    return new NumberType();
-
-                case "System.String":
-                    return new StringType();
-
-                case "System.DateTime":
-                case "System.DateTimeOffset":
-                    if (Settings.UseNativeDates)
-                        return new DateTimeType();
-                    else
-                        return new StringType();
-
-                default:
-                    return new TypescriptType();
-            }
+            return result;
         }
 
         private bool IsNullable(string typeFullName)

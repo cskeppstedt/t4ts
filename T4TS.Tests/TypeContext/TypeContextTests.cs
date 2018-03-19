@@ -10,10 +10,7 @@ namespace T4TS.Tests
         [TestMethod]
         public void ShouldSupportDatetimesAsNativeDates()
         {
-            var context = new TypeContext(new Settings
-            {
-                UseNativeDates = true
-            });
+            var context = new TypeContext(useNativeDates: true);
 
             var resolvedType = context.GetTypeScriptType(typeof(DateTime).FullName);
             Assert.IsInstanceOfType(resolvedType, typeof(DateTimeType));
@@ -22,10 +19,7 @@ namespace T4TS.Tests
         [TestMethod]
         public void ShouldSupportDatetimesAsStrings()
         {
-            var context = new TypeContext(new Settings
-            {
-                UseNativeDates = false
-            });
+            var context = new TypeContext(useNativeDates: false);
 
             var resolvedType = context.GetTypeScriptType(typeof(DateTime).FullName);
             Assert.IsInstanceOfType(resolvedType, typeof(StringType));
@@ -34,10 +28,7 @@ namespace T4TS.Tests
         [TestMethod]
         public void ShouldSupportDatetimeOffsetAsNativeDates()
         {
-            var context = new TypeContext(new Settings 
-            {
-                UseNativeDates = true
-            });
+            var context = new TypeContext(useNativeDates: true);
 
             var resolvedType = context.GetTypeScriptType(typeof(DateTimeOffset).FullName);
             Assert.IsInstanceOfType(resolvedType, typeof(DateTimeType));
@@ -46,10 +37,7 @@ namespace T4TS.Tests
         [TestMethod]
         public void ShouldSupportDatetimeOffsetAsStrings()
         {
-            var context = new TypeContext(new Settings
-            {
-                UseNativeDates = false
-            });
+            var context = new TypeContext(useNativeDates: false);
 
             var resolvedType = context.GetTypeScriptType(typeof(DateTimeOffset).FullName);
             Assert.IsInstanceOfType(resolvedType, typeof(StringType));
@@ -72,7 +60,7 @@ namespace T4TS.Tests
                 typeof(double)
             };
 
-            var context = new TypeContext(new Settings());
+            var context = new TypeContext(useNativeDates: false);
             var expectedType = typeof(NumberType);
 
             foreach (var type in inputTypes)
@@ -85,7 +73,7 @@ namespace T4TS.Tests
         [TestMethod]
         public void ShouldSupportIEnumerableTypes()
         {
-            var context = new TypeContext(new Settings());
+            var context = new TypeContext(useNativeDates: false);
 
             var resolvedType = context.GetTypeScriptType(typeof(IEnumerable<String>).FullName);
             Assert.IsInstanceOfType(resolvedType, typeof(ArrayType));
@@ -97,7 +85,7 @@ namespace T4TS.Tests
         [TestMethod]
         public void ShouldSupportDicionaryTypes()
         {
-            var context = new TypeContext(new Settings());
+            var context = new TypeContext(useNativeDates: false);
 
             var resolvedType = context.GetTypeScriptType(typeof(Dictionary<String, float>).FullName);
             Assert.IsInstanceOfType(resolvedType, typeof(DictionaryType));

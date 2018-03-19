@@ -8,16 +8,15 @@ namespace T4TS
 {
     public class InterfaceType : TypescriptType
     {
-        public TypeScriptInterfaceAttributeValues AttributeValues { get; private set; }
+        TypeScriptInterface tsInterface;
 
         public string QualifedModule 
         { 
             get 
             {
-                if (AttributeValues == null)
-                    return null;
-
-                return AttributeValues.Module; 
+                return (this.tsInterface.Module != null)
+                    ? this.tsInterface.Module.QualifiedName
+                    : null;
             } 
         }
 
@@ -25,24 +24,13 @@ namespace T4TS
         {
             get
             {
-                if (!string.IsNullOrEmpty(AttributeValues.NamePrefix))
-                    return AttributeValues.NamePrefix + AttributeValues.Name;
-
-                return AttributeValues.Name;
+                return this.tsInterface.Name;
             }
         }
 
-        public InterfaceType(TypeScriptInterfaceAttributeValues values)
+        public InterfaceType(TypeScriptInterface tsInterface)
         {
-            AttributeValues = values;
-        }
-
-        public InterfaceType(string name)
-        {
-            AttributeValues = new TypeScriptInterfaceAttributeValues
-            {
-                Name = name
-            };
+            this.tsInterface = tsInterface;
         }
 
         public override string ToString()
