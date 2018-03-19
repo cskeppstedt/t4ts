@@ -11,7 +11,7 @@ namespace T4TS.Tests.Fixtures.Dictionary
         public void DictionaryModelHasExpectedOutput()
         {
             // Expect
-            new OutputFor(
+            new OutputForAttributeBuilder(
                 typeof(BasicModel),
                 typeof(DictionaryModel)
             ).ToEqual(ExpectedOutput);

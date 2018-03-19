@@ -109,7 +109,8 @@
     <Compile Include="CodeTraverserTests.cs" />
     <Compile Include="TypeContext\TypeContextTests.cs" />
     <Compile Include="Utils\DTETransformer.cs" />
-    <Compile Include="Utils\OutputFor.cs" />
+    <Compile Include="Utils\OutputForDirectBuilder.cs" />
+    <Compile Include="Utils\OutputForAttributeBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\T4TS.Attributes\T4TS.Attributes.csproj">

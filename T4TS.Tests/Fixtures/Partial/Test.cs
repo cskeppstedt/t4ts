@@ -12,7 +12,7 @@ namespace T4TS.Tests.Fixtures.Partial
         public void PartialModelHasExpectedOutput()
         {
             // Expect
-            new OutputFor(
+            new OutputForAttributeBuilder(
                 typeof(PartialModel),
                 typeof(ModelFromDifferentProject),
                 typeof(BasicModel)

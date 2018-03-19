@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
+using T4TS.Builders;
 using T4TS.Example.Models;
 using T4TS.Tests.Models;
 using T4TS.Tests.Utils;
@@ -18,7 +19,11 @@ namespace T4TS.Tests
                 typeof(string)                      // has no TypeScriptInterface attribute
             );
 
-            var codeTraverser = new CodeTraverser(solution, new Settings());
+            var attributeBuilder = new AttributeInterfaceBuilder(new Settings());
+            var codeTraverser = new CodeTraverser(
+                solution,
+                new TypeContext(useNativeDates: false),
+                attributeBuilder);
             Assert.AreEqual(2, codeTraverser.GetAllInterfaces().Count());
         }
 
@@ -40,7 +45,11 @@ namespace T4TS.Tests
                 typeof(T4TS.Tests.Fixtures.Partial.InheritsFromPartialModel)
             );
 
-            var codeTraverser = new CodeTraverser(solution, new Settings());
+            var attributeBuilder = new AttributeInterfaceBuilder(new Settings());
+            var codeTraverser = new CodeTraverser(
+                solution,
+                new TypeContext(useNativeDates: false),
+                attributeBuilder);
             var allModules = codeTraverser.GetAllInterfaces();
             Assert.AreEqual(1, allModules.Count());
 
@@ -52,7 +61,11 @@ namespace T4TS.Tests
         public void ShouldHandleReservedPropNames()
         {
             var solution = DTETransformer.BuildDteSolution(typeof(ReservedPropModel));
-            var codeTraverser = new CodeTraverser(solution, new Settings());
+            var attributeBuilder = new AttributeInterfaceBuilder(new Settings());
+            var codeTraverser = new CodeTraverser(
+                solution,
+                new TypeContext(useNativeDates: false),
+                attributeBuilder);
             
             var modules = codeTraverser.GetAllInterfaces();
             var interfaces = modules.Single().Interfaces;

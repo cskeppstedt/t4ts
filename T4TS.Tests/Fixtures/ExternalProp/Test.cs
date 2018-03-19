@@ -12,7 +12,7 @@ namespace T4TS.Tests.Fixtures.ExternalProp
         public void ExternalPropModelHasExpectedOutput()
         {
             // Expect
-            new OutputFor(
+            new OutputForAttributeBuilder(
                 typeof(ExternalPropModel),
                 typeof(ModelFromDifferentProject),
                 typeof(BasicModel)

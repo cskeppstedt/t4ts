@@ -10,7 +10,7 @@ namespace T4TS.Tests.Fixtures.Nullable
         public void NullableModelHasExpectedOutput()
         {
             // Expect
-            new OutputFor(
+            new OutputForAttributeBuilder(
                 typeof(NullableModel)
             ).ToEqual(ExpectedOutput);
         }

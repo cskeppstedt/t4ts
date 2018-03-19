@@ -122,10 +122,14 @@ namespace T4TS.Tests.Utils
             basesMoq.Setup(x => x.Item(It.IsAny<int>()))
                 .Returns((int i) => bases.ElementAtOrDefault(i - 1)); // Item() accessor is not zero-based
 
+            var moqCodeNamespace = new Mock<CodeNamespace>();
+            moqCodeNamespace.SetupGet(x => x.FullName).Returns(fromClass.Namespace);
+
             moqMember.SetupGet(x => x.Name).Returns(fromClass.Name);
             moqMember.SetupGet(x => x.FullName).Returns(fromClass.FullName);
             moqMember.SetupGet(x => x.Bases).Returns(basesMoq.Object);
             moqMember.SetupGet(x => x.Members).Returns(propertiesMoq.Object);
+            moqMember.SetupGet(x => x.Namespace).Returns(moqCodeNamespace.Object);
 
             return moqMember.Object;
         }
@@ -254,8 +258,6 @@ namespace T4TS.Tests.Utils
             "System.Collections.Generic.IDictionary",
             "System.Nullable"
         };
-
-        private static readonly string nullableTypeStart = "<";
 
 
         private static string GetTypeFullname(string typeFullname)

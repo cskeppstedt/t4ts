@@ -10,7 +10,7 @@ namespace T4TS.Tests.Fixtures.Options.Default
         public void DefaultModuleSettingHasExpectedOutput()
         {
             // Expect
-            new OutputFor(
+            new OutputForAttributeBuilder(
                 typeof(DefaultModuleModel),
                 typeof(DefaultModuleOverrideModel)
             ).With(new Settings {

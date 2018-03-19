@@ -12,7 +12,7 @@ namespace T4TS.Tests.Fixtures.Enumerable
         public void EnumerableModelHasExpectedOutput()
         {
             // Expect
-            new OutputFor(
+            new OutputForAttributeBuilder(
                 typeof(EnumerableModel),
                 typeof(BasicModel)
             ).ToEqual(ExpectedOutput);

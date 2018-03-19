@@ -10,7 +10,7 @@ namespace T4TS.Tests.Fixtures.Options.Default
         public void UseNativeDatesSettingHasExpectedOutput()
         {
             // Expect
-            new OutputFor(
+            new OutputForAttributeBuilder(
                 typeof(UseNativeDatesModel)
             ).With(new Settings {
                 UseNativeDates = true

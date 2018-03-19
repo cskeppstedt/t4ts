@@ -12,7 +12,7 @@ namespace T4TS.Tests.Fixtures.ExtendsExplicit
         public void ExtendsExplicitModelHasExpectedOutput()
         {
             // Expect
-            new OutputFor(
+            new OutputForAttributeBuilder(
                 typeof(ExtendsExplicitModel),
                 typeof(BasicModel)
             ).ToEqual(ExpectedOutput);

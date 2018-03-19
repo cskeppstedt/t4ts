@@ -19,9 +19,12 @@ namespace T4TS
         public TypeScriptInterface Parent { get; set; }
         public TypeScriptModule Module { get; set; }
 
+        public IList<TypeScriptInterface> Bases { get; set; }
+
         public TypeScriptInterface()
         {
             Members = new List<TypeScriptInterfaceMember>();
+            Bases = new List<TypeScriptInterface>();
         }
     }
 }

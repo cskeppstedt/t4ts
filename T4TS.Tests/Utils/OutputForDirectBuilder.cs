@@ -6,21 +6,22 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using T4TS.Builders;
 
 namespace T4TS.Tests.Utils
 {
-    class OutputFor
+    class OutputForDirectBuilder
     {
         readonly IReadOnlyCollection<Type> Types;
-        public Settings Settings { get; private set; }
+        public DirectInterfaceBuilder.Settings Settings { get; private set; }
 
-        public OutputFor(params Type[] types)
+        public OutputForDirectBuilder(params Type[] types)
         {
             this.Types = new ReadOnlyCollection<Type>(types);
-            this.Settings = new Settings();
+            this.Settings = new DirectInterfaceBuilder.Settings();
         }
 
-        public OutputFor With(Settings settings)
+        public OutputForDirectBuilder With(DirectInterfaceBuilder.Settings settings)
         {
             this.Settings = settings;
             return this;
@@ -35,10 +36,15 @@ namespace T4TS.Tests.Utils
         private string GenerateOutput()
         {
             var solution = DTETransformer.BuildDteSolution(this.Types.ToArray());
-            var generator = new CodeTraverser(solution, this.Settings);
+            var attributeBuilder = new DirectInterfaceBuilder(this.Settings);
+            var typeContext = new TypeContext(useNativeDates: false);
+            var generator = new CodeTraverser(
+                solution,
+                typeContext,
+                attributeBuilder);
             var data = generator.GetAllInterfaces().ToList();
 
-            return OutputFormatter.GetOutput(data, this.Settings);
+            return OutputFormatter.GetOutput(data, new Settings());
         }
 
         static string Normalize(string output)

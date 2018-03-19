@@ -10,7 +10,7 @@ namespace T4TS.Tests.Fixtures.Options.Override
         public void OverrideModelsHaveExpectedOutput()
         {
             // Expect
-            new OutputFor(
+            new OutputForAttributeBuilder(
                 typeof(InterfaceNamePrefixModel),
                 typeof(InterfaceNameOverrideModel),
                 typeof(ModuleNameOverrideModel),

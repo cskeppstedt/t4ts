@@ -11,7 +11,7 @@ namespace T4TS.Tests.Fixtures.Indexed
         public void IndexedModelHasExpectedOutput()
         {
             // Expect
-            new OutputFor(
+            new OutputForAttributeBuilder(
                 typeof(BasicModel),
                 typeof(IndexedComplexModel),
                 typeof(IndexedPrimitiveModel)

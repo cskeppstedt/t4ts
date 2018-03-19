@@ -12,7 +12,7 @@ namespace T4TS.Tests.Fixtures.Inheritance
         public void InheritanceModelHasExpectedOutput()
         {
             // Expect
-            new OutputFor(
+            new OutputForAttributeBuilder(
                 typeof(InheritanceModel),
                 typeof(OtherInheritanceModel),
                 typeof(ModelFromDifferentProject),

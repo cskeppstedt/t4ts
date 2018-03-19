@@ -8,46 +8,42 @@ namespace T4TS
 {
     public class CodeTraverser
     {
-        public Solution Solution { get; private set; }
-        public Settings Settings { get; private set; }
+        private Solution solution;
+        private CodeClassInterfaceBuilder builder;
+        private TypeContext context;
 
-        private static readonly string InterfaceAttributeFullName = "T4TS.TypeScriptInterfaceAttribute";
-        private static readonly string MemberAttributeFullName = "T4TS.TypeScriptMemberAttribute";
-
-        private AttributeInterfaceBuilder builder;
-
-        public CodeTraverser(Solution solution, Settings settings)
+        public CodeTraverser(
+            Solution solution,
+            TypeContext context,
+            CodeClassInterfaceBuilder builder)
         {
             if (solution == null)
                 throw new ArgumentNullException("solution");
 
-            if (settings == null)
-                throw new ArgumentNullException("settings");
-
-            Solution = solution;
-            this.Settings = settings;
-
-            builder = new AttributeInterfaceBuilder(this.Settings);
+            this.solution = solution;
+            this.context = context;
+            this.builder = builder;
         }
 
         public IEnumerable<TypeScriptModule> GetAllInterfaces()
         {
             var tsMap = new Dictionary<CodeClass, TypeScriptInterface>();
-            TypeContext typeContext = new TypeContext(this.Settings.UseNativeDates);
 
-            Traversal.TraverseNamespacesInSolution(this.Solution, (ns) =>
-            {
-                Traversal.TraverseClassesInNamespace(ns, (codeClass) =>
+            Traversal.TraverseNamespacesInSolution(
+                this.solution,
+                (ns) =>
                 {
-                    TypeScriptInterface tsInterface = this.builder.Build(
-                        codeClass,
-                        typeContext);
-                    if (tsInterface != null)
+                    Traversal.TraverseClassesInNamespace(ns, (codeClass) =>
                     {
-                        tsMap.Add(codeClass, tsInterface);
-                    }
+                        TypeScriptInterface tsInterface = this.builder.Build(
+                            codeClass,
+                            this.context);
+                        if (tsInterface != null)
+                        {
+                            tsMap.Add(codeClass, tsInterface);
+                        }
+                    });
                 });
-            });
 
             var tsInterfaces = tsMap.Values.ToList();
             tsMap.Keys.ToList().ForEach(codeClass =>
@@ -69,7 +65,7 @@ namespace T4TS
                 }
             });
 
-            return typeContext.GetModules()
+            return this.context.GetModules()
                 .OrderBy(m => m.QualifiedName)
                 .ToList();
         }

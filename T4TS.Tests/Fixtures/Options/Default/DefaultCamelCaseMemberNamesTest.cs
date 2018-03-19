@@ -10,7 +10,7 @@ namespace T4TS.Tests.Fixtures.Options.Default
         public void DefaultCamelCaseMemberNamesHasExpectedOutput()
         {
             // Expect
-            new OutputFor(
+            new OutputForAttributeBuilder(
                 typeof(DefaultCamelCaseMemberNamesModel),
                 typeof(DefaultCamelCaseMemberNamesOverrideModel)
             ).With(new Settings {
