@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EnvDTE;
+using System.Collections;
 
 namespace T4TS.Builders
 {
@@ -42,7 +43,28 @@ namespace T4TS.Builders
                     out interfaceCreated);
 
                 result.Name = GetInterfaceName(attributeValues);
-                result.Extends = attributeValues.Extends;
+                if (!String.IsNullOrEmpty(attributeValues.Extends))
+                {
+                    result.Parent = new TypeScriptLiteralType()
+                    {
+                        FullName = attributeValues.Extends
+                    };
+                }
+                else if (codeClass.Bases.Count > 0)
+                {
+                    IEnumerator enumerator = codeClass.Bases.GetEnumerator();
+                    enumerator.MoveNext();
+                    string parentTypeName = ((CodeElement)enumerator.Current).FullName;
+
+                    if (parentTypeName != typeof(Object).FullName)
+                    {
+                        bool created;
+                        result.Parent = typeContext.GetOrCreateOutputType(
+                            parentTypeName,
+                            resolveOutputOnly: true,
+                            created: out created);
+                    }
+                }
 
                 TypescriptType indexedType;
                 if (TryGetIndexedType(codeClass, typeContext, out indexedType))
@@ -169,10 +191,11 @@ namespace T4TS.Builders
             }
             else
             {
-                type = new TypeScriptDelayResolveType(typeContext)
-                {
-                    FullName = getter.Type.AsFullName
-                };
+                bool typeCreated;
+                type = typeContext.GetOrCreateOutputType(
+                    getter.Type.AsFullName,
+                    resolveOutputOnly: false,
+                    created: out typeCreated);
             }
 
             member = new TypeScriptInterfaceMember

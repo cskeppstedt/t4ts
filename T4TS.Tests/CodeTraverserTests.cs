@@ -24,7 +24,10 @@ namespace T4TS.Tests
                 solution,
                 new TypeContext(useNativeDates: false))
             {
-                InterfaceBuilder = attributeBuilder
+                Settings = new CodeTraverser.TraverserSettings()
+                {
+                    InterfaceBuilder = attributeBuilder
+                }
             };
             Assert.AreEqual(2, codeTraverser.GetAllInterfaces().Count());
         }
@@ -52,7 +55,10 @@ namespace T4TS.Tests
                 solution,
                 new TypeContext(useNativeDates: false))
             {
-                InterfaceBuilder = attributeBuilder
+                Settings = new CodeTraverser.TraverserSettings()
+                {
+                    InterfaceBuilder = attributeBuilder
+                }
             };
             var allModules = codeTraverser.GetAllInterfaces();
             Assert.AreEqual(1, allModules.Count());
@@ -70,7 +76,10 @@ namespace T4TS.Tests
                 solution,
                 new TypeContext(useNativeDates: false))
             {
-                InterfaceBuilder = attributeBuilder
+                Settings = new CodeTraverser.TraverserSettings()
+                {
+                    InterfaceBuilder = attributeBuilder
+                }
             };
             
             var modules = codeTraverser.GetAllInterfaces();

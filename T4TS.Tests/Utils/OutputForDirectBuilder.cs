@@ -14,73 +14,50 @@ namespace T4TS.Tests.Utils
     {
         readonly IReadOnlyCollection<Type> Types;
         public DirectSettings Settings { get; private set; }
+        public CodeTraverser.TraverserSettings TraverserSettings { get; private set; }
 
         public OutputForDirectBuilder(params Type[] types)
         {
             this.Types = new ReadOnlyCollection<Type>(types);
             this.Settings = new DirectSettings();
+            this.TraverserSettings = new CodeTraverser.TraverserSettings()
+            {
+                InterfaceBuilder = new DirectInterfaceBuilder(this.Settings),
+                EnumBuilder = new DirectEnumBuilder(this.Settings)
+            };
         }
 
-        public OutputForDirectBuilder With(DirectSettings settings)
+        public OutputForDirectBuilder WithSettings(
+            Action<DirectSettings> changeSettings)
         {
-            this.Settings = settings;
+            changeSettings(this.Settings);
+            return this;
+        }
+
+        public OutputForDirectBuilder WithTraverserSettings(
+            Action<CodeTraverser.TraverserSettings> changeSettings)
+        {
+            changeSettings(this.TraverserSettings);
             return this;
         }
 
         public void ToEqual(string expectedOutput)
         {
             var generatedOutput = GenerateOutput();
-
-            string assertMessage = null;
-            for (int index = 0; index < expectedOutput.Length; index++)
-            {
-                if (generatedOutput.Length <= index)
-                {
-                    assertMessage = "Reached the end of the actual string while comparing with the expected";
-                    break;
-                }
-                else if (expectedOutput[index] != generatedOutput[index])
-                {
-                    assertMessage = "Actual string differs from expected starting at index "
-                        + index.ToString()
-                        + " expected segment: \""
-                        + expectedOutput
-                            .Substring(index)
-                            .Substring(0,
-                                Math.Min(
-                                    10,
-                                    (expectedOutput.Length - index) - 1))
-                        + "\" actual segment: \""
-                        + generatedOutput
-                            .Substring(index)
-                            .Substring(0,
-                                Math.Min(
-                                    10,
-                                    (generatedOutput.Length - index) - 1))
-                        + "\"";
-                    break;
-                }
-            }
-            Assert.IsNull(
-                assertMessage,
-                assertMessage
-                    + "\r\nExpected: "
-                    + expectedOutput
-                    + "\r\nActual: "
-                    + generatedOutput);
+            StringCompare.AssertAreEqual(
+                expectedOutput,
+                generatedOutput);
         }
 
         private string GenerateOutput()
         {
             var solution = DTETransformer.BuildDteSolution(this.Types.ToArray());
-            var attributeBuilder = new DirectInterfaceBuilder(this.Settings);
             var typeContext = new TypeContext(useNativeDates: false);
             var generator = new CodeTraverser(
                 solution,
                 typeContext)
             {
-                InterfaceBuilder = attributeBuilder,
-                EnumBuilder = new DirectEnumBuilder(this.Settings)
+                Settings = this.TraverserSettings
             };
             var data = generator.GetAllInterfaces().ToList();
 

@@ -19,7 +19,9 @@ namespace T4TS.Tests
             var member = new TypeScriptInterfaceMember
             {
                 Name = "Foo",
-                Type = new TypeScriptDelayResolveType(typeContext)
+                Type = new TypeScriptDelayResolveType(
+                    typeContext,
+                    resolveOutputOnly: false)
                 {
                     FullName = typeof(bool).FullName
                 }
@@ -43,7 +45,9 @@ namespace T4TS.Tests
             var member = new TypeScriptInterfaceMember
             {
                 Name = "Foo",
-                Type = new TypeScriptDelayResolveType(typeContext)
+                Type = new TypeScriptDelayResolveType(
+                    typeContext,
+                    resolveOutputOnly: false)
                 {
                     FullName = typeof(bool).FullName
                 }
@@ -67,7 +71,9 @@ namespace T4TS.Tests
             var member = new TypeScriptInterfaceMember
             {
                 Name = "Foo",
-                Type = new TypeScriptDelayResolveType(typeContext)
+                Type = new TypeScriptDelayResolveType(
+                    typeContext,
+                    resolveOutputOnly: false)
                 {
                     FullName = typeof(bool).FullName
                 }

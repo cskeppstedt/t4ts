@@ -13,6 +13,8 @@ namespace T4TS
             = new Dictionary<Type, IDictionary<string, TypeScriptOutputType>>();
         private IDictionary<string, TypeScriptModule> modulesByName =
             new Dictionary<string, TypeScriptModule>();
+        private IDictionary<string, TypeScriptDelayResolveType> delayLoadByName
+            = new Dictionary<string, TypeScriptDelayResolveType>();
 
         public TypeContext(bool useNativeDates)
         {
@@ -80,6 +82,43 @@ namespace T4TS
             return result;
         }
 
+        public TypeScriptOutputType GetOrCreateOutputType(
+            string fullName,
+            bool resolveOutputOnly,
+            out bool created)
+        {
+            TypeScriptOutputType result = this.GetOutput(fullName);
+            if (result != null)
+            {
+                created = false;
+            }
+            else
+            {
+                TypeScriptDelayResolveType delayType;
+                if (this.delayLoadByName.TryGetValue(
+                    fullName,
+                    out delayType))
+                {
+                    created = true;
+                }
+                else
+                {
+                    delayType = new TypeScriptDelayResolveType(
+                        this,
+                        resolveOutputOnly)
+                    {
+                        FullName = fullName
+                    };
+                    this.delayLoadByName.Add(
+                        fullName,
+                        delayType);
+                    created = true;
+                }
+                result = delayType;
+            }
+            return result;
+        }
+
         public TType GetOrCreateOutput<TType>(
             string fullName,
             out bool created)
@@ -140,7 +179,13 @@ namespace T4TS
             return this.modulesByName.Values
                 .OrderBy((module) => module.QualifiedName);
         }
-        
+
+        public IEnumerable<TypeScriptDelayResolveType> GetDelayLoadTypes()
+        {
+            return this.delayLoadByName.Values
+                .OrderBy((module) => module.FullName);
+        }
+
         public TypescriptType GetTypeScriptType(CodeTypeRef codeType)
         {
             switch (codeType.TypeKind)

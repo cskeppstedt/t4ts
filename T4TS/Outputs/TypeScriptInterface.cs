@@ -12,19 +12,18 @@ namespace T4TS
     {
         public string Name { get; set; }
         public string FullName { get; set; }
-        public string Extends { get; set; }
 
         public List<TypeScriptInterfaceMember> Members { get; set; }
         public TypescriptType IndexedType { get; set; }
-        public TypeScriptInterface Parent { get; set; }
+        public TypeScriptOutputType Parent { get; set; }
         public TypeScriptModule Module { get; set; }
 
-        public IList<TypeScriptInterface> Bases { get; set; }
+        public IList<TypeScriptOutputType> Bases { get; set; }
 
         public TypeScriptInterface()
         {
             Members = new List<TypeScriptInterfaceMember>();
-            Bases = new List<TypeScriptInterface>();
+            Bases = new List<TypeScriptOutputType>();
         }
     }
 }

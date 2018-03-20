@@ -51,6 +51,7 @@
     <Compile Include="Builders\DirectInterfaceBuilder.cs" />
     <Compile Include="Builders\AttributeInterfaceBuilder.cs" />
     <Compile Include="Builders\DirectSettings.cs" />
+    <Compile Include="CodeTraverser.Settings.cs" />
     <Compile Include="Outputs\EnumOutputAppender.cs" />
     <Compile Include="Outputs\OutputAppender.cs" />
     <Compile Include="Outputs\InterfaceOutputAppender.cs" />

@@ -116,6 +116,7 @@
     <Compile Include="Utils\DTETransformer.cs" />
     <Compile Include="Utils\OutputForDirectBuilder.cs" />
     <Compile Include="Utils\OutputForAttributeBuilder.cs" />
+    <Compile Include="Utils\StringCompare.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\T4TS.Attributes\T4TS.Attributes.csproj">

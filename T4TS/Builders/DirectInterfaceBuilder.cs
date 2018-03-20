@@ -37,11 +37,16 @@ namespace T4TS.Builders
             {
                 foreach (CodeElement baseElement in codeClass.Bases)
                 {
-                    result.Bases.Add(
-                        typeContext.GetOrCreateOutput<TypeScriptInterface>(
-                            baseElement.FullName,
-                            out createdBase));
+                    if (baseElement.FullName != typeof(Object).FullName)
+                    {
+                        result.Bases.Add(
+                            typeContext.GetOrCreateOutputType(
+                                baseElement.FullName,
+                                resolveOutputOnly: true,
+                                created: out createdBase));
+                    }
                 }
+                result.Parent = result.Bases.FirstOrDefault();
             }
 
             TypescriptType indexedType;
@@ -114,14 +119,15 @@ namespace T4TS.Builders
             {
                 name = name.Substring(0, 1).ToLowerInvariant() + name.Substring(1);
             }
-            
+
+            bool typeCreated;
             member = new TypeScriptInterfaceMember
             {
                 Name = name,
-                Type = new TypeScriptDelayResolveType(typeContext)
-                    {
-                        FullName = getter.Type.AsFullName
-                    }
+                Type = typeContext.GetOrCreateOutputType(
+                    getter.Type.AsFullName,
+                    resolveOutputOnly: false,
+                    created: out typeCreated)
             };
             return true;
         }

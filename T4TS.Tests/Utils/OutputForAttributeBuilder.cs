@@ -30,7 +30,9 @@ namespace T4TS.Tests.Utils
         public void ToEqual(string expectedOutput)
         {
             var generatedOutput = GenerateOutput();
-            Assert.AreEqual(Normalize(expectedOutput), Normalize(generatedOutput));
+            StringCompare.AssertAreEqual(
+                expectedOutput,
+                generatedOutput);
         }
 
         private string GenerateOutput()
@@ -42,7 +44,10 @@ namespace T4TS.Tests.Utils
                 solution,
                 typeContext)
             {
-                InterfaceBuilder = attributeBuilder
+                Settings =
+                {
+                    InterfaceBuilder = attributeBuilder
+                }
             };
             var data = generator.GetAllInterfaces().ToList();
 

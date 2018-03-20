@@ -9,15 +9,18 @@ namespace T4TS
     public class TypeScriptDelayResolveType : TypeScriptOutputType
     {
         private TypeContext typeContext;
+        private bool resolveOutputOnly;
         private string fullName;
 
         private string name;
         private TypeScriptModule module;
 
         public TypeScriptDelayResolveType(
-            TypeContext typeContext)
+            TypeContext typeContext,
+            bool resolveOutputOnly)
         {
             this.typeContext = typeContext;
+            this.resolveOutputOnly = resolveOutputOnly;
         }
         
         public string Name
@@ -62,7 +65,7 @@ namespace T4TS
                     this.name = output.Name;
                     this.module = output.Module;
                 }
-                else
+                else if (!this.resolveOutputOnly)
                 {
                     this.name = this.typeContext.GetTypeScriptType(this.fullName).ToString();
                 }

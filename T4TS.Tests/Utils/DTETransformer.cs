@@ -89,6 +89,7 @@ namespace T4TS.Tests.Utils
             var moqCodeNamespace = new Mock<CodeNamespace>();
             moqCodeNamespace.SetupGet(x => x.Members).Returns(moqMembers.Object);
             moqCodeNamespace.SetupGet(x => x.Name).Returns(namespaceName);
+            moqCodeNamespace.SetupGet(x => x.FullName).Returns(namespaceName);
 
             moqProjCodeElements.Setup(x => x.GetEnumerator()).Returns(() => new[] { moqCodeNamespace.Object }.GetEnumerator());
             moqFileCodeModel.SetupGet(x => x.CodeElements).Returns(moqProjCodeElements.Object);
