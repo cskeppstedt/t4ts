@@ -6,17 +6,14 @@ using System.Threading.Tasks;
 
 namespace T4TS.Tests.Fixtures.Enumeration
 {
-    public enum SampleEmum
-    {
-        First = 1,
-        Second = 2,
-        Fifth = 5
-    }
-
     public class EnumerationModel
     {
-        public SampleEmum NormalProperty { get; set; }
-        public SampleEmum[] PrimitiveArray { get; set; }
-        public List<SampleEmum> PrimitiveList { get; set; }
+        public ExplicitValueEnum ExplicitProperty { get; set; }
+        public ExplicitValueEnum[] ExplicitArray { get; set; }
+        public List<ExplicitValueEnum> ExplicitList { get; set; }
+
+        public ImplicitValueEnum ImplicitProperty { get; set; }
+        public ImplicitValueEnum[] ImplicitArray { get; set; }
+        public List<ImplicitValueEnum> ImplicitList { get; set; }
     }
 }

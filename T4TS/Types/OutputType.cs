@@ -8,7 +8,7 @@ namespace T4TS
 {
     public class OutputType : TypescriptType
     {
-        private TypeScriptType output;
+        private TypeScriptOutputType output;
 
         public string QualifedModule 
         { 
@@ -28,7 +28,7 @@ namespace T4TS
             }
         }
 
-        public OutputType(TypeScriptType output)
+        public OutputType(TypeScriptOutputType output)
         {
             this.output = output;
         }

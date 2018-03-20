@@ -73,6 +73,8 @@
     <Compile Include="Fixtures\Basic\Test.cs" />
     <Compile Include="Fixtures\Basic\BasicModel.cs" />
     <Compile Include="Fixtures\Enumeration\EnumerationModel.cs" />
+    <Compile Include="Fixtures\Enumeration\ImplicitValueEnum.cs" />
+    <Compile Include="Fixtures\Enumeration\ExplicitValueEnum.cs" />
     <Compile Include="Fixtures\Enumeration\Test.cs" />
     <Compile Include="Fixtures\ExtendsExplicit\ExtendsExplicit.cs" />
     <Compile Include="Fixtures\ExtendsExplicit\Test.cs" />
@@ -104,6 +106,7 @@
     <Compile Include="Fixtures\ExternalProp\Test.cs" />
     <Compile Include="Models\LocalModel.cs" />
     <Compile Include="Models\ReservedPropModel.cs" />
+    <Compile Include="Output\EnumOutputAppenderTests.cs" />
     <Compile Include="TraversalTests.cs" />
     <Compile Include="Output\MemberOutputAppenderTests.cs" />
     <Compile Include="Output\ModuleOutputAppenderTests.cs" />

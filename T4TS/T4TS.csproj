@@ -50,7 +50,8 @@
     <Compile Include="Builders\DirectEnumBuilder.cs" />
     <Compile Include="Builders\DirectInterfaceBuilder.cs" />
     <Compile Include="Builders\AttributeInterfaceBuilder.cs" />
-    <Compile Include="Builders\DirectInterfaceBuilder.Settings.cs" />
+    <Compile Include="Builders\DirectSettings.cs" />
+    <Compile Include="Outputs\EnumOutputAppender.cs" />
     <Compile Include="Outputs\OutputAppender.cs" />
     <Compile Include="Outputs\InterfaceOutputAppender.cs" />
     <Compile Include="Outputs\MemberOutputAppender.cs" />
@@ -62,7 +63,7 @@
     <Compile Include="Outputs\TypeScriptLiteralType.cs" />
     <Compile Include="Outputs\TypeScriptMemberAttributeValues.cs" />
     <Compile Include="CodeTraverser.cs" />
-    <Compile Include="Outputs\TypeScriptType.cs" />
+    <Compile Include="Outputs\TypeScriptOutputType.cs" />
     <Compile Include="Outputs\TypeScriptDelayResolveType.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

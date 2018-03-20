@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace T4TS
+namespace T4TS.Tests.Fixtures.Enumeration
 {
-    public class TypeScriptEnumValue
+    public enum ImplicitValueEnum
     {
-        public string Name { get; set; }
-        public string Value { get; set; }
+        First,
+        Second,
+        Third
     }
 }

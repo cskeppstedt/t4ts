@@ -1,4 +1,5 @@
 ﻿using EnvDTE;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,13 +9,10 @@ namespace T4TS
     {
         private bool useNativeDates;
 
+        private IDictionary<Type, IDictionary<string, TypeScriptOutputType>> outputsByTypeAndName
+            = new Dictionary<Type, IDictionary<string, TypeScriptOutputType>>();
         private IDictionary<string, TypeScriptModule> modulesByName =
             new Dictionary<string, TypeScriptModule>();
-        private IDictionary<string, TypeScriptInterface> interfacesByFullName =
-            new Dictionary<string, TypeScriptInterface>();
-        private IDictionary<string, TypeScriptEnum> enumsByFullName =
-            new Dictionary<string, TypeScriptEnum>();
-
 
         public TypeContext(bool useNativeDates)
         {
@@ -35,7 +33,7 @@ namespace T4TS
             string fullName,
             out bool created)
         {
-            TypeScriptInterface result = this.GetOrCreateInterface(
+            TypeScriptInterface result = this.GetOrCreateOutput<TypeScriptInterface>(
                 fullName,
                 out created);
 
@@ -56,12 +54,12 @@ namespace T4TS
             return result;
         }
 
-        public TypeScriptInterface GetOrCreateEnum(
+        public TypeScriptEnum GetOrCreateEnum(
             string moduleName,
             string fullName,
             out bool created)
         {
-            TypeScriptInterface result = this.GetOrCreateInterface(
+            TypeScriptEnum result = this.GetOrCreateOutput<TypeScriptEnum>(
                 fullName,
                 out created);
 
@@ -71,7 +69,7 @@ namespace T4TS
                 out moduleCreated);
             if (result.Module == null)
             {
-                module.Interfaces.Add(result);
+                module.Enums.Add(result);
                 result.Module = module;
             }
             else if (result.Module.QualifiedName != moduleName)
@@ -82,13 +80,24 @@ namespace T4TS
             return result;
         }
 
-
-        public TypeScriptInterface GetOrCreateInterface(
+        public TType GetOrCreateOutput<TType>(
             string fullName,
             out bool created)
+                where TType : TypeScriptOutputType, new()
         {
-            TypeScriptInterface result;
-            if (this.interfacesByFullName.TryGetValue(
+            IDictionary<string, TypeScriptOutputType> outputsByName;
+            if (!this.outputsByTypeAndName.TryGetValue(
+                typeof(TType),
+                out outputsByName))
+            {
+                outputsByName = new Dictionary<string, TypeScriptOutputType>();
+                this.outputsByTypeAndName.Add(
+                    typeof(TType),
+                    outputsByName);
+            }
+
+            TypeScriptOutputType result;
+            if (outputsByName.TryGetValue(
                 fullName,
                 out result))
             {
@@ -96,37 +105,31 @@ namespace T4TS
             }
             else
             {
-                result = new TypeScriptInterface()
+                result = new TType()
                 {
                     FullName = fullName
                 };
-                this.interfacesByFullName.Add(
+                outputsByName.Add(
                     fullName,
                     result);
                 created = true;
             }
-            return result;
+            return (TType)result;
         }
         
-        public TypeScriptType GetOutput(string fullName)
+        public TypeScriptOutputType GetOutput(string fullName)
         {
-            TypeScriptType result = null;
-
-            TypeScriptInterface interfaceOutput;
-            if (this.interfacesByFullName.TryGetValue(
-                fullName,
-                out interfaceOutput))
+            TypeScriptOutputType result = null;
+            if (fullName != null)
             {
-                result = interfaceOutput;
-            }
-            else
-            {
-                TypeScriptEnum enumOutput;
-                if (this.enumsByFullName.TryGetValue(
-                    fullName,
-                    out enumOutput))
+                foreach (IDictionary<string, TypeScriptOutputType> outputsByName in this.outputsByTypeAndName.Values)
                 {
-                    result = enumOutput;
+                    if (outputsByName.TryGetValue(
+                      fullName,
+                      out result))
+                    {
+                        break;
+                    }
                 }
             }
             return result;
@@ -205,12 +208,10 @@ namespace T4TS
         {
             TypescriptType result;
 
-            TypeScriptInterface interfaceType;
-            if (this.interfacesByFullName.TryGetValue(
-                typeFullName,
-                out interfaceType))
+            TypeScriptOutputType output = this.GetOutput(typeFullName);
+            if (output != null)
             {
-                result = new OutputType(interfaceType);
+                result = new OutputType(output);
             }
             else
             { 
@@ -282,8 +283,11 @@ namespace T4TS
                             result = new StringType();
                         break;
                     default:
-                        TypeScriptType output = this.GetOutput(typeFullName);
-                        result = new OutputType(output);
+                        result = new OutputType(
+                            new TypeScriptLiteralType()
+                            {
+                                FullName = typeFullName
+                            });
                         break;
                 }
             }

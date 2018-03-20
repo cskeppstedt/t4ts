@@ -19,9 +19,10 @@ namespace T4TS.Tests
             var member = new TypeScriptInterfaceMember
             {
                 Name = "Foo",
-                Type = new TypeScriptDelayResolveType(
-                    typeContext,
-                    typeof(bool).FullName)
+                Type = new TypeScriptDelayResolveType(typeContext)
+                {
+                    FullName = typeof(bool).FullName
+                }
             };
 
             var appender = new MemberOutputAppender(sb, 0, new Settings
@@ -42,9 +43,10 @@ namespace T4TS.Tests
             var member = new TypeScriptInterfaceMember
             {
                 Name = "Foo",
-                Type = new TypeScriptDelayResolveType(
-                    typeContext,
-                    typeof(bool).FullName)
+                Type = new TypeScriptDelayResolveType(typeContext)
+                {
+                    FullName = typeof(bool).FullName
+                }
             };
 
             var appender = new MemberOutputAppender(sb, 0, new Settings
@@ -65,9 +67,10 @@ namespace T4TS.Tests
             var member = new TypeScriptInterfaceMember
             {
                 Name = "Foo",
-                Type = new TypeScriptDelayResolveType(
-                    typeContext,
-                    typeof(bool).FullName)
+                Type = new TypeScriptDelayResolveType(typeContext)
+                {
+                    FullName = typeof(bool).FullName
+                }
             };
 
             var appender = new MemberOutputAppender(sb, 0, new Settings

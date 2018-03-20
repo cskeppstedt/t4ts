@@ -13,15 +13,15 @@ namespace T4TS.Tests.Utils
     class OutputForDirectBuilder
     {
         readonly IReadOnlyCollection<Type> Types;
-        public DirectInterfaceBuilder.Settings Settings { get; private set; }
+        public DirectSettings Settings { get; private set; }
 
         public OutputForDirectBuilder(params Type[] types)
         {
             this.Types = new ReadOnlyCollection<Type>(types);
-            this.Settings = new DirectInterfaceBuilder.Settings();
+            this.Settings = new DirectSettings();
         }
 
-        public OutputForDirectBuilder With(DirectInterfaceBuilder.Settings settings)
+        public OutputForDirectBuilder With(DirectSettings settings)
         {
             this.Settings = settings;
             return this;
@@ -30,7 +30,44 @@ namespace T4TS.Tests.Utils
         public void ToEqual(string expectedOutput)
         {
             var generatedOutput = GenerateOutput();
-            Assert.AreEqual(Normalize(expectedOutput), Normalize(generatedOutput));
+
+            string assertMessage = null;
+            for (int index = 0; index < expectedOutput.Length; index++)
+            {
+                if (generatedOutput.Length <= index)
+                {
+                    assertMessage = "Reached the end of the actual string while comparing with the expected";
+                    break;
+                }
+                else if (expectedOutput[index] != generatedOutput[index])
+                {
+                    assertMessage = "Actual string differs from expected starting at index "
+                        + index.ToString()
+                        + " expected segment: \""
+                        + expectedOutput
+                            .Substring(index)
+                            .Substring(0,
+                                Math.Min(
+                                    10,
+                                    (expectedOutput.Length - index) - 1))
+                        + "\" actual segment: \""
+                        + generatedOutput
+                            .Substring(index)
+                            .Substring(0,
+                                Math.Min(
+                                    10,
+                                    (generatedOutput.Length - index) - 1))
+                        + "\"";
+                    break;
+                }
+            }
+            Assert.IsNull(
+                assertMessage,
+                assertMessage
+                    + "\r\nExpected: "
+                    + expectedOutput
+                    + "\r\nActual: "
+                    + generatedOutput);
         }
 
         private string GenerateOutput()
@@ -42,7 +79,8 @@ namespace T4TS.Tests.Utils
                 solution,
                 typeContext)
             {
-                InterfaceBuilder = attributeBuilder
+                InterfaceBuilder = attributeBuilder,
+                EnumBuilder = new DirectEnumBuilder(this.Settings)
             };
             var data = generator.GetAllInterfaces().ToList();
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace T4TS
 {
-    public class TypeScriptDelayResolveType : TypeScriptType
+    public class TypeScriptDelayResolveType : TypeScriptOutputType
     {
         private TypeContext typeContext;
         private string fullName;
@@ -15,11 +15,9 @@ namespace T4TS
         private TypeScriptModule module;
 
         public TypeScriptDelayResolveType(
-            TypeContext typeContext,
-            string fullName)
+            TypeContext typeContext)
         {
             this.typeContext = typeContext;
-            this.fullName = fullName;
         }
         
         public string Name
@@ -43,13 +41,22 @@ namespace T4TS
         public string FullName
         {
             get { return this.fullName; }
+            set
+            {
+                if (this.fullName != value)
+                {
+                    this.fullName = value;
+                    this.name = null;
+                    this.module = null;
+                }
+            }
         }
 
         private void EnsureResolved()
         {
             if (this.name == null)
             {
-                TypeScriptType output = this.typeContext.GetOutput(this.fullName);
+                TypeScriptOutputType output = this.typeContext.GetOutput(this.fullName);
                 if (output != null)
                 {
                     this.name = output.Name;

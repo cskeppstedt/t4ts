@@ -6,25 +6,16 @@ using System.Threading.Tasks;
 
 namespace T4TS
 {
-    public class TypeScriptEnum : TypeScriptType
+    public class TypeScriptEnum : TypeScriptOutputType
     {
-        IList<TypeScriptEnumValue> Values { get; set; }
+        public IList<TypeScriptEnumValue> Values { get; set; }
 
-        public string Name
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public string Name { get; set; }
         public TypeScriptModule Module { get; set; }
 
         public string FullName
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get; set;
         }
 
         public TypeScriptEnum()

@@ -65,15 +65,18 @@ namespace T4TS.Tests.Utils
             return moqProject.Object;
         }
 
-        public static ProjectItem BuildDteProjectItem(IEnumerable<Type> fromClassTypes, string projectItemName, ProjectItems subProjectItems = null)
+        public static ProjectItem BuildDteProjectItem(
+            IEnumerable<Type> fromTypes,
+            string projectItemName,
+            ProjectItems subProjectItems = null)
         {
-            var namespaceName = fromClassTypes
+            var namespaceName = fromTypes
                 .Select(t => t.Namespace)
                 .Distinct()
                 .Single();
 
-            var classes = fromClassTypes
-                .Select(BuildDteClass)
+            var mockedTypes = fromTypes
+                .Select(BuildDteObject)
                 .ToList();
 
             var moqFileCodeModel = new Mock<FileCodeModel>();
@@ -81,7 +84,7 @@ namespace T4TS.Tests.Utils
             var moqProjCodeElements = new Mock<CodeElements>();
 
             var moqMembers = new Mock<CodeElements>();
-            moqMembers.Setup(x => x.GetEnumerator()).Returns(() => classes.GetEnumerator());
+            moqMembers.Setup(x => x.GetEnumerator()).Returns(() => mockedTypes.GetEnumerator());
 
             var moqCodeNamespace = new Mock<CodeNamespace>();
             moqCodeNamespace.SetupGet(x => x.Members).Returns(moqMembers.Object);
@@ -94,6 +97,20 @@ namespace T4TS.Tests.Utils
             moqProjectItem.SetupGet(x => x.ProjectItems).Returns(subProjectItems);
 
             return moqProjectItem.Object;
+        }
+
+        public static object BuildDteObject(Type fromType)
+        {
+            object result = null;
+            if (fromType.IsClass)
+            {
+                result = DTETransformer.BuildDteClass(fromType);
+            }
+            else if (fromType.IsEnum)
+            {
+                result = DTETransformer.BuildDteEnum(fromType);
+            }
+            return result;
         }
 
         public static CodeClass BuildDteClass(Type fromClass)
@@ -129,6 +146,51 @@ namespace T4TS.Tests.Utils
             moqMember.SetupGet(x => x.FullName).Returns(fromClass.FullName);
             moqMember.SetupGet(x => x.Bases).Returns(basesMoq.Object);
             moqMember.SetupGet(x => x.Members).Returns(propertiesMoq.Object);
+            moqMember.SetupGet(x => x.Namespace).Returns(moqCodeNamespace.Object);
+
+            return moqMember.Object;
+        }
+
+        public static CodeEnum BuildDteEnum(Type fromType)
+        {
+            var moqMember = new Mock<CodeEnum>();
+
+            var classAttributes = BuildDteAttributes<TypeScriptInterfaceAttribute>(fromType);
+            moqMember.SetupGet(x => x.Attributes).Returns(classAttributes);
+
+            var properties = new List<CodeProperty>(
+                fromType
+                    .GetProperties(BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.Instance)
+                    .Select(BuildDteProperty)
+            );
+
+            var propertiesMoq = new Mock<CodeElements>();
+            propertiesMoq.Setup(x => x.GetEnumerator()).Returns(() => properties.GetEnumerator());
+
+            var values = Enum.GetValues(fromType)
+                .Cast<int>()
+                .Select(
+                    (enumValue) =>
+                    {
+                        var valueMoq = new Mock<CodeVariable>();
+                        valueMoq.SetupGet(x => x.Name).Returns(Enum.GetName(fromType, enumValue));
+                        valueMoq.SetupGet(x => x.InitExpression).Returns(enumValue);
+                        return valueMoq.Object;
+                    })
+                .ToList();
+
+            var valuesMoq = new Mock<CodeElements>();
+            valuesMoq.Setup(x => x.GetEnumerator()).Returns(() => values.GetEnumerator());
+            valuesMoq.Setup(x => x.Count).Returns(() => values.Count);
+            //valuesMoq.Setup(x => x.Item(It.IsAny<int>()))
+            //    .Returns((int i) => values.ElementAtOrDefault(i - 1)); // Item() accessor is not zero-based
+
+            var moqCodeNamespace = new Mock<CodeNamespace>();
+            moqCodeNamespace.SetupGet(x => x.FullName).Returns(fromType.Namespace);
+
+            moqMember.SetupGet(x => x.Name).Returns(fromType.Name);
+            moqMember.SetupGet(x => x.FullName).Returns(fromType.FullName);
+            moqMember.SetupGet(x => x.Members).Returns(valuesMoq.Object);
             moqMember.SetupGet(x => x.Namespace).Returns(moqCodeNamespace.Object);
 
             return moqMember.Object;

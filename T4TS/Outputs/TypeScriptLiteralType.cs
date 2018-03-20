@@ -6,16 +6,14 @@ using System.Threading.Tasks;
 
 namespace T4TS
 {
-    public class TypeScriptLiteralType : TypeScriptType
+    public class TypeScriptLiteralType : TypeScriptOutputType
     {
-        public TypeScriptLiteralType(string name)
+        public string Name
         {
-            this.FullName = this.Name = name;
+            get { return this.FullName; }
         }
 
-        public string Name { get; private set; }
-
-        public string FullName { get; private set; }
+        public string FullName { get; set; }
 
         public TypeScriptModule Module
         {

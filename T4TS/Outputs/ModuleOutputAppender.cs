@@ -17,9 +17,17 @@ namespace T4TS
         {
             BeginModule(module);
 
-            var interfaceAppender = new InterfaceOutputAppender(Output, BaseIndentation + 4, Settings, module.IsGlobal);
+            InterfaceOutputAppender interfaceAppender = new InterfaceOutputAppender(Output, BaseIndentation + 4, Settings, module.IsGlobal);
             foreach (var tsInterface in module.Interfaces)
+            {
                 interfaceAppender.AppendOutput(tsInterface);
+            }
+
+            EnumOutputAppender enumAppender = new EnumOutputAppender(Output, BaseIndentation + 4, Settings, module.IsGlobal);
+            foreach (var tsEnum in module.Enums)
+            {
+                enumAppender.AppendOutput(tsEnum);
+            }
 
             EndModule(module);
         }

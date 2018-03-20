@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace T4TS
 {
-    public interface TypeScriptType
+    public interface TypeScriptOutputType
     {
         string Name { get; }
-        string FullName { get; }
+        string FullName { get; set; }
 
         TypeScriptModule Module { get; }
     }

@@ -9,9 +9,9 @@ namespace T4TS.Builders
 {
     public partial class DirectInterfaceBuilder : CodeClassInterfaceBuilder
     {
-        private Settings settings;
+        private DirectSettings settings;
 
-        public DirectInterfaceBuilder(Settings settings)
+        public DirectInterfaceBuilder(DirectSettings settings)
         {
             this.settings = settings;
         }
@@ -22,7 +22,7 @@ namespace T4TS.Builders
         {
             TypeScriptInterface result = null;
 
-            string moduleName = this.GetModuleNameFromNamespace(codeClass.Namespace);
+            string moduleName = this.settings.GetModuleNameFromNamespace(codeClass.Namespace);
                 
             bool interfaceCreated;
             result = typeContext.GetOrCreateInterface(
@@ -38,7 +38,7 @@ namespace T4TS.Builders
                 foreach (CodeElement baseElement in codeClass.Bases)
                 {
                     result.Bases.Add(
-                        typeContext.GetOrCreateInterface(
+                        typeContext.GetOrCreateOutput<TypeScriptInterface>(
                             baseElement.FullName,
                             out createdBase));
                 }
@@ -61,18 +61,6 @@ namespace T4TS.Builders
             return result;
         }
 
-        private string GetModuleNameFromNamespace(CodeNamespace codeNamespace)
-        {
-            string result = codeNamespace.FullName;
-            if (this.settings.ModuleRoot != null)
-            {
-                return result.Replace(
-                    this.settings.NamespaceRoot,
-                    this.settings.ModuleRoot);
-            }
-            return result;
-        }
-        
         private bool TryGetAttribute(CodeElements attributes, string attributeFullName, out CodeAttribute attribute)
         {
             foreach (CodeAttribute attr in attributes)
@@ -130,9 +118,10 @@ namespace T4TS.Builders
             member = new TypeScriptInterfaceMember
             {
                 Name = name,
-                Type = new TypeScriptDelayResolveType(
-                    typeContext,
-                    getter.Type.AsFullName)
+                Type = new TypeScriptDelayResolveType(typeContext)
+                    {
+                        FullName = getter.Type.AsFullName
+                    }
             };
             return true;
         }
