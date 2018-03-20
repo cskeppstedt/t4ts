@@ -31,7 +31,8 @@ namespace T4TS
 
         public IEnumerable<TypeScriptModule> GetAllInterfaces()
         {
-            IDictionary<string, CodeNamespace> namespacesByName = new Dictionary<string, CodeNamespace>();
+            IDictionary<string, IList<CodeNamespace>> namespacesByName
+                = new Dictionary<string, IList<CodeNamespace>>();
 
             Traversal.TraverseNamespacesInSolution(
                 this.solution,
@@ -43,9 +44,17 @@ namespace T4TS
 
                     if (this.Settings.ResolveReferences)
                     {
-                        namespacesByName.Add(
+                        IList<CodeNamespace> namespaceList;
+                        if (!namespacesByName.TryGetValue(
                             codeNamespace.FullName,
-                            codeNamespace);
+                            out namespaceList))
+                        {
+                            namespaceList = new List<CodeNamespace>();
+                            namespacesByName.Add(
+                                codeNamespace.FullName,
+                                namespaceList);
+                        }
+                        namespaceList.Add(codeNamespace);
                     }
                 });
 
@@ -103,7 +112,7 @@ namespace T4TS
         }
 
         private void ResolveReferenceTypes(
-            IDictionary<string, CodeNamespace> namespacesByName,
+            IDictionary<string, IList<CodeNamespace>> namespacesByName,
             ICollection<string> fullNamesToIgnore)
         {
             int result = 0;
@@ -112,13 +121,13 @@ namespace T4TS
             {
                 fullNamesToIgnore = new HashSet<string>();
             }
-            IDictionary<CodeNamespace, ICollection<string>> typeNamesByNamespace =
-                new Dictionary<CodeNamespace, ICollection<string>>();
+            IDictionary<IList<CodeNamespace>, ICollection<string>> typeNamesByNamespaces =
+                new Dictionary<IList<CodeNamespace>, ICollection<string>>();
 
             string fullName;
             TypeScriptOutputType outputType;
             string namespaceName;
-            CodeNamespace codeNamespace;
+            IList<CodeNamespace> namespaceList;
             ICollection<string> typeNames;
             foreach (TypeScriptDelayResolveType delayType in this.context.GetDelayLoadTypes())
             {
@@ -129,27 +138,30 @@ namespace T4TS
                     if (outputType == null)
                     {
                         int classNameStartIndex = fullName.LastIndexOf('.');
-                        namespaceName = fullName.Substring(
-                            0,
-                            classNameStartIndex);
-
-                        if (namespacesByName.TryGetValue(
-                            namespaceName,
-                            out codeNamespace))
+                        if (classNameStartIndex > 0)
                         {
-                            if (!typeNamesByNamespace.TryGetValue(
-                                codeNamespace,
-                                out typeNames))
-                            {
-                                typeNames = new HashSet<string>();
-                                typeNamesByNamespace.Add(
-                                    codeNamespace,
-                                    typeNames);
-                            }
+                            namespaceName = fullName.Substring(
+                                0,
+                                classNameStartIndex);
 
-                            typeNames.Add(
-                                fullName.Substring(classNameStartIndex + 1));
-                            result++;
+                            if (namespacesByName.TryGetValue(
+                                namespaceName,
+                                out namespaceList))
+                            {
+                                if (!typeNamesByNamespaces.TryGetValue(
+                                    namespaceList,
+                                    out typeNames))
+                                {
+                                    typeNames = new HashSet<string>();
+                                    typeNamesByNamespaces.Add(
+                                        namespaceList,
+                                        typeNames);
+                                }
+
+                                typeNames.Add(
+                                    fullName.Substring(classNameStartIndex + 1));
+                                result++;
+                            }
                         }
                     }
                     fullNamesToIgnore.Add(fullName);
@@ -157,8 +169,8 @@ namespace T4TS
             }
 
             TraverserSettings settings;
-            foreach (KeyValuePair<CodeNamespace, ICollection<string>> namespaceTypeNamesPair
-                in typeNamesByNamespace)
+            foreach (KeyValuePair<IList<CodeNamespace>, ICollection<string>> namespaceTypeNamesPair
+                in typeNamesByNamespaces)
             {
                 settings = new TraverserSettings()
                 {
@@ -168,12 +180,15 @@ namespace T4TS
                     EnumFilter = (codeEnum) => namespaceTypeNamesPair.Value.Contains(codeEnum.Name)
                 };
 
-                this.TraverseNamespace(
-                    namespaceTypeNamesPair.Key,
-                    settings);
+                foreach (CodeNamespace codeNamespace in namespaceTypeNamesPair.Key)
+                {
+                    this.TraverseNamespace(
+                        codeNamespace,
+                        settings);
+                }
             }
 
-            if (typeNamesByNamespace.Count > 0)
+            if (typeNamesByNamespaces.Count > 0)
             {
                 this.ResolveReferenceTypes(
                     namespacesByName,

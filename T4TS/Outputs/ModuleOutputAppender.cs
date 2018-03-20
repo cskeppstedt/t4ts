@@ -18,7 +18,8 @@ namespace T4TS
             BeginModule(module);
 
             InterfaceOutputAppender interfaceAppender = new InterfaceOutputAppender(Output, BaseIndentation + 4, Settings, module.IsGlobal);
-            foreach (var tsInterface in module.Interfaces)
+            foreach (var tsInterface in module.Interfaces
+                .OrderBy((currentInterface) => currentInterface.Name))
             {
                 interfaceAppender.AppendOutput(tsInterface);
             }
