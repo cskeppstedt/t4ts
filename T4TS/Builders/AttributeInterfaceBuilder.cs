@@ -159,15 +159,19 @@ namespace T4TS.Builders
                     name = name.Substring(1);
             }
 
+            TypeScriptType type = (!string.IsNullOrWhiteSpace(values.Type))
+                ? (TypeScriptType)new TypeScriptLiteralType(values.Type)
+                : (TypeScriptType)new TypeScriptDelayResolveType(
+                    typeContext,
+                    getter.Type.AsFullName);
+
             member = new TypeScriptInterfaceMember
             {
                 Name = name,
                 //FullName = property.FullName,
                 Optional = values.Optional,
                 Ignore = values.Ignore,
-                Type = (string.IsNullOrWhiteSpace(values.Type))
-                    ? typeContext.GetTypeScriptType(getter.Type)
-                    : new LiteralType(values.Type)
+                Type = type
             };
 
             if (member.Ignore)

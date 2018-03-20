@@ -18,20 +18,28 @@ namespace T4TS
             AppendIndendation();
 
             bool isOptional = member.Optional;
-            string type = member.Type.ToString();
+            string typeName = member.Type.Name;
 
-            if (member.Type is BoolType)
+            if (member.Type.FullName == typeof(bool).FullName)
             {
                 if (Settings.CompatibilityVersion != null && Settings.CompatibilityVersion < new Version(0, 9, 0))
-                    type = "bool";
+                    typeName = "bool";
                 else
-                    type = "boolean";
+                    typeName = "boolean";
+            }
+
+            if (member.Type.Module != null)
+            {
+                typeName = String.Format(
+                    "{0}.{1}",
+                    member.Type.Module.QualifiedName,
+                    typeName);
             }
 
             Output.AppendFormat("{0}{1}: {2}",
                 member.Name,
                 (isOptional ? "?" : ""),
-                type
+                typeName
             );
             
             Output.AppendLine(";");

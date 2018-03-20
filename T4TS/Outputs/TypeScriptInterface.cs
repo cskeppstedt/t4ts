@@ -8,7 +8,7 @@ using EnvDTE;
 namespace T4TS
 {
     [System.Diagnostics.DebuggerDisplay("TypeScriptInterface {FullName}")]    
-    public class TypeScriptInterface
+    public class TypeScriptInterface : TypeScriptType
     {
         public string Name { get; set; }
         public string FullName { get; set; }

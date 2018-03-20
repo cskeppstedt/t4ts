@@ -8,21 +8,21 @@ namespace T4TS
 {
     public class CodeTraverser
     {
+        public CodeClassInterfaceBuilder InterfaceBuilder { get; set; }
+        public CodeEnumBuilder EnumBuilder { get; set; }
+
         private Solution solution;
-        private CodeClassInterfaceBuilder builder;
         private TypeContext context;
 
         public CodeTraverser(
             Solution solution,
-            TypeContext context,
-            CodeClassInterfaceBuilder builder)
+            TypeContext context)
         {
             if (solution == null)
                 throw new ArgumentNullException("solution");
 
             this.solution = solution;
             this.context = context;
-            this.builder = builder;
         }
 
         public IEnumerable<TypeScriptModule> GetAllInterfaces()
@@ -33,16 +33,29 @@ namespace T4TS
                 this.solution,
                 (ns) =>
                 {
-                    Traversal.TraverseClassesInNamespace(ns, (codeClass) =>
+                    if (this.InterfaceBuilder != null)
                     {
-                        TypeScriptInterface tsInterface = this.builder.Build(
-                            codeClass,
-                            this.context);
-                        if (tsInterface != null)
+                        Traversal.TraverseClassesInNamespace(ns, (codeClass) =>
                         {
-                            tsMap.Add(codeClass, tsInterface);
-                        }
-                    });
+                            TypeScriptInterface tsInterface = this.InterfaceBuilder.Build(
+                                codeClass,
+                                this.context);
+                            if (tsInterface != null)
+                            {
+                                tsMap.Add(codeClass, tsInterface);
+                            }
+                        });
+                    }
+
+                    if (this.EnumBuilder != null)
+                    { 
+                        Traversal.TraverseEnumsInNamespace(ns, (codeEnum) =>
+                        {
+                            this.EnumBuilder.Build(
+                                codeEnum,
+                                this.context);
+                        });
+                    }
                 });
 
             var tsInterfaces = tsMap.Values.ToList();

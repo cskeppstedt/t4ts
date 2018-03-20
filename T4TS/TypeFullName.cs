@@ -22,6 +22,11 @@ namespace T4TS
             return this.FullName == "System.Collections.Generic.IEnumerable";
         }
 
+        public bool IsArray()
+        {
+            return this.FullName.EndsWith("[]");
+        }
+
         public bool IsDictionary()
         {
             switch(this.FullName)

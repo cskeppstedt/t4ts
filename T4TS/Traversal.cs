@@ -61,6 +61,23 @@ namespace T4TS
                 }
             }
         }
+        public static void TraverseEnumsInNamespace(CodeNamespace ns, Action<CodeEnum> withCodeEnum)
+        {
+            if (ns == null)
+                throw new ArgumentNullException("ns");
+
+            if (withCodeEnum == null)
+                throw new ArgumentNullException("withCodeClass");
+
+            if (ns.Members != null)
+            {
+                foreach (object elem in ns.Members)
+                {
+                    if (elem is CodeEnum)
+                        withCodeEnum((CodeEnum)elem);
+                }
+            }
+        }
 
         public static void TraversePropertiesInClass(CodeClass codeClass, Action<CodeProperty> withProperty)
         {

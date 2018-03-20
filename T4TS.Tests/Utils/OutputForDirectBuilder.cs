@@ -40,8 +40,10 @@ namespace T4TS.Tests.Utils
             var typeContext = new TypeContext(useNativeDates: false);
             var generator = new CodeTraverser(
                 solution,
-                typeContext,
-                attributeBuilder);
+                typeContext)
+            {
+                InterfaceBuilder = attributeBuilder
+            };
             var data = generator.GetAllInterfaces().ToList();
 
             return OutputFormatter.GetOutput(data, new Settings());

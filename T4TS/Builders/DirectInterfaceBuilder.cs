@@ -126,14 +126,13 @@ namespace T4TS.Builders
             {
                 name = name.Substring(0, 1).ToLowerInvariant() + name.Substring(1);
             }
-
-            TypescriptType memberType = typeContext.GetTypeScriptType(getter.Type);
-
+            
             member = new TypeScriptInterfaceMember
             {
                 Name = name,
-                Optional = (memberType is NullableType),
-                Type = memberType
+                Type = new TypeScriptDelayResolveType(
+                    typeContext,
+                    getter.Type.AsFullName)
             };
             return true;
         }

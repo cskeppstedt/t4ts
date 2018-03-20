@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace T4TS
 {
-    public class InterfaceType : TypescriptType
+    public class OutputType : TypescriptType
     {
-        TypeScriptInterface tsInterface;
+        private TypeScriptType output;
 
         public string QualifedModule 
         { 
             get 
             {
-                return (this.tsInterface.Module != null)
-                    ? this.tsInterface.Module.QualifiedName
+                return (this.output.Module != null)
+                    ? this.output.Module.QualifiedName
                     : null;
             } 
         }
@@ -24,13 +24,13 @@ namespace T4TS
         {
             get
             {
-                return this.tsInterface.Name;
+                return this.output.Name;
             }
         }
 
-        public InterfaceType(TypeScriptInterface tsInterface)
+        public OutputType(TypeScriptType output)
         {
-            this.tsInterface = tsInterface;
+            this.output = output;
         }
 
         public override string ToString()

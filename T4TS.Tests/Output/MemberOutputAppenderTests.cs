@@ -13,11 +13,15 @@ namespace T4TS.Tests
         [TestMethod]
         public void TypescriptVersion083YieldsBool()
         {
+            TypeContext typeContext = new TypeContext(useNativeDates: false);
+
             var sb = new StringBuilder();
             var member = new TypeScriptInterfaceMember
             {
                 Name = "Foo",
-                Type = new BoolType()
+                Type = new TypeScriptDelayResolveType(
+                    typeContext,
+                    typeof(bool).FullName)
             };
 
             var appender = new MemberOutputAppender(sb, 0, new Settings
@@ -32,11 +36,15 @@ namespace T4TS.Tests
         [TestMethod]
         public void TypescriptVersion090YieldsBoolean()
         {
+            TypeContext typeContext = new TypeContext(useNativeDates: false);
+
             var sb = new StringBuilder();
             var member = new TypeScriptInterfaceMember
             {
                 Name = "Foo",
-                Type = new BoolType()
+                Type = new TypeScriptDelayResolveType(
+                    typeContext,
+                    typeof(bool).FullName)
             };
 
             var appender = new MemberOutputAppender(sb, 0, new Settings
@@ -51,11 +59,15 @@ namespace T4TS.Tests
         [TestMethod]
         public void DefaultTypescriptVersionYieldsBoolean()
         {
+            TypeContext typeContext = new TypeContext(useNativeDates: false);
+
             var sb = new StringBuilder();
             var member = new TypeScriptInterfaceMember
             {
                 Name = "Foo",
-                Type = new BoolType()
+                Type = new TypeScriptDelayResolveType(
+                    typeContext,
+                    typeof(bool).FullName)
             };
 
             var appender = new MemberOutputAppender(sb, 0, new Settings
