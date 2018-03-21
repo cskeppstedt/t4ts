@@ -44,6 +44,30 @@ namespace T4TS
             else
                 AppendIndented("export interface " + tsInterface.Name);
 
+            if (tsInterface.GenericParameters != null)
+            {
+                bool firstGenericParameter = true;
+                foreach(string genericParameter in tsInterface.GenericParameters)
+                {
+                    if (firstGenericParameter)
+                    {
+                        Output.Append("<");
+                        firstGenericParameter = false;
+                    }
+                    else
+                    {
+                        Output.Append(", ");
+                    }
+                    Output.Append(genericParameter);
+                }
+                if (!firstGenericParameter)
+                {
+                    Output.Append(">");
+                }
+            }
+
+            // In some cases the Parent is a complex type, like a List<> that we don't want to define as a base type.
+            // Those types end up with a null Name.  There should be a better way to handle that.
             if (tsInterface.Parent != null
                 && !String.IsNullOrEmpty(tsInterface.Parent.Name))
             {

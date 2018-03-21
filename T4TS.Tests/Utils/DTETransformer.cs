@@ -142,9 +142,9 @@ namespace T4TS.Tests.Utils
 
             var moqCodeNamespace = new Mock<CodeNamespace>();
             moqCodeNamespace.SetupGet(x => x.FullName).Returns(fromClass.Namespace);
-
-            moqMember.SetupGet(x => x.Name).Returns(fromClass.Name);
-            moqMember.SetupGet(x => x.FullName).Returns(fromClass.FullName);
+            
+            moqMember.SetupGet(x => x.Name).Returns(DTETransformer.GenerateNameFromType(fromClass));
+            moqMember.SetupGet(x => x.FullName).Returns(DTETransformer.GenerateFullNameFromType(fromClass));
             moqMember.SetupGet(x => x.Bases).Returns(basesMoq.Object);
             moqMember.SetupGet(x => x.Members).Returns(propertiesMoq.Object);
             moqMember.SetupGet(x => x.Namespace).Returns(moqCodeNamespace.Object);
@@ -297,8 +297,8 @@ namespace T4TS.Tests.Utils
         {
             var getterType = new Mock<CodeTypeRef>();
             var typeRef = GetTypeRef(fromType);
-
-            string typeFullname = GetTypeFullname(fromType.FullName);
+            
+            string typeFullname = GetTypeFullname(fromType.FullName ?? fromType.Name);
 
             getterType.SetupGet(x => x.TypeKind).Returns(typeRef);
             getterType.SetupGet(x => x.AsFullName).Returns(typeFullname);
@@ -308,7 +308,6 @@ namespace T4TS.Tests.Utils
                 var elementType = GetCodeTypeRef(fromType.GetElementType());
                 getterType.SetupGet(x => x.ElementType).Returns(elementType);
             }
-
             return getterType.Object;
         }
 
@@ -365,8 +364,11 @@ namespace T4TS.Tests.Utils
         private static vsCMTypeRef GetTypeRef(Type fromType)
         {
             vsCMTypeRef typeRef;
-            if (TypeMap.TryGetValue(fromType.FullName, out typeRef))
+            if (!String.IsNullOrEmpty(fromType.FullName)
+                && TypeMap.TryGetValue(fromType.FullName, out typeRef))
+            {
                 return typeRef;
+            }
 
             if (fromType.IsArray)
                 return vsCMTypeRef.vsCMTypeRefArray;
@@ -384,6 +386,23 @@ namespace T4TS.Tests.Utils
                 .Concat(type.GetInterfaces())
                 .Concat(type.GetInterfaces().SelectMany<Type, Type>(GetBaseTypes))
                 .Concat(GetBaseTypes(type.BaseType));
+        }
+
+        private static string GenerateNameFromType(Type type)
+        {
+            TypeFullName nameWithoutArguments = TypeFullNameParser.Parse(type.Name);
+            return nameWithoutArguments.FullName;
+        }
+
+        private static string GenerateFullNameFromType(Type type)
+        {
+            TypeFullName nameWithoutArguments = TypeFullNameParser.Parse(type.FullName);
+            TypeFullName result = new TypeFullName(
+                nameWithoutArguments.FullName,
+                type.GetGenericArguments()
+                    .Select((genericType) => new TypeFullName(genericType.Name))
+                    .ToArray());
+            return result.ToString();
         }
     }
 }

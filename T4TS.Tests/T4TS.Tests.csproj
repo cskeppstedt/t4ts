@@ -80,6 +80,8 @@
     <Compile Include="Fixtures\ExtendsExplicit\Test.cs" />
     <Compile Include="Fixtures\Dictionary\DictionaryModel.cs" />
     <Compile Include="Fixtures\Dictionary\Test.cs" />
+    <Compile Include="Fixtures\Generics\GenericModel.cs" />
+    <Compile Include="Fixtures\Generics\Test.cs" />
     <Compile Include="Fixtures\Indexed\IndexedModel.cs" />
     <Compile Include="Fixtures\Indexed\Test.cs" />
     <Compile Include="Fixtures\Nullable\NullableModel.cs" />

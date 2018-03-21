@@ -17,6 +17,7 @@ namespace T4TS
         public TypescriptType IndexedType { get; set; }
         public TypeScriptOutputType Parent { get; set; }
         public TypeScriptModule Module { get; set; }
+        public List<string> GenericParameters { get; set; }
 
         public IList<TypeScriptOutputType> Bases { get; set; }
 
@@ -24,6 +25,7 @@ namespace T4TS
         {
             Members = new List<TypeScriptInterfaceMember>();
             Bases = new List<TypeScriptOutputType>();
+            GenericParameters = new List<string>();
         }
     }
 }

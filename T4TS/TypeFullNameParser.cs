@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace T4TS
 {
-    class TypeFullNameParser
+    public class TypeFullNameParser
     {
         private static TypeFullName ParseCSharp(string fullNameFromType)
         {

@@ -32,6 +32,15 @@ namespace T4TS.Builders
 
             result.Name = codeClass.Name;
 
+            TypeFullName fullName = TypeFullNameParser.Parse(codeClass.FullName);
+            if (fullName.TypeArgumentFullNames != null)
+            {
+                foreach (TypeFullName typeArgumentName in fullName.TypeArgumentFullNames)
+                {
+                    result.GenericParameters.Add(typeArgumentName.FullName);
+                }
+            }
+
             bool createdBase;
             if (codeClass.Bases != null)
             {
