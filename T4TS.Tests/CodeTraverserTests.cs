@@ -6,6 +6,7 @@ using T4TS.Tests.Models;
 using T4TS.Tests.Utils;
 using T4TS.Tests.Fixtures.Inheritance;
 using T4TS.Tests.Fixtures.Basic;
+using System;
 
 namespace T4TS.Tests
 {
@@ -102,8 +103,10 @@ namespace T4TS.Tests
         }
 
         [TestMethod]
-        public void CodeTraverserClassFilter()
+        public void CodeTraverserClassFilterFail()
         {
+            try
+            {
             // Expect
             new OutputForDirectBuilder(
                 typeof(InheritanceModel),
@@ -127,6 +130,12 @@ namespace T4TS.Tests
                             codeClass.FullName == typeof(InheritanceModel).FullName
                                 || codeClass.FullName == typeof(BasicModel).FullName)
                     .ToEqual(ExpectedOutputSingle);
+
+                Assert.Fail("Expected exception for unresolved type");
+            }
+            catch (Exception)
+            {
+            }
         }
 
         [TestMethod]

@@ -11,4 +11,9 @@ namespace T4TS.Tests.Fixtures.Generics
         public TItem Item { get; set; }
         public int SomethingElse { get; set; }
     }
+
+    public class InheritGenericModel : GenericModel<string>
+    {
+        public string SubTypeProperty { get; set; }
+    }
 }

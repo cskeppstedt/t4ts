@@ -124,47 +124,48 @@ namespace T4TS
             IDictionary<IList<CodeNamespace>, ICollection<string>> typeNamesByNamespaces =
                 new Dictionary<IList<CodeNamespace>, ICollection<string>>();
 
-            string fullName;
+            TypeName sourceType;
             TypeScriptOutputType outputType;
-            string namespaceName;
             IList<CodeNamespace> namespaceList;
             ICollection<string> typeNames;
-            foreach (TypeScriptDelayResolveType delayType in this.context.GetDelayLoadTypes())
+            IList<TypeScriptDelayResolveType> delayTypes = this.context.GetDelayResolveTypes().ToList();
+            foreach (TypeScriptDelayResolveType delayType in delayTypes)
             {
-                fullName = delayType.FullName;
-                if (!fullNamesToIgnore.Contains(fullName))
+                sourceType = delayType.SourceType;
+                if (!fullNamesToIgnore.Contains(sourceType.UniversalName))
                 {
-                    outputType = this.context.GetOutput(fullName);
+                    outputType = this.context.GetOutput(sourceType);
                     if (outputType == null)
                     {
-                        int classNameStartIndex = fullName.LastIndexOf('.');
-                        if (classNameStartIndex > 0)
+                        outputType = this.context.GetSystemOutputType(sourceType);
+                    }
+                    if (outputType == null)
+                    {
+                        if (namespacesByName.TryGetValue(
+                            sourceType.Namespace,
+                            out namespaceList))
                         {
-                            namespaceName = fullName.Substring(
-                                0,
-                                classNameStartIndex);
-
-                            if (namespacesByName.TryGetValue(
-                                namespaceName,
-                                out namespaceList))
+                            if (!typeNamesByNamespaces.TryGetValue(
+                                namespaceList,
+                                out typeNames))
                             {
-                                if (!typeNamesByNamespaces.TryGetValue(
+                                typeNames = new HashSet<string>();
+                                typeNamesByNamespaces.Add(
                                     namespaceList,
-                                    out typeNames))
-                                {
-                                    typeNames = new HashSet<string>();
-                                    typeNamesByNamespaces.Add(
-                                        namespaceList,
-                                        typeNames);
-                                }
-
-                                typeNames.Add(
-                                    fullName.Substring(classNameStartIndex + 1));
-                                result++;
+                                    typeNames);
                             }
+
+                            typeNames.Add(sourceType.UnqualifiedTypeName);
+                            result++;
+                        }
+                        else
+                        {
+                            throw new Exception(String.Format(
+                                "Can't resolve type {0} because the namespace is unknown",
+                                sourceType.QualifiedName));
                         }
                     }
-                    fullNamesToIgnore.Add(fullName);
+                    fullNamesToIgnore.Add(sourceType.UniversalName);
                 }
             }
 

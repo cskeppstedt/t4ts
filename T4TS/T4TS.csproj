@@ -52,6 +52,8 @@
     <Compile Include="Builders\AttributeInterfaceBuilder.cs" />
     <Compile Include="Builders\DirectSettings.cs" />
     <Compile Include="CodeTraverser.Settings.cs" />
+    <Compile Include="TypeName.cs" />
+    <Compile Include="TypeName.Parser.cs" />
     <Compile Include="Outputs\EnumOutputAppender.cs" />
     <Compile Include="Outputs\OutputAppender.cs" />
     <Compile Include="Outputs\InterfaceOutputAppender.cs" />
@@ -75,6 +77,7 @@
     <Compile Include="Types\ArrayType.cs" />
     <Compile Include="Types\BoolType.cs" />
     <Compile Include="Types\DictionaryType.cs" />
+    <Compile Include="Types\GenericType.cs" />
     <Compile Include="Types\OutputType.cs" />
     <Compile Include="Types\NullableType.cs" />
     <Compile Include="Types\NumberType.cs" />
@@ -84,7 +87,7 @@
     <Compile Include="Outputs\TypeScriptInterface.cs" />
     <Compile Include="Outputs\TypeScriptInterfaceMember.cs" />
     <Compile Include="Types\GuidType.cs" />
-    <Compile Include="Types\TypescriptType.cs" />
+    <Compile Include="Types\TypeScriptType.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

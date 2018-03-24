@@ -9,18 +9,42 @@ namespace T4TS
     public class TypeScriptDelayResolveType : TypeScriptOutputType
     {
         private TypeContext typeContext;
-        private bool resolveOutputOnly;
-        private string fullName;
+        private TypeName sourceType;
 
-        private string name;
-        private TypeScriptModule module;
+        private TypeName resolvedType;
+        private string resolvedName;
+        private TypeScriptModule resolvedModule;
 
-        public TypeScriptDelayResolveType(
-            TypeContext typeContext,
-            bool resolveOutputOnly)
+        public TypeScriptDelayResolveType()
         {
-            this.typeContext = typeContext;
-            this.resolveOutputOnly = resolveOutputOnly;
+        }
+
+        public TypeContext TypeContext
+        {
+            get { return this.typeContext; }
+            set
+            {
+                if (this.typeContext != value)
+                {
+                    this.typeContext = value;
+                    this.resolvedType = null;
+                    this.resolvedModule = null;
+                }
+            }
+        }
+
+        public TypeName SourceType
+        {
+            get { return this.sourceType; }
+            set
+            {
+                if (this.sourceType != value)
+                {
+                    this.sourceType = value;
+                    this.resolvedType = null;
+                    this.resolvedModule = null;
+                }
+            }
         }
         
         public string Name
@@ -28,7 +52,9 @@ namespace T4TS
             get
             {
                 this.EnsureResolved();
-                return this.name;
+                return (this.resolvedType != null)
+                    ? this.resolvedType.QualifiedTypeName
+                    : this.resolvedName;
             }
         }
 
@@ -37,37 +63,42 @@ namespace T4TS
             get
             {
                 this.EnsureResolved();
-                return this.module;
+                return this.resolvedModule;
             }
         }
 
         public string FullName
         {
-            get { return this.fullName; }
-            set
-            {
-                if (this.fullName != value)
-                {
-                    this.fullName = value;
-                    this.name = null;
-                    this.module = null;
-                }
-            }
+            get { return this.SourceType.RawName; }
+            set { throw new NotSupportedException(); }
         }
 
         private void EnsureResolved()
         {
-            if (this.name == null)
+            if (this.resolvedType == null)
             {
-                TypeScriptOutputType output = this.typeContext.GetOutput(this.fullName);
-                if (output != null)
+                TypeScriptOutputType resolvedOutputType = this.typeContext.GetOutput(this.sourceType);
+                if (resolvedOutputType != null)
                 {
-                    this.name = output.Name;
-                    this.module = output.Module;
+                    this.resolvedType = this.SourceType
+                        .ReplaceUnqualifiedName(resolvedOutputType.Name)
+                        .ReplaceTypeArguments(this.SourceType.TypeArguments
+                            .Select((typeArgument) => 
+                                this.typeContext.GetSystemOutputType(typeArgument)
+                                .Name));
+                    this.resolvedModule = resolvedOutputType.Module;
                 }
-                else if (!this.resolveOutputOnly)
+                else
                 {
-                    this.name = this.typeContext.GetTypeScriptType(this.fullName).ToString();
+                    resolvedOutputType = this.typeContext.GetSystemOutputType(this.SourceType);
+                    if (resolvedOutputType != null)
+                    {
+                        this.resolvedName = resolvedOutputType.Name;
+                    }
+                    else
+                    {
+                        throw new Exception("Failed to resolve type " + this.SourceType.QualifiedName);
+                    }
                 }
             }
         }

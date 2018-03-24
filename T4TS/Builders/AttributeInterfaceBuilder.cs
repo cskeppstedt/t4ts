@@ -39,7 +39,7 @@ namespace T4TS.Builders
                 bool interfaceCreated;
                 result = typeContext.GetOrCreateInterface(
                     moduleName,
-                    codeClass.FullName,
+                    TypeName.ParseDte(codeClass.FullName),
                     out interfaceCreated);
 
                 result.Name = GetInterfaceName(attributeValues);
@@ -52,21 +52,17 @@ namespace T4TS.Builders
                 }
                 else if (codeClass.Bases.Count > 0)
                 {
+                    // Getting the first item directly causes problems in unit tests.  Get it from an enumerator.
                     IEnumerator enumerator = codeClass.Bases.GetEnumerator();
                     enumerator.MoveNext();
                     string parentTypeName = ((CodeElement)enumerator.Current).FullName;
-
-                    if (parentTypeName != typeof(Object).FullName)
+                    if (!typeContext.IsGenericEnumerable(parentTypeName))
                     {
-                        bool created;
-                        result.Parent = typeContext.GetOrCreateOutputType(
-                            parentTypeName,
-                            resolveOutputOnly: true,
-                            created: out created);
+                        result.Parent = typeContext.GetResolvableTypeFromDteName(parentTypeName);
                     }
                 }
 
-                TypescriptType indexedType;
+                TypeScriptOutputType indexedType;
                 if (TryGetIndexedType(codeClass, typeContext, out indexedType))
                 {
                     result.IndexedType = indexedType;
@@ -138,7 +134,10 @@ namespace T4TS.Builders
             return false;
         }
 
-        private bool TryGetIndexedType(CodeClass codeClass, TypeContext typeContext, out TypescriptType indexedType)
+        private bool TryGetIndexedType(
+            CodeClass codeClass,
+            TypeContext typeContext,
+            out TypeScriptOutputType indexedType)
         {
             indexedType = null;
             if (codeClass.Bases == null || codeClass.Bases.Count == 0)
@@ -149,7 +148,7 @@ namespace T4TS.Builders
                 if (typeContext.IsGenericEnumerable(baseClass.FullName))
                 {
                     string fullName = typeContext.UnwrapGenericType(baseClass.FullName);
-                    indexedType = typeContext.GetTypeScriptType(fullName);
+                    indexedType = typeContext.GetResolvableTypeFromDteName(fullName);
                     return true;
                 }
             }
@@ -191,11 +190,7 @@ namespace T4TS.Builders
             }
             else
             {
-                bool typeCreated;
-                type = typeContext.GetOrCreateOutputType(
-                    getter.Type.AsFullName,
-                    resolveOutputOnly: false,
-                    created: out typeCreated);
+                type = typeContext.GetResolvableTypeFromDteName(getter.Type.AsFullName);
             }
 
             member = new TypeScriptInterfaceMember

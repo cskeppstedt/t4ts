@@ -23,7 +23,7 @@ namespace T4TS
             AppendMembers(tsInterface);
             
             if (tsInterface.IndexedType != null)
-                AppendIndexer(tsInterface);
+                AppendIndexer(tsInterface.IndexedType);
 
             EndInterface();
         }
@@ -37,34 +37,14 @@ namespace T4TS
 
         private void BeginInterface(TypeScriptInterface tsInterface)
         {
-            AppendIndentedLine("/** Generated from " + tsInterface.FullName + " **/");
+            AppendIndentedLine("/** Generated from " + tsInterface.SourceType.RawName + " **/");
+
+            TypeName outputName = tsInterface.SourceType.ReplaceUnqualifiedName(tsInterface.Name);
 
             if (InGlobalModule)
-                AppendIndented("interface " + tsInterface.Name);
+                AppendIndented("interface " + outputName.QualifiedName);
             else
-                AppendIndented("export interface " + tsInterface.Name);
-
-            if (tsInterface.GenericParameters != null)
-            {
-                bool firstGenericParameter = true;
-                foreach(string genericParameter in tsInterface.GenericParameters)
-                {
-                    if (firstGenericParameter)
-                    {
-                        Output.Append("<");
-                        firstGenericParameter = false;
-                    }
-                    else
-                    {
-                        Output.Append(", ");
-                    }
-                    Output.Append(genericParameter);
-                }
-                if (!firstGenericParameter)
-                {
-                    Output.Append(">");
-                }
-            }
+                AppendIndented("export interface " + outputName.QualifiedName);
 
             // In some cases the Parent is a complex type, like a List<> that we don't want to define as a base type.
             // Those types end up with a null Name.  There should be a better way to handle that.
@@ -85,10 +65,16 @@ namespace T4TS
             AppendIndentedLine("}");
         }
 
-        private void AppendIndexer(TypeScriptInterface tsInterface)
+        private void AppendIndexer(TypeScriptOutputType indexedType)
         {
             AppendIndendation();
-            Output.AppendFormat("    [index: number]: {0};", tsInterface.IndexedType);
+            string parentModuleName = (indexedType.Module != null)
+                ? indexedType.Module.QualifiedName + "."
+                : String.Empty;
+            Output.AppendFormat(
+                "    [index: number]: {0}{1};",
+                parentModuleName,
+                indexedType.Name);
             Output.AppendLine();
         }
     }

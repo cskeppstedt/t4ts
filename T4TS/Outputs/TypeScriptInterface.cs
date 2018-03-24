@@ -14,10 +14,10 @@ namespace T4TS
         public string FullName { get; set; }
 
         public List<TypeScriptInterfaceMember> Members { get; set; }
-        public TypescriptType IndexedType { get; set; }
+        public TypeScriptOutputType IndexedType { get; set; }
         public TypeScriptOutputType Parent { get; set; }
         public TypeScriptModule Module { get; set; }
-        public List<string> GenericParameters { get; set; }
+        public TypeName SourceType { get; set; }
 
         public IList<TypeScriptOutputType> Bases { get; set; }
 
@@ -25,7 +25,6 @@ namespace T4TS
         {
             Members = new List<TypeScriptInterfaceMember>();
             Bases = new List<TypeScriptOutputType>();
-            GenericParameters = new List<string>();
         }
     }
 }

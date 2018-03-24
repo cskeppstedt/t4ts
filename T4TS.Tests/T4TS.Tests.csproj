@@ -108,6 +108,7 @@
     <Compile Include="Fixtures\ExternalProp\Test.cs" />
     <Compile Include="Models\LocalModel.cs" />
     <Compile Include="Models\ReservedPropModel.cs" />
+    <Compile Include="TypeNameTests.cs" />
     <Compile Include="Output\EnumOutputAppenderTests.cs" />
     <Compile Include="TraversalTests.cs" />
     <Compile Include="Output\MemberOutputAppenderTests.cs" />

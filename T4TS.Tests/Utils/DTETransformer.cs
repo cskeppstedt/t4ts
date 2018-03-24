@@ -200,7 +200,7 @@ namespace T4TS.Tests.Utils
         private static CodeElement BuildDteBase(Type withType)
         {
             var moqBase = new Mock<CodeElement>();
-            string baseTypeFullname = GetTypeFullname(withType.FullName);
+            string baseTypeFullname = DTETransformer.GenerateFullNameFromType(withType);
 
             moqBase.SetupGet(x => x.FullName).Returns(baseTypeFullname);
             return moqBase.Object;
@@ -378,14 +378,21 @@ namespace T4TS.Tests.Utils
 
         private static IEnumerable<Type> GetBaseTypes(Type type)
         {
-            if (type.BaseType == null)
-                return type.GetInterfaces();
-
-            return Enumerable
-                .Repeat(type.BaseType, 1)
-                .Concat(type.GetInterfaces())
-                .Concat(type.GetInterfaces().SelectMany<Type, Type>(GetBaseTypes))
-                .Concat(GetBaseTypes(type.BaseType));
+            IEnumerable<Type> result;
+            if (type.BaseType == null
+                || type.BaseType == typeof(object))
+            {
+                result = type.GetInterfaces();
+            }
+            else
+            {
+                result = Enumerable
+                    .Repeat(type.BaseType, 1)
+                    .Concat(type.GetInterfaces())
+                    .Concat(type.GetInterfaces().SelectMany<Type, Type>(GetBaseTypes))
+                    .Concat(GetBaseTypes(type.BaseType));
+            }
+            return result;
         }
 
         private static string GenerateNameFromType(Type type)
@@ -400,7 +407,7 @@ namespace T4TS.Tests.Utils
             TypeFullName result = new TypeFullName(
                 nameWithoutArguments.FullName,
                 type.GetGenericArguments()
-                    .Select((genericType) => new TypeFullName(genericType.Name))
+                    .Select((genericType) => new TypeFullName(genericType.FullName ?? genericType.Name))
                     .ToArray());
             return result.ToString();
         }

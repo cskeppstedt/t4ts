@@ -13,8 +13,8 @@ namespace T4TS
             = new Dictionary<Type, IDictionary<string, TypeScriptOutputType>>();
         private IDictionary<string, TypeScriptModule> modulesByName =
             new Dictionary<string, TypeScriptModule>();
-        private IDictionary<string, TypeScriptDelayResolveType> delayLoadByName
-            = new Dictionary<string, TypeScriptDelayResolveType>();
+        private IList<TypeScriptDelayResolveType> delayResolveTypes
+            = new List<TypeScriptDelayResolveType>();
 
         public TypeContext(bool useNativeDates)
         {
@@ -32,12 +32,16 @@ namespace T4TS
         
         public TypeScriptInterface GetOrCreateInterface(
             string moduleName,
-            string fullName,
+            TypeName typeName,
             out bool created)
         {
             TypeScriptInterface result = this.GetOrCreateOutput<TypeScriptInterface>(
-                fullName,
+                typeName.UniversalName,
                 out created);
+            if (created)
+            {
+                result.SourceType = typeName;
+            }
 
             bool moduleCreated;
             TypeScriptModule module = this.GetOrCreateModule(
@@ -51,7 +55,7 @@ namespace T4TS
             else if (result.Module.QualifiedName != moduleName)
             {
                 throw new System.InvalidOperationException(
-                    "Interface was registered with multiple module names " + fullName);
+                    "Interface was registered with multiple module names " + typeName.UniversalName);
             }
             return result;
         }
@@ -82,45 +86,8 @@ namespace T4TS
             return result;
         }
 
-        public TypeScriptOutputType GetOrCreateOutputType(
-            string fullName,
-            bool resolveOutputOnly,
-            out bool created)
-        {
-            TypeScriptOutputType result = this.GetOutput(fullName);
-            if (result != null)
-            {
-                created = false;
-            }
-            else
-            {
-                TypeScriptDelayResolveType delayType;
-                if (this.delayLoadByName.TryGetValue(
-                    fullName,
-                    out delayType))
-                {
-                    created = true;
-                }
-                else
-                {
-                    delayType = new TypeScriptDelayResolveType(
-                        this,
-                        resolveOutputOnly)
-                    {
-                        FullName = fullName
-                    };
-                    this.delayLoadByName.Add(
-                        fullName,
-                        delayType);
-                    created = true;
-                }
-                result = delayType;
-            }
-            return result;
-        }
-
         public TType GetOrCreateOutput<TType>(
-            string fullName,
+            string universalName,
             out bool created)
                 where TType : TypeScriptOutputType, new()
         {
@@ -137,7 +104,7 @@ namespace T4TS
 
             TypeScriptOutputType result;
             if (outputsByName.TryGetValue(
-                fullName,
+                universalName,
                 out result))
             {
                 created = false;
@@ -146,70 +113,94 @@ namespace T4TS
             {
                 result = new TType()
                 {
-                    FullName = fullName
+                    FullName = universalName
                 };
                 outputsByName.Add(
-                    fullName,
+                    universalName,
                     result);
                 created = true;
             }
             return (TType)result;
         }
         
-        public TypeScriptOutputType GetOutput(string fullName)
+        public TypeScriptOutputType GetOutput(TypeName typeName)
         {
             TypeScriptOutputType result = null;
-            if (fullName != null)
+            foreach (IDictionary<string, TypeScriptOutputType> outputsByName in this.outputsByTypeAndName.Values)
             {
-                foreach (IDictionary<string, TypeScriptOutputType> outputsByName in this.outputsByTypeAndName.Values)
+                if (outputsByName.TryGetValue(
+                    typeName.UniversalName,
+                    out result))
                 {
-                    if (outputsByName.TryGetValue(
-                      fullName,
-                      out result))
-                    {
-                        break;
-                    }
+                    break;
                 }
             }
             return result;
         }
 
+        public TypeScriptOutputType GetResolvableTypeFromDteName(string fullName)
+        {
+            TypeScriptOutputType result = this.GetSimpleSystemOutputType(fullName);
+            if (result == null)
+            {
+                TypeScriptDelayResolveType delayType = new TypeScriptDelayResolveType()
+                {
+                    TypeContext = this,
+                    SourceType = TypeName.ParseDte(fullName)
+                };
+
+                this.delayResolveTypes.Add(delayType);
+
+                result = delayType;
+            }
+            return result;
+        }
+
+        public TypeScriptOutputType GetSystemOutputType(TypeName typeName)
+        {
+            TypeScriptOutputType result;
+
+            TypescriptType systemType = this.GetSimpleSystemType(typeName.QualifiedName);
+            if (systemType == null)
+            {
+                systemType = this.GetComplexSystemType(typeName.QualifiedName);
+            }
+
+            string literal = null;
+            if (systemType != null)
+            {
+                literal = systemType.ToString();
+            }
+            else if (String.IsNullOrEmpty(typeName.Namespace))
+            {
+                literal = typeName.RawName;
+            }
+
+            if (literal != null)
+            {
+                result = new TypeScriptLiteralType()
+                {
+                    FullName = literal
+                };
+            }
+            else
+            {
+                result = null;
+            }
+            return result;
+        }
+        
         public IEnumerable<TypeScriptModule> GetModules()
         {
             return this.modulesByName.Values
                 .OrderBy((module) => module.QualifiedName);
         }
 
-        public IEnumerable<TypeScriptDelayResolveType> GetDelayLoadTypes()
+        public IEnumerable<TypeScriptDelayResolveType> GetDelayResolveTypes()
         {
-            return this.delayLoadByName.Values
-                .OrderBy((module) => module.FullName);
+            return this.delayResolveTypes;
         }
-
-        public TypescriptType GetTypeScriptType(CodeTypeRef codeType)
-        {
-            switch (codeType.TypeKind)
-            {
-                case vsCMTypeRef.vsCMTypeRefChar:
-                case vsCMTypeRef.vsCMTypeRefString:
-                    return new StringType();
-
-                case vsCMTypeRef.vsCMTypeRefBool:
-                    return new BoolType();
-
-                case vsCMTypeRef.vsCMTypeRefByte:
-                case vsCMTypeRef.vsCMTypeRefDouble:
-                case vsCMTypeRef.vsCMTypeRefInt:
-                case vsCMTypeRef.vsCMTypeRefShort:
-                case vsCMTypeRef.vsCMTypeRefFloat:
-                case vsCMTypeRef.vsCMTypeRefLong:
-                case vsCMTypeRef.vsCMTypeRefDecimal:
-                    return new NumberType();
-
-                default:
-                    return TryResolveType(codeType);
-            }
-        }
+        
         private TypeScriptModule GetOrCreateModule(
             string name,
             out bool created)
@@ -235,106 +226,114 @@ namespace T4TS
             return result;
         }
 
-        private TypescriptType TryResolveType(CodeTypeRef codeType)
+
+        private TypescriptType ResolveType(string rawName)
         {
-            if (codeType.TypeKind == vsCMTypeRef.vsCMTypeRefArray)
+            TypeName typeName = TypeName.ParseDte(rawName);
+            TypeScriptOutputType outputType = this.GetOutput(typeName);
+            if (outputType == null)
+            {
+                outputType = this.GetSystemOutputType(typeName);
+            }
+            return new OutputType(outputType);
+        }
+
+        private TypescriptType GetComplexSystemType(string typeFullName)
+        {
+            TypescriptType result = null;
+            if (IsGenericEnumerable(typeFullName))
+            {
+                return new ArrayType
+                {
+                    ElementType = ResolveType(UnwrapGenericType(typeFullName))
+                };
+            }
+            else if (IsNullable(typeFullName))
+            {
+                return new NullableType
+                {
+                    WrappedType = ResolveType(UnwrapGenericType(typeFullName))
+                };
+            }
+
+            var realType = TypeFullNameParser.Parse(typeFullName);
+
+            if (realType.IsEnumerable()
+                || realType.IsArray())
             {
                 return new ArrayType()
                 {
-                    ElementType = GetTypeScriptType(codeType.ElementType)
+                    ElementType = ResolveType(realType.TypeArgumentFullNames[0].FullName)
                 };
             }
-            
-
-            return GetTypeScriptType(codeType.AsFullName);
+            else if (realType.IsDictionary())
+            {
+                return new DictionaryType()
+                {
+                    KeyType = ResolveType(realType.TypeArgumentFullNames[0].FullName),
+                    ElementType = ResolveType(realType.TypeArgumentFullNames[1].FullName)
+                };
+            }
+            else if (TypeFullName.IsGenericType(typeFullName))
+            {
+                return new GenericType()
+                {
+                    BaseType = this.ResolveType(realType.FullName),
+                    TypeArguments = realType.TypeArgumentFullNames
+                        .Select((typeArgument) => this.ResolveType(typeArgument.FullName))
+                        .ToList()
+                };
+            }
+            return result;
         }
 
-        public TypescriptType GetTypeScriptType(string typeFullName)
+        private TypeScriptOutputType GetSimpleSystemOutputType(string typeFullName)
         {
-            TypescriptType result;
+            TypescriptType simpleType = this.GetSimpleSystemType(typeFullName);
+            return (simpleType != null)
+                ? new TypeScriptLiteralType()
+                {
+                    FullName = simpleType.ToString()
+                }
+                : null;
+        }
 
-            TypeScriptOutputType output = this.GetOutput(typeFullName);
-            if (output != null)
+        private TypescriptType GetSimpleSystemType(string typeFullName)
+        {
+            TypescriptType result = null;
+            switch (typeFullName)
             {
-                result = new OutputType(output);
-            }
-            else
-            { 
-                if (IsGenericEnumerable(typeFullName))
-                {
-                    return new ArrayType
-                    {
-                        ElementType = GetTypeScriptType(UnwrapGenericType(typeFullName))
-                    };
-                }
-                else if (IsNullable(typeFullName))
-                {
-                    return new NullableType
-                    {
-                        WrappedType = GetTypeScriptType(UnwrapGenericType(typeFullName))
-                    };
-                }
+                case "System.Guid":
+                    result = new GuidType();
+                    break;
+                case "System.Boolean":
+                    result = new BoolType();
+                    break;
+                case "System.Double":
+                case "System.Int16":
+                case "System.Int32":
+                case "System.Int64":
+                case "System.UInt16":
+                case "System.UInt32":
+                case "System.UInt64":
+                case "System.Decimal":
+                case "System.Byte":
+                case "System.SByte":
+                case "System.Single":
+                    result = new NumberType();
+                    break;
 
-                var realType = TypeFullNameParser.Parse(typeFullName);
+                case "System.String":
+                    result = new StringType();
+                    break;
 
-                if (realType.IsEnumerable()
-                    || realType.IsArray())
-                {
-                    return new ArrayType()
-                    {
-                        ElementType = GetTypeScriptType(realType.TypeArgumentFullNames[0].FullName)
-                    };
-                }
-                else if(realType.IsDictionary())
-                {
-                    return new DictionaryType()
-                    {
-                        KeyType = GetTypeScriptType(realType.TypeArgumentFullNames[0].FullName),
-                        ElementType = GetTypeScriptType(realType.TypeArgumentFullNames[1].FullName)
-                    };
-                }
-
-                switch (typeFullName)
-                {
-                    case "System.Guid":
-                        result = new GuidType();
-                        break;
-                    case "System.Boolean":
-                        result = new BoolType();
-                        break;
-                    case "System.Double":
-                    case "System.Int16":
-                    case "System.Int32":
-                    case "System.Int64":
-                    case "System.UInt16":
-                    case "System.UInt32":
-                    case "System.UInt64":
-                    case "System.Decimal":
-                    case "System.Byte":
-                    case "System.SByte":
-                    case "System.Single":
-                        result = new NumberType();
-                        break;
-
-                    case "System.String":
+                case "System.DateTime":
+                case "System.DateTimeOffset":
+                    if (this.useNativeDates)
+                        result = new DateTimeType();
+                    else
                         result = new StringType();
-                        break;
-
-                    case "System.DateTime":
-                    case "System.DateTimeOffset":
-                        if (this.useNativeDates)
-                            result = new DateTimeType();
-                        else
-                            result = new StringType();
-                        break;
-                    default:
-                        result = new OutputType(
-                            new TypeScriptLiteralType()
-                            {
-                                FullName = typeFullName
-                            });
-                        break;
-                }
+                    break;
             }
             return result;
         }
