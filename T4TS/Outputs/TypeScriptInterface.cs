@@ -5,26 +5,26 @@ using System.Text;
 using System.Threading.Tasks;
 using EnvDTE;
 
-namespace T4TS
+namespace T4TS.Outputs
 {
     [System.Diagnostics.DebuggerDisplay("TypeScriptInterface {FullName}")]    
-    public class TypeScriptInterface : TypeScriptOutputType
+    public class TypeScriptInterface : TypeReference
     {
-        public string Name { get; set; }
-        public string FullName { get; set; }
-
         public List<TypeScriptInterfaceMember> Members { get; set; }
-        public TypeScriptOutputType IndexedType { get; set; }
-        public TypeScriptOutputType Parent { get; set; }
-        public TypeScriptModule Module { get; set; }
-        public TypeName SourceType { get; set; }
+        public TypeReference IndexedType { get; set; }
+        public TypeReference Parent { get; set; }
 
-        public IList<TypeScriptOutputType> Bases { get; set; }
+        public IList<TypeReference> Bases { get; set; }
 
-        public TypeScriptInterface()
+        public TypeScriptInterface(
+            TypeName sourceType,
+            TypeReferenceFactory referenceFactory)
+                : base(
+                      sourceType,
+                      referenceFactory)
         {
             Members = new List<TypeScriptInterfaceMember>();
-            Bases = new List<TypeScriptOutputType>();
+            Bases = new List<TypeReference>();
         }
     }
 }

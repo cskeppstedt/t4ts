@@ -1,4 +1,5 @@
 ﻿using EnvDTE;
+using T4TS.Outputs;
 
 namespace T4TS.Builders
 {

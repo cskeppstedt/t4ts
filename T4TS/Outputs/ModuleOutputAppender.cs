@@ -3,13 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using T4TS.Outputs;
 
 namespace T4TS
 {
     public class ModuleOutputAppender : OutputAppender<TypeScriptModule>
     {
-        public ModuleOutputAppender(StringBuilder output, int baseIndentation, Settings settings)
-            : base(output, baseIndentation, settings)
+        public ModuleOutputAppender(
+            StringBuilder output,
+            int baseIndentation,
+            Settings settings,
+            TypeContext typeContext)
+                : base(
+                    output,
+                    baseIndentation,
+                    settings,
+                    typeContext)
         {
         }
 
@@ -17,14 +26,24 @@ namespace T4TS
         {
             BeginModule(module);
 
-            InterfaceOutputAppender interfaceAppender = new InterfaceOutputAppender(Output, BaseIndentation + 4, Settings, module.IsGlobal);
+            InterfaceOutputAppender interfaceAppender = new InterfaceOutputAppender(
+                this.Output,
+                this.BaseIndentation + 4,
+                this.Settings,
+                this.TypeContext,
+                module.IsGlobal);
             foreach (var tsInterface in module.Interfaces
-                .OrderBy((currentInterface) => currentInterface.Name))
+                .OrderBy((currentInterface) => currentInterface.SourceType.RawName))
             {
                 interfaceAppender.AppendOutput(tsInterface);
             }
 
-            EnumOutputAppender enumAppender = new EnumOutputAppender(Output, BaseIndentation + 4, Settings, module.IsGlobal);
+            EnumOutputAppender enumAppender = new EnumOutputAppender(
+                this.Output,
+                this.BaseIndentation + 4,
+                this.Settings,
+                this.TypeContext,
+                module.IsGlobal);
             foreach (var tsEnum in module.Enums)
             {
                 enumAppender.AppendOutput(tsEnum);

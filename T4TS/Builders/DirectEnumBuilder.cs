@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EnvDTE;
+using T4TS.Outputs;
 
 namespace T4TS.Builders
 {
@@ -25,10 +26,9 @@ namespace T4TS.Builders
             bool enumCreated;
             TypeScriptEnum result = typeContext.GetOrCreateEnum(
                 moduleName,
-                codeEnum.FullName,
+                TypeName.ParseDte(codeEnum.FullName),
+                codeEnum.Name,
                 out enumCreated);
-
-            result.Name = codeEnum.Name;
 
             foreach (CodeVariable member in codeEnum.Members)
             {

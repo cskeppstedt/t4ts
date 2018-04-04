@@ -4,21 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace T4TS
+namespace T4TS.Outputs
 {
-    public class TypeScriptEnum : TypeScriptOutputType
+    public class TypeScriptEnum : TypeReference
     {
         public IList<TypeScriptEnumValue> Values { get; set; }
 
-        public string Name { get; set; }
         public TypeScriptModule Module { get; set; }
+        
 
-        public string FullName
-        {
-            get; set;
-        }
-
-        public TypeScriptEnum()
+        public TypeScriptEnum(
+            TypeName sourceType,
+            TypeReferenceFactory referenceFactory)
+                : base(
+                      sourceType,
+                      referenceFactory)
         {
             this.Values = new List<TypeScriptEnumValue>();
         }

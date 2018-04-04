@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using T4TS.Outputs;
 
 namespace T4TS.Tests
 {
@@ -19,16 +20,18 @@ namespace T4TS.Tests
             var member = new TypeScriptInterfaceMember
             {
                 Name = "Foo",
-                Type = new TypeScriptLiteralType()
-                {
-                    FullName = typeof(bool).FullName
-                }
+                Type = typeContext.GetTypeReference(
+                    TypeName.FromLiteral(typeof(bool).FullName))
             };
 
-            var appender = new MemberOutputAppender(sb, 0, new Settings
-            {
-                CompatibilityVersion = new Version(0, 8, 3)
-            });
+            var appender = new MemberOutputAppender(
+                sb,
+                0,
+                new Settings
+                {
+                    CompatibilityVersion = new Version(0, 8, 3)
+                },
+                new TypeContext(useNativeDates: false));
 
             appender.AppendOutput(member);
             Assert.AreEqual("Foo: bool;", sb.ToString().Trim());
@@ -43,16 +46,18 @@ namespace T4TS.Tests
             var member = new TypeScriptInterfaceMember
             {
                 Name = "Foo",
-                Type = new TypeScriptLiteralType()
-                {
-                    FullName = typeof(bool).FullName
-                }
+                Type = typeContext.GetTypeReference(
+                    TypeName.FromLiteral(typeof(bool).FullName))
             };
 
-            var appender = new MemberOutputAppender(sb, 0, new Settings
-            {
-                CompatibilityVersion = new Version(0, 9, 0)
-            });
+            var appender = new MemberOutputAppender(
+                sb,
+                0,
+                new Settings
+                {
+                    CompatibilityVersion = new Version(0, 9, 0)
+                },
+                new TypeContext(useNativeDates: false));
 
             appender.AppendOutput(member);
             Assert.AreEqual("Foo: boolean;", sb.ToString().Trim());
@@ -67,16 +72,18 @@ namespace T4TS.Tests
             var member = new TypeScriptInterfaceMember
             {
                 Name = "Foo",
-                Type = new TypeScriptLiteralType()
-                {
-                    FullName = typeof(bool).FullName
-                }
+                Type = typeContext.GetTypeReference(
+                    TypeName.FromLiteral(typeof(bool).FullName))
             };
 
-            var appender = new MemberOutputAppender(sb, 0, new Settings
-            {
-                CompatibilityVersion = null
-            });
+            var appender = new MemberOutputAppender(
+                sb,
+                0,
+                new Settings
+                {
+                    CompatibilityVersion = null
+                },
+                new TypeContext(useNativeDates: false));
 
             appender.AppendOutput(member);
             Assert.AreEqual("Foo: boolean;", sb.ToString().Trim());

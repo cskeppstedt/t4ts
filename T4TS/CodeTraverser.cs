@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using T4TS.Builders;
+using T4TS.Outputs;
 
 namespace T4TS
 {
@@ -62,7 +63,7 @@ namespace T4TS
             {
                 this.ResolveReferenceTypes(
                     namespacesByName,
-                    fullNamesToIgnore: null);
+                    attemptedSourceNames: null);
             }
 
             return this.context.GetModules()
@@ -113,36 +114,32 @@ namespace T4TS
 
         private void ResolveReferenceTypes(
             IDictionary<string, IList<CodeNamespace>> namespacesByName,
-            ICollection<string> fullNamesToIgnore)
+            ICollection<string> attemptedSourceNames)
         {
             int result = 0;
 
-            if (fullNamesToIgnore == null)
+            if (attemptedSourceNames == null)
             {
-                fullNamesToIgnore = new HashSet<string>();
+                attemptedSourceNames = new HashSet<string>();
             }
             IDictionary<IList<CodeNamespace>, ICollection<string>> typeNamesByNamespaces =
                 new Dictionary<IList<CodeNamespace>, ICollection<string>>();
 
-            TypeName sourceType;
-            TypeScriptOutputType outputType;
+            TypeName sourceName;
+            TypeName outputName;
             IList<CodeNamespace> namespaceList;
             ICollection<string> typeNames;
-            IList<TypeScriptDelayResolveType> delayTypes = this.context.GetDelayResolveTypes().ToList();
-            foreach (TypeScriptDelayResolveType delayType in delayTypes)
+            IList<string> referencedSourceNames = this.context.GetReferencedTypeNames().ToList();
+            foreach (string referencedSourceName in referencedSourceNames)
             {
-                sourceType = delayType.SourceType;
-                if (!fullNamesToIgnore.Contains(sourceType.UniversalName))
+                sourceName = TypeName.ParseDte(referencedSourceName);
+                if (!attemptedSourceNames.Contains(referencedSourceName))
                 {
-                    outputType = this.context.GetOutput(sourceType);
-                    if (outputType == null)
-                    {
-                        outputType = this.context.GetSystemOutputType(sourceType);
-                    }
-                    if (outputType == null)
+                    outputName = this.context.ResolveOutputTypeName(sourceName);
+                    if (outputName == null)
                     {
                         if (namespacesByName.TryGetValue(
-                            sourceType.Namespace,
+                            sourceName.Namespace,
                             out namespaceList))
                         {
                             if (!typeNamesByNamespaces.TryGetValue(
@@ -155,17 +152,17 @@ namespace T4TS
                                     typeNames);
                             }
 
-                            typeNames.Add(sourceType.UnqualifiedTypeName);
+                            typeNames.Add(referencedSourceName);
                             result++;
                         }
                         else
                         {
                             throw new Exception(String.Format(
                                 "Can't resolve type {0} because the namespace is unknown",
-                                sourceType.QualifiedName));
+                                referencedSourceName));
                         }
                     }
-                    fullNamesToIgnore.Add(sourceType.UniversalName);
+                    attemptedSourceNames.Add(referencedSourceName);
                 }
             }
 
@@ -177,8 +174,8 @@ namespace T4TS
                 {
                     InterfaceBuilder = this.Settings.InterfaceBuilder,
                     EnumBuilder = this.Settings.EnumBuilder,
-                    ClassFilter = (codeClass) => namespaceTypeNamesPair.Value.Contains(codeClass.Name),
-                    EnumFilter = (codeEnum) => namespaceTypeNamesPair.Value.Contains(codeEnum.Name)
+                    ClassFilter = (codeClass) => namespaceTypeNamesPair.Value.Contains(codeClass.FullName),
+                    EnumFilter = (codeEnum) => namespaceTypeNamesPair.Value.Contains(codeEnum.FullName)
                 };
 
                 foreach (CodeNamespace codeNamespace in namespaceTypeNamesPair.Key)
@@ -193,7 +190,7 @@ namespace T4TS
             {
                 this.ResolveReferenceTypes(
                     namespacesByName,
-                    fullNamesToIgnore);
+                    attemptedSourceNames);
             }
         }
     }

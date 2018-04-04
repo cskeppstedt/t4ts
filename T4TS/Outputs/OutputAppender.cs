@@ -12,8 +12,13 @@ namespace T4TS
         protected StringBuilder Output { get; private set; }
         protected int BaseIndentation { get; private set; }
         protected Settings Settings { get; private set; }
+        protected TypeContext TypeContext { get; private set; }
 
-        public OutputAppender(StringBuilder output, int baseIndentation, Settings settings)
+        public OutputAppender(
+            StringBuilder output,
+            int baseIndentation,
+            Settings settings,
+            TypeContext typeContext)
         {
             if (output == null)
                 throw new ArgumentNullException("output");
@@ -24,6 +29,7 @@ namespace T4TS
             this.Output = output;
             this.BaseIndentation = baseIndentation;
             this.Settings = settings;
+            this.TypeContext = typeContext;
         }
 
         public abstract void AppendOutput(TSegment segment);

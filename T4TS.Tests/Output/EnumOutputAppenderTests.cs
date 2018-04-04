@@ -4,78 +4,88 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using T4TS.Outputs;
 
 namespace T4TS.Tests.Output
 {
     [TestClass]
     public class EnumOutputAppenderTests
     {
-        private const string NotGlobalExplicitExpectedOutput = @"/** Generated from Foo.SampleEnum **/
-export enum SampleEnum {
+        private const string NotGlobalExplicitExpectedOutput = @"/** Generated from Foo.ExplicitEnum **/
+export enum ExplicitEnum {
     First = 1,
     Second = 2,
     Fifth = 5
 }
 ";
 
-        private const string NotGlobalImplicitExpectedOutput = @"/** Generated from Foo.SampleEnum **/
-export enum SampleEnum {
+        private const string NotGlobalImplicitExpectedOutput = @"/** Generated from Foo.ImplicitEnum **/
+export enum ImplicitEnum {
     First,
     Second,
     Third
 }
 ";
-        private const string GlobalExplicitExpectedOutput = @"/** Generated from Foo.SampleEnum **/
-enum SampleEnum {
+        private const string GlobalExplicitExpectedOutput = @"/** Generated from Foo.ExplicitEnum **/
+enum ExplicitEnum {
     First = 1,
     Second = 2,
     Fifth = 5
 }
 ";
+        private TypeContext typeContext = new TypeContext(useNativeDates: false);
 
-        private static TypeScriptEnum explicitEnumType = new TypeScriptEnum()
+        private TypeScriptEnum explicitEnumType;
+        private TypeScriptEnum implicitEnumType;
+
+        public EnumOutputAppenderTests()
         {
-            FullName = "Foo.SampleEnum",
-            Name = "SampleEnum",
-            Values = new List<TypeScriptEnumValue>()
+            bool created;
+            explicitEnumType = this.typeContext.GetOrCreateEnum(
+                "Foo",
+                TypeName.ParseDte("Foo.ExplicitEnum"),
+                "ExplicitEnum",
+                out created);
+            explicitEnumType.Values = new List<TypeScriptEnumValue>()
+            {
+                new TypeScriptEnumValue()
                 {
-                    new TypeScriptEnumValue()
-                    {
-                        Name = "First",
-                        Value = "1"
-                    },
-                    new TypeScriptEnumValue()
-                    {
-                        Name = "Second",
-                        Value = "2"
-                    },
-                    new TypeScriptEnumValue()
-                    {
-                        Name = "Fifth",
-                        Value = "5"
-                    }
-                }
-        };
-        private static TypeScriptEnum implicitEnumType = new TypeScriptEnum()
-        {
-            FullName = "Foo.SampleEnum",
-            Name = "SampleEnum",
-            Values = new List<TypeScriptEnumValue>()
+                    Name = "First",
+                    Value = "1"
+                },
+                new TypeScriptEnumValue()
                 {
-                    new TypeScriptEnumValue()
-                    {
-                        Name = "First"
-                    },
-                    new TypeScriptEnumValue()
-                    {
-                        Name = "Second"
-                    },
-                    new TypeScriptEnumValue()
-                    {
-                        Name = "Third"
-                    }
+                    Name = "Second",
+                    Value = "2"
+                },
+                new TypeScriptEnumValue()
+                {
+                    Name = "Fifth",
+                    Value = "5"
                 }
-        };
+            };
+
+            implicitEnumType = this.typeContext.GetOrCreateEnum(
+                "Foo",
+                TypeName.ParseDte("Foo.ImplicitEnum"),
+                "ImplicitEnum",
+                out created);
+            implicitEnumType.Values = new List<TypeScriptEnumValue>()
+            {
+                new TypeScriptEnumValue()
+                {
+                    Name = "First"
+                },
+                new TypeScriptEnumValue()
+                {
+                    Name = "Second"
+                },
+                new TypeScriptEnumValue()
+                {
+                    Name = "Third"
+                }
+            };
+        }
 
         [TestMethod]
         public void EnumAppenderExplicitNotGlobal()
@@ -85,9 +95,10 @@ enum SampleEnum {
                 sb,
                 0,
                 new Settings(),
+                this.typeContext,
                 inGlobalModule: false);
 
-            appender.AppendOutput(EnumOutputAppenderTests.explicitEnumType);
+            appender.AppendOutput(this.explicitEnumType);
 
             Assert.AreEqual(EnumOutputAppenderTests.NotGlobalExplicitExpectedOutput, sb.ToString());
         }
@@ -100,9 +111,10 @@ enum SampleEnum {
                 sb,
                 0,
                 new Settings(),
+                this.typeContext,
                 inGlobalModule: true);
 
-            appender.AppendOutput(EnumOutputAppenderTests.explicitEnumType);
+            appender.AppendOutput(this.explicitEnumType);
 
             Assert.AreEqual(EnumOutputAppenderTests.GlobalExplicitExpectedOutput, sb.ToString());
         }
@@ -115,9 +127,10 @@ enum SampleEnum {
                 sb,
                 0,
                 new Settings(),
+                this.typeContext,
                 inGlobalModule: false);
 
-            appender.AppendOutput(EnumOutputAppenderTests.implicitEnumType);
+            appender.AppendOutput(this.implicitEnumType);
 
             Assert.AreEqual(EnumOutputAppenderTests.NotGlobalImplicitExpectedOutput, sb.ToString());
         }

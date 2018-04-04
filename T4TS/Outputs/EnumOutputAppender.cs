@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace T4TS
+namespace T4TS.Outputs
 {
     public class EnumOutputAppender : OutputAppender<TypeScriptEnum>
     {
@@ -14,20 +14,26 @@ namespace T4TS
             StringBuilder output,
             int baseIndentation,
             Settings settings,
+            TypeContext typeContext,
             bool inGlobalModule)
-                : base(output, baseIndentation, settings)
+                : base(
+                      output,
+                      baseIndentation,
+                      settings,
+                      typeContext)
         {
             this.inGlobalModule = inGlobalModule;
         }
 
         public override void AppendOutput(TypeScriptEnum segment)
         {
-            AppendIndentedLine("/** Generated from " + segment.FullName + " **/");
+            AppendIndentedLine("/** Generated from " + segment.SourceType.RawName + " **/");
 
+            TypeName outputName = this.TypeContext.ResolveOutputTypeName(segment.SourceType);
             if (this.inGlobalModule)
-                AppendIndented("enum " + segment.Name);
+                AppendIndented("enum " + outputName.QualifiedSimpleName);
             else
-                AppendIndented("export enum " + segment.Name);
+                AppendIndented("export enum " + outputName.QualifiedSimpleName);
             
             Output.AppendLine(" {");
 

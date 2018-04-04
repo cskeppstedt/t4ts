@@ -28,6 +28,17 @@ namespace T4TS
                             openAngleIndex + 1,
                             closeAngleIndex - (openAngleIndex + 1)));
                 }
+                else if (rawName.EndsWith(TypeName.ArraySuffix))
+                {
+                    unqualifiedName = TypeName.ArraySuffix;
+                    typeArguments = new List<TypeName>()
+                    {
+                        DteParser.Parse(
+                            rawName.Substring(
+                                0,
+                                rawName.Length - TypeName.ArraySuffix.Length))
+                    };
+                }
                 else
                 {
                     unqualifiedName = rawName;

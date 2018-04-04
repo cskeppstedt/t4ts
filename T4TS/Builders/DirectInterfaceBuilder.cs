@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EnvDTE;
+using T4TS.Outputs;
+using T4TS.Builders;
 
 namespace T4TS.Builders
 {
@@ -23,14 +25,13 @@ namespace T4TS.Builders
             TypeScriptInterface result = null;
 
             string moduleName = this.settings.GetModuleNameFromNamespace(codeClass.Namespace);
-                
+
             bool interfaceCreated;
             result = typeContext.GetOrCreateInterface(
                 moduleName,
                 TypeName.ParseDte(codeClass.FullName),
+                codeClass.Name,
                 out interfaceCreated);
-
-            result.Name = codeClass.Name;
             
             if (codeClass.Bases != null)
             {
@@ -39,22 +40,17 @@ namespace T4TS.Builders
                     if (baseElement.FullName != typeof(Object).FullName)
                     {
                         result.Bases.Add(
-                            typeContext.GetResolvableTypeFromDteName(baseElement.FullName));
+                            typeContext.GetTypeReference(
+                                TypeName.ParseDte(baseElement.FullName)));
                     }
                 }
 
-                TypeScriptOutputType parentType = result.Bases.FirstOrDefault();
+                TypeReference parentType = result.Bases.FirstOrDefault();
                 if (parentType != null
-                    && !typeContext.IsGenericEnumerable(parentType.FullName))
+                    && BuilderHelper.IsValidBaseType(parentType.SourceType))
                 {
                     result.Parent = parentType;
                 }
-            }
-
-            TypeScriptOutputType indexedType;
-            if (TryGetIndexedType(codeClass, typeContext, out indexedType))
-            {
-                result.IndexedType = indexedType;
             }
 
             Traversal.TraversePropertiesInClass(codeClass, (property) =>
@@ -83,28 +79,6 @@ namespace T4TS.Builders
             return false;
         }
 
-        private bool TryGetIndexedType(
-            CodeClass codeClass,
-            TypeContext typeContext,
-            out TypeScriptOutputType indexedType)
-        {
-            indexedType = null;
-            if (codeClass.Bases == null || codeClass.Bases.Count == 0)
-                return false;
-
-            foreach (CodeElement baseClass in codeClass.Bases)
-            {
-                if (typeContext.IsGenericEnumerable(baseClass.FullName))
-                {
-                    string fullName = typeContext.UnwrapGenericType(baseClass.FullName);
-                    indexedType = typeContext.GetResolvableTypeFromDteName(fullName);
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
         private bool TryGetMember(CodeProperty property, TypeContext typeContext, out TypeScriptInterfaceMember member)
         {
             member = null;
@@ -128,8 +102,8 @@ namespace T4TS.Builders
             member = new TypeScriptInterfaceMember
             {
                 Name = name,
-                Type = typeContext.GetResolvableTypeFromDteName(
-                    getter.Type.AsFullName)
+                Type = typeContext.GetTypeReference(
+                    TypeName.ParseDte(getter.Type.AsFullName))
             };
             return true;
         }

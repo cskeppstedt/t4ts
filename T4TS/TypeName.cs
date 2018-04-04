@@ -8,6 +8,8 @@ namespace T4TS
 {
     public partial class TypeName
     {
+        private const string ArraySuffix = "[]";
+
         public string RawName { get; private set; }
 
         public string UnqualifiedName { get; private set; }
@@ -43,6 +45,17 @@ namespace T4TS
                 {
                     result = this.UnqualifiedName;
                 }
+                else if (this.IsArray
+                    && this.TypeArguments.Count == 1)
+                {
+                    result = String.Format(
+                        "{0}{1}",
+                        this.TypeArguments
+                            .Select(
+                                (typeArgument) => typeArgument.QualifiedName)
+                            .First(),
+                        this.UnqualifiedName);
+                }
                 else
                 {
                     result = String.Format(
@@ -76,27 +89,7 @@ namespace T4TS
                 return result;
             }
         }
-
-        public string UnqualifiedTypeName
-        {
-            get
-            {
-                string result;
-                int typeStartIndex = this.UnqualifiedName.LastIndexOf('.');
-                if (typeStartIndex < 0)
-                {
-                    result = this.UnqualifiedName;
-                }
-                else
-                {
-                    result = this.UnqualifiedName.Substring(
-                        typeStartIndex + 1);
-                }
-                return result;
-            }
-        }
-
-        public string QualifiedTypeName
+        public string QualifiedSimpleName
         {
             get
             {
@@ -115,19 +108,34 @@ namespace T4TS
             }
         }
 
+        public bool IsArray
+        {
+            get { return this.UnqualifiedName == TypeName.ArraySuffix; }
+        }
+
         protected TypeName(
             string rawName,
             string unqualifiedName,
-            IList<TypeName> typeArguments)
+            IEnumerable<TypeName> typeArguments)
         {
             this.RawName = rawName;
             this.UnqualifiedName = unqualifiedName;
-            this.TypeArguments = typeArguments;
+            this.TypeArguments = (typeArguments != null)
+                ? typeArguments.ToList()
+                : new List<TypeName>();
         }
 
         public static TypeName ParseDte(string rawName)
         {
             return DteParser.Parse(rawName);
+        }
+
+        public static TypeName FromLiteral(string value)
+        {
+            return new TypeName(
+                value,
+                value,
+                new List<TypeName>());
         }
 
         public TypeName ReplaceUnqualifiedName(string newUnqualifiedName)
@@ -144,13 +152,21 @@ namespace T4TS
             IEnumerable<string> typeArgumentNames)
         {
             IList<TypeName> typeArguments = typeArgumentNames
-                .Select((typeArgumentName) => TypeName.ParseDte(typeArgumentName))
+                .Select((typeArgumentName) => TypeName.FromLiteral(typeArgumentName))
                 .ToList();
             if (typeArguments.Count != this.TypeArguments.Count)
             {
                 throw new InvalidOperationException();
             }
 
+            return new TypeName(
+                this.RawName,
+                this.UnqualifiedName,
+                typeArguments);
+        }
+        public TypeName ReplaceTypeArguments(
+            IEnumerable<TypeName> typeArguments)
+        {
             return new TypeName(
                 this.RawName,
                 this.UnqualifiedName,

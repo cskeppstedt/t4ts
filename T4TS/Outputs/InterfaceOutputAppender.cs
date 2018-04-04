@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using T4TS.Outputs;
 
 namespace T4TS
 {
@@ -10,8 +11,17 @@ namespace T4TS
     {
         private bool InGlobalModule { get; set; }
 
-        public InterfaceOutputAppender(StringBuilder output, int baseIndentation, Settings settings, bool inGlobalModule)
-            : base(output, baseIndentation, settings)
+        public InterfaceOutputAppender(
+            StringBuilder output,
+            int baseIndentation,
+            Settings settings,
+            TypeContext typeContext,
+            bool inGlobalModule)
+                : base(
+                    output,
+                    baseIndentation,
+                    settings,
+                    typeContext)
         {
             this.InGlobalModule = inGlobalModule;
         }
@@ -30,7 +40,11 @@ namespace T4TS
 
         private void AppendMembers(TypeScriptInterface tsInterface)
         {
-            var appender = new MemberOutputAppender(Output, BaseIndentation + 4, Settings);
+            var appender = new MemberOutputAppender(
+                this.Output,
+                this.BaseIndentation + 4,
+                this.Settings,
+                this.TypeContext);
             foreach (var member in tsInterface.Members)
                 appender.AppendOutput(member);
         }
@@ -39,22 +53,17 @@ namespace T4TS
         {
             AppendIndentedLine("/** Generated from " + tsInterface.SourceType.RawName + " **/");
 
-            TypeName outputName = tsInterface.SourceType.ReplaceUnqualifiedName(tsInterface.Name);
+            TypeName outputName = this.TypeContext.ResolveOutputTypeName(tsInterface.SourceType);
 
             if (InGlobalModule)
-                AppendIndented("interface " + outputName.QualifiedName);
+                AppendIndented("interface " + outputName.QualifiedSimpleName);
             else
-                AppendIndented("export interface " + outputName.QualifiedName);
-
-            // In some cases the Parent is a complex type, like a List<> that we don't want to define as a base type.
-            // Those types end up with a null Name.  There should be a better way to handle that.
-            if (tsInterface.Parent != null
-                && !String.IsNullOrEmpty(tsInterface.Parent.Name))
+                AppendIndented("export interface " + outputName.QualifiedSimpleName);
+            
+            if (tsInterface.Parent != null)
             {
-                string parentModuleName = (tsInterface.Parent.Module != null)
-                    ? tsInterface.Parent.Module.QualifiedName + "."
-                    : String.Empty;
-                Output.Append(" extends " + parentModuleName + tsInterface.Parent.Name);
+                TypeName parentName = this.TypeContext.ResolveOutputTypeName(tsInterface.Parent.SourceType);
+                Output.Append(" extends " + parentName.QualifiedName);
             }
 
             Output.AppendLine(" {");
@@ -65,16 +74,14 @@ namespace T4TS
             AppendIndentedLine("}");
         }
 
-        private void AppendIndexer(TypeScriptOutputType indexedType)
+        private void AppendIndexer(TypeReference indexedType)
         {
+            TypeName indexedTypeName = this.TypeContext.ResolveOutputTypeName(
+                indexedType.SourceType);
             AppendIndendation();
-            string parentModuleName = (indexedType.Module != null)
-                ? indexedType.Module.QualifiedName + "."
-                : String.Empty;
             Output.AppendFormat(
-                "    [index: number]: {0}{1};",
-                parentModuleName,
-                indexedType.Name);
+                "    [index: number]: {0};",
+                indexedTypeName.QualifiedName);
             Output.AppendLine();
         }
     }

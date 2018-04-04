@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace T4TS
+namespace T4TS.Outputs
 {
     [System.Diagnostics.DebuggerDisplay("TSModule {QualifiedName}")]
     public class TypeScriptModule

@@ -61,7 +61,10 @@ namespace T4TS.Tests.Utils
             };
             var data = generator.GetAllInterfaces().ToList();
 
-            return OutputFormatter.GetOutput(data, new Settings());
+            return OutputFormatter.GetOutput(
+                data,
+                new Settings(),
+                typeContext);
         }
 
         static string Normalize(string output)

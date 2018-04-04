@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using T4TS.Outputs;
 
 namespace T4TS.Tests
 {
@@ -19,10 +20,14 @@ namespace T4TS.Tests
                 QualifiedName = "Foo"
             };
             
-            var appender = new ModuleOutputAppender(sb, 0, new Settings
-            {
-                CompatibilityVersion = new Version(0, 8, 3)
-            });
+            var appender = new ModuleOutputAppender(
+                sb,
+                0,
+                new Settings
+                {
+                    CompatibilityVersion = new Version(0, 8, 3)
+                },
+                new TypeContext(useNativeDates: false));
 
             appender.AppendOutput(module);
             Assert.IsTrue(sb.ToString().StartsWith("module "));
@@ -37,10 +42,14 @@ namespace T4TS.Tests
                 QualifiedName = "Foo"
             };
 
-            var appender = new ModuleOutputAppender(sb, 0, new Settings
-            {
-                CompatibilityVersion = new Version(0, 9, 0)
-            });
+            var appender = new ModuleOutputAppender(
+                sb,
+                0,
+                new Settings
+                {
+                    CompatibilityVersion = new Version(0, 9, 0)
+                },
+                new TypeContext(useNativeDates: false));
 
             appender.AppendOutput(module);
             Assert.IsTrue(sb.ToString().StartsWith("declare module "));
@@ -55,10 +64,14 @@ namespace T4TS.Tests
                 QualifiedName = "Foo"
             };
 
-            var appender = new ModuleOutputAppender(sb, 0, new Settings
-            {
-                CompatibilityVersion = null
-            });
+            var appender = new ModuleOutputAppender(
+                sb,
+                0,
+                new Settings
+                {
+                    CompatibilityVersion = null
+                },
+                new TypeContext(useNativeDates: false));
 
             appender.AppendOutput(module);
             Assert.IsTrue(sb.ToString().StartsWith("declare module "));
