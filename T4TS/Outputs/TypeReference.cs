@@ -11,23 +11,18 @@ namespace T4TS.Outputs
         public TypeName SourceType { get; private set; }
 
         public IEnumerable<TypeReference> TypeArgumentReferences { get; private set; }
+
+        public TypeReference ContextTypeReference { get; private set; }
+
         
         public TypeReference(
             TypeName sourceType,
-            TypeReferenceFactory factory)
+            IEnumerable<TypeReference> typeArgumentReferences,
+            TypeReference contextTypeReference)
         {
             this.SourceType = sourceType;
-            if (sourceType.TypeArguments != null)
-            {
-                this.TypeArgumentReferences = sourceType.TypeArguments
-                    .Select((argumentType) =>
-                        factory.GetTypeReference(argumentType))
-                    .ToList();
-            }
-            else
-            {
-                this.TypeArgumentReferences = new TypeReference[0];
-            }
+            this.TypeArgumentReferences = typeArgumentReferences;
+            this.ContextTypeReference = contextTypeReference;
         }
     }
 }

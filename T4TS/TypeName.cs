@@ -148,6 +148,30 @@ namespace T4TS
                 new List<TypeName>(this.TypeArguments));
         }
 
+        public static TypeName Format(
+            string format,
+            IEnumerable<TypeName> typaArguments)
+        {
+            return TypeName.ParseDte(
+                String.Format(
+                    format,
+                    typaArguments
+                        .Select((typeArgument) =>
+                            typeArgument.QualifiedName)
+                        .ToArray()));
+        }
+
+        public static TypeName Format(
+            string format,
+            IEnumerable<string> typaArgumentStrings)
+        {
+            return TypeName.ParseDte(
+                String.Format(
+                    format,
+                    typaArgumentStrings
+                        .ToArray()));
+        }
+
         public TypeName ReplaceTypeArguments(
             IEnumerable<string> typeArgumentNames)
         {

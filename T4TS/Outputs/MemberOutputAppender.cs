@@ -27,8 +27,7 @@ namespace T4TS
             AppendIndendation();
 
             bool isOptional = member.Optional;
-            TypeName outputName = this.TypeContext.ResolveOutputTypeName(
-                member.Type.SourceType);
+            TypeName outputName = this.TypeContext.ResolveOutputTypeName(member.Type);
 
             //if (member.Type.FullName == typeof(bool).FullName)
             //{

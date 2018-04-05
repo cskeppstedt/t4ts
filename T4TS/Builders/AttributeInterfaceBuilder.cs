@@ -58,18 +58,25 @@ namespace T4TS.Builders
 
                     if (BuilderHelper.IsValidBaseType(parentTypeName))
                     {
-                        result.Parent = typeContext.GetTypeReference(parentTypeName);
+                        result.Parent = typeContext.GetTypeReference(
+                            parentTypeName,
+                            result);
                     }
                 }
 
                 result.IndexedType = this.GetIndexedType(
+                    result,
                     codeClass,
                     typeContext);
 
                 Traversal.TraversePropertiesInClass(codeClass, (property) =>
                 {
                     TypeScriptInterfaceMember member;
-                    if (TryGetMember(property, typeContext, out member))
+                    if (TryGetMember(
+                        result,
+                        property,
+                        typeContext,
+                        out member))
                     {
                         result.Members.Add(member);
                     }
@@ -133,6 +140,7 @@ namespace T4TS.Builders
         }
 
         private TypeReference GetIndexedType(
+            TypeScriptInterface interfaceContext,
             CodeClass codeClass,
             TypeContext typeContext)
         {
@@ -146,14 +154,18 @@ namespace T4TS.Builders
                     if (baseName.UniversalName == typeof(IEnumerable<>).FullName)
                     {
                         result = typeContext.GetTypeReference(
-                            baseName.TypeArguments.First());
+                            baseName.TypeArguments.First(),
+                            interfaceContext);
                     }
                 }
             }
             return result;
         }
 
-        private bool TryGetMember(CodeProperty property, TypeContext typeContext, out TypeScriptInterfaceMember member)
+        private bool TryGetMember(TypeScriptInterface interfaceContext,
+            CodeProperty property,
+            TypeContext typeContext,
+            out TypeScriptInterfaceMember member)
         {
             member = null;
             if (property.Access != vsCMAccess.vsCMAccessPublic)
@@ -185,7 +197,8 @@ namespace T4TS.Builders
             else
             {
                 memberType = typeContext.GetTypeReference(
-                    TypeName.ParseDte(getter.Type.AsFullName));
+                    TypeName.ParseDte(getter.Type.AsFullName),
+                    interfaceContext);
             }
 
             member = new TypeScriptInterfaceMember

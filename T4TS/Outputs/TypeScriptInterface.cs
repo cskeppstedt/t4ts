@@ -18,10 +18,12 @@ namespace T4TS.Outputs
 
         public TypeScriptInterface(
             TypeName sourceType,
-            TypeReferenceFactory referenceFactory)
+            IEnumerable<TypeReference> typeArgumentReferences,
+            TypeReference contextTypeReference)
                 : base(
-                      sourceType,
-                      referenceFactory)
+                    sourceType,
+                    typeArgumentReferences,
+                    contextTypeReference)
         {
             Members = new List<TypeScriptInterfaceMember>();
             Bases = new List<TypeReference>();

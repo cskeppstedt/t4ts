@@ -53,7 +53,7 @@ namespace T4TS
         {
             AppendIndentedLine("/** Generated from " + tsInterface.SourceType.RawName + " **/");
 
-            TypeName outputName = this.TypeContext.ResolveOutputTypeName(tsInterface.SourceType);
+            TypeName outputName = this.TypeContext.ResolveOutputTypeName(tsInterface);
 
             if (InGlobalModule)
                 AppendIndented("interface " + outputName.QualifiedSimpleName);
@@ -62,7 +62,7 @@ namespace T4TS
             
             if (tsInterface.Parent != null)
             {
-                TypeName parentName = this.TypeContext.ResolveOutputTypeName(tsInterface.Parent.SourceType);
+                TypeName parentName = this.TypeContext.ResolveOutputTypeName(tsInterface.Parent);
                 Output.Append(" extends " + parentName.QualifiedName);
             }
 
@@ -76,8 +76,7 @@ namespace T4TS
 
         private void AppendIndexer(TypeReference indexedType)
         {
-            TypeName indexedTypeName = this.TypeContext.ResolveOutputTypeName(
-                indexedType.SourceType);
+            TypeName indexedTypeName = this.TypeContext.ResolveOutputTypeName(indexedType);
             AppendIndendation();
             Output.AppendFormat(
                 "    [index: number]: {0};",

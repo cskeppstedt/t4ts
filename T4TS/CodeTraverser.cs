@@ -129,17 +129,16 @@ namespace T4TS
             TypeName outputName;
             IList<CodeNamespace> namespaceList;
             ICollection<string> typeNames;
-            IList<string> referencedSourceNames = this.context.GetReferencedTypeNames().ToList();
-            foreach (string referencedSourceName in referencedSourceNames)
+            IList<TypeReference> typeReferences = this.context.GetTypeReferences().ToList();
+            foreach (TypeReference typeReference in typeReferences)
             {
-                sourceName = TypeName.ParseDte(referencedSourceName);
-                if (!attemptedSourceNames.Contains(referencedSourceName))
+                if (!attemptedSourceNames.Contains(typeReference.SourceType.QualifiedName))
                 {
-                    outputName = this.context.ResolveOutputTypeName(sourceName);
+                    outputName = this.context.ResolveOutputTypeName(typeReference);
                     if (outputName == null)
                     {
                         if (namespacesByName.TryGetValue(
-                            sourceName.Namespace,
+                            typeReference.SourceType.Namespace,
                             out namespaceList))
                         {
                             if (!typeNamesByNamespaces.TryGetValue(
@@ -152,17 +151,17 @@ namespace T4TS
                                     typeNames);
                             }
 
-                            typeNames.Add(referencedSourceName);
+                            typeNames.Add(typeReference.SourceType.QualifiedName);
                             result++;
                         }
                         else
                         {
                             throw new Exception(String.Format(
                                 "Can't resolve type {0} because the namespace is unknown",
-                                referencedSourceName));
+                                typeReference));
                         }
                     }
-                    attemptedSourceNames.Add(referencedSourceName);
+                    attemptedSourceNames.Add(typeReference.SourceType.QualifiedName);
                 }
             }
 

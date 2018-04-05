@@ -53,10 +53,8 @@
     <Compile Include="Builders\AttributeInterfaceBuilder.cs" />
     <Compile Include="Builders\DirectSettings.cs" />
     <Compile Include="CodeTraverser.Settings.cs" />
-    <Compile Include="Outputs\OutputTypeResolver.cs" />
-    <Compile Include="Outputs\TypeReferenceFactory.cs" />
     <Compile Include="Outputs\TypeReference.cs" />
-    <Compile Include="Outputs\TypeSettings.cs" />
+    <Compile Include="TypeContext.Settings.cs" />
     <Compile Include="TypeName.cs" />
     <Compile Include="TypeName.Parser.cs" />
     <Compile Include="Outputs\EnumOutputAppender.cs" />

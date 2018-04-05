@@ -23,8 +23,8 @@ const string ExpectedOutput =
 declare module T4TS {
     /** Generated from T4TS.Tests.Fixtures.Nullable.NullableModel **/
     export interface NullableModel {
-        NullableInt: number;
-        NullableDouble: number;
+        NullableInt: number?;
+        NullableDouble: number?;
     }
 }
 ";

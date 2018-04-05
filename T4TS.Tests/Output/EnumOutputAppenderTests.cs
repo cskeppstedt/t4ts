@@ -33,7 +33,7 @@ enum ExplicitEnum {
     Fifth = 5
 }
 ";
-        private TypeContext typeContext = new TypeContext(useNativeDates: false);
+        private TypeContext typeContext = new TypeContext();
 
         private TypeScriptEnum explicitEnumType;
         private TypeScriptEnum implicitEnumType;

@@ -52,7 +52,7 @@ namespace T4TS.Tests.Utils
         private string GenerateOutput()
         {
             var solution = DTETransformer.BuildDteSolution(this.Types.ToArray());
-            var typeContext = new TypeContext(useNativeDates: false);
+            var typeContext = new TypeContext();
             var generator = new CodeTraverser(
                 solution,
                 typeContext)

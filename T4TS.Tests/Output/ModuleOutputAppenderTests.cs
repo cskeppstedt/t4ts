@@ -14,6 +14,8 @@ namespace T4TS.Tests
         [TestMethod]
         public void TypescriptVersion083YieldsModule()
         {
+            Version version = new Version(0, 8, 3);
+
             var sb = new StringBuilder();
             var module = new TypeScriptModule
             {
@@ -25,9 +27,12 @@ namespace T4TS.Tests
                 0,
                 new Settings
                 {
-                    CompatibilityVersion = new Version(0, 8, 3)
+                    CompatibilityVersion = version
                 },
-                new TypeContext(useNativeDates: false));
+                new TypeContext(new TypeContext.Settings()
+                {
+                    CompatibilityVersion = version
+                }));
 
             appender.AppendOutput(module);
             Assert.IsTrue(sb.ToString().StartsWith("module "));
@@ -49,7 +54,7 @@ namespace T4TS.Tests
                 {
                     CompatibilityVersion = new Version(0, 9, 0)
                 },
-                new TypeContext(useNativeDates: false));
+                new TypeContext());
 
             appender.AppendOutput(module);
             Assert.IsTrue(sb.ToString().StartsWith("declare module "));
@@ -71,7 +76,7 @@ namespace T4TS.Tests
                 {
                     CompatibilityVersion = null
                 },
-                new TypeContext(useNativeDates: false));
+                new TypeContext());
 
             appender.AppendOutput(module);
             Assert.IsTrue(sb.ToString().StartsWith("declare module "));

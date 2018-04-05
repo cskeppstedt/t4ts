@@ -15,10 +15,12 @@ namespace T4TS.Outputs
 
         public TypeScriptEnum(
             TypeName sourceType,
-            TypeReferenceFactory referenceFactory)
+            IEnumerable<TypeReference> typeArgumentReferences,
+            TypeReference contextTypeReference)
                 : base(
-                      sourceType,
-                      referenceFactory)
+                    sourceType,
+                    typeArgumentReferences,
+                    contextTypeReference)
         {
             this.Values = new List<TypeScriptEnumValue>();
         }

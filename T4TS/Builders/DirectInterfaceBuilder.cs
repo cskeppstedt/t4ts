@@ -41,7 +41,8 @@ namespace T4TS.Builders
                     {
                         result.Bases.Add(
                             typeContext.GetTypeReference(
-                                TypeName.ParseDte(baseElement.FullName)));
+                                TypeName.ParseDte(baseElement.FullName),
+                                result));
                     }
                 }
 
@@ -56,7 +57,11 @@ namespace T4TS.Builders
             Traversal.TraversePropertiesInClass(codeClass, (property) =>
             {
                 TypeScriptInterfaceMember member;
-                if (TryGetMember(property, typeContext, out member))
+                if (TryGetMember(
+                    result,
+                    property,
+                    typeContext,
+                    out member))
                 {
                     result.Members.Add(member);
                 }
@@ -79,7 +84,11 @@ namespace T4TS.Builders
             return false;
         }
 
-        private bool TryGetMember(CodeProperty property, TypeContext typeContext, out TypeScriptInterfaceMember member)
+        private bool TryGetMember(
+            TypeScriptInterface interfaceContext,
+            CodeProperty property,
+            TypeContext typeContext,
+            out TypeScriptInterfaceMember member)
         {
             member = null;
             if (property.Access != vsCMAccess.vsCMAccessPublic)
@@ -103,7 +112,8 @@ namespace T4TS.Builders
             {
                 Name = name,
                 Type = typeContext.GetTypeReference(
-                    TypeName.ParseDte(getter.Type.AsFullName))
+                    TypeName.ParseDte(getter.Type.AsFullName),
+                    interfaceContext)
             };
             return true;
         }

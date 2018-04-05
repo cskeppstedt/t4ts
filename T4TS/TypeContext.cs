@@ -7,10 +7,11 @@ using T4TS.Outputs;
 
 namespace T4TS
 {
-    public class TypeContext : Outputs.TypeReferenceFactory
+    public partial class TypeContext
     {
-        private bool useNativeDates;
-        private HashSet<string> referencedTypeNames = new HashSet<string>();
+        private Settings settings;
+
+        private IList<TypeReference> typeReferences = new List<TypeReference>();
 
         private IDictionary<string, TypeScriptModule> modulesByName =
             new Dictionary<string, TypeScriptModule>();
@@ -22,22 +23,32 @@ namespace T4TS
         private IDictionary<string, string> sourceNamesToOutputTypeMap;
 
 
-        public TypeContext(bool useNativeDates)
+        public TypeContext()
+            : this(new Settings())
         {
-            this.useNativeDates = useNativeDates;
+        }
+
+        public TypeContext(Settings settings)
+        {
+            this.settings = settings;
 
             this.InitializeTypeMap();
         }
         
 
         public TypeReference GetTypeReference(
-            TypeName sourceType)
+            TypeName sourceType,
+            TypeReference contextTypeReference)
         {
-            this.referencedTypeNames.Add(sourceType.UniversalName);
-
-            return new TypeReference(
+            TypeReference result = new TypeReference(
                 sourceType,
-                this);
+                this.GetTypeArgumentReferences(
+                    sourceType.TypeArguments,
+                    contextTypeReference),
+                contextTypeReference);
+
+            this.typeReferences.Add(result);
+            return result;
         }
 
         public TypeReference GetLiteralReference(string outputName)
@@ -47,7 +58,9 @@ namespace T4TS
                 sourceType.UniversalName,
                 outputName);
 
-            return this.GetTypeReference(sourceType);
+            return this.GetTypeReference(
+                sourceType,
+                contextTypeReference: null);
         }
 
         public TypeScriptInterface GetOrCreateInterface(
@@ -63,7 +76,10 @@ namespace T4TS
             {
                 result = new TypeScriptInterface(
                     sourceType,
-                    this);
+                    this.GetTypeArgumentReferences(
+                        sourceType.TypeArguments,
+                        contextTypeReference: null),
+                    contextTypeReference: null);
 
                 this.sourceToInterfaceMap.Add(
                     sourceType.UniversalName,
@@ -78,18 +94,18 @@ namespace T4TS
                             ? sourceType.TypeArguments.Count
                             : 0));
 
+                bool moduleCreated;
+                TypeScriptModule module = this.GetOrCreateModule(
+                    moduleName,
+                    out moduleCreated);
+                module.Interfaces.Add(result);
+
                 created = true;
             }
             else
             {
                 created = false;
             }
-
-            bool moduleCreated;
-            TypeScriptModule module = this.GetOrCreateModule(
-                moduleName,
-                out moduleCreated);
-            module.Interfaces.Add(result);
 
             return result;
         }
@@ -107,7 +123,10 @@ namespace T4TS
             {
                 result = new TypeScriptEnum(
                     sourceType,
-                    this);
+                    this.GetTypeArgumentReferences(
+                        sourceType.TypeArguments,
+                        contextTypeReference: null),
+                    contextTypeReference: null);
 
                 this.sourceToEnumMap.Add(
                     sourceType.UniversalName,
@@ -138,29 +157,49 @@ namespace T4TS
             return result;
         }
 
-        public TypeName ResolveOutputTypeName(TypeName sourceType)
+        public TypeName ResolveOutputTypeName(TypeReference typeReference)
         {
             TypeName result;
-            string outputName = this.GetOutputName(sourceType.UniversalName);
+            string outputName = this.GetOutputName(typeReference.SourceType.UniversalName);
 
             if (outputName == null)
             {
-                result = sourceType;
+                if (typeReference.ContextTypeReference != null
+                    && typeReference.ContextTypeReference.SourceType.TypeArguments != null)
+                {
+                    result = typeReference.ContextTypeReference.SourceType.TypeArguments.FirstOrDefault(
+                        (typeName) => typeName.QualifiedName == typeReference.SourceType.QualifiedName);
+                }
+                else
+                {
+                    result = null;
+                }
             }
-            else if (sourceType.TypeArguments == null
-                || !sourceType.TypeArguments.Any())
+            else if (typeReference.SourceType.TypeArguments == null
+                || !typeReference.SourceType.TypeArguments.Any())
             {
-                result = sourceType.ReplaceUnqualifiedName(outputName);
+                result = typeReference.SourceType.ReplaceUnqualifiedName(outputName);
+            }
+            else if (typeReference is TypeScriptInterface)
+            {
+                result = TypeName.Format(
+                    outputName,
+                    typeReference.SourceType.TypeArguments);
             }
             else
             {
-                result = TypeName.ParseDte(
-                    String.Format(
-                        outputName,
-                        sourceType.TypeArguments
-                            .Select(
-                                (typeArgument) => this.ResolveOutputTypeName(typeArgument).QualifiedName)
-                            .ToArray()));
+                IEnumerable<string> resolvedTypes = typeReference.TypeArgumentReferences
+                    .Select(
+                        (typeArgumentReference) =>
+                        {
+                            TypeName argumentName = this.ResolveOutputTypeName(typeArgumentReference);
+                            return (argumentName != null)
+                                ? argumentName.QualifiedName
+                                : "UNKNOWN_TYPE_" + typeArgumentReference.SourceType.RawName;
+                        });
+                result = TypeName.Format(
+                    outputName,
+                    resolvedTypes);
             }
             return result;
         }
@@ -171,9 +210,9 @@ namespace T4TS
                 .OrderBy((module) => module.QualifiedName);
         }
 
-        public IEnumerable<string> GetReferencedTypeNames()
+        public IEnumerable<TypeReference> GetTypeReferences()
         {
-            return this.referencedTypeNames;
+            return this.typeReferences;
         }
 
         private string GetOutputName(string sourceTypeName)
@@ -182,6 +221,28 @@ namespace T4TS
             this.sourceNamesToOutputTypeMap.TryGetValue(
                 sourceTypeName,
                 out result);
+            return result;
+        }
+
+        private IList<TypeReference> GetTypeArgumentReferences(
+            IEnumerable<TypeName> typeArguments,
+            TypeReference contextTypeReference)
+        {
+            IList<TypeReference> result;
+            if (typeArguments == null
+                || !typeArguments.Any())
+            {
+                result = new List<TypeReference>();
+            }
+            else
+            {
+                result = typeArguments
+                    .Select((typeArgument) =>
+                        this.GetTypeReference(
+                            typeArgument,
+                            contextTypeReference))
+                    .ToList();
+            }
             return result;
         }
 
@@ -244,7 +305,12 @@ namespace T4TS
         {
             this.sourceNamesToOutputTypeMap = new Dictionary<string, string>()
             {
-                { typeof(bool).FullName,            TSOutputTypeNames.Bool },
+                {
+                    typeof(bool).FullName,
+                    (this.settings.CompatibilityVersion < TSOutputTypeNames.OldBoolEndVersion)
+                        ? TSOutputTypeNames.OldBool
+                        : TSOutputTypeNames.Bool
+                },
                 { typeof(double).FullName,          TSOutputTypeNames.Number },
                 { typeof(float).FullName,           TSOutputTypeNames.Number },
                 { typeof(decimal).FullName,         TSOutputTypeNames.Number },
@@ -258,8 +324,18 @@ namespace T4TS
                 { typeof(UInt64).FullName,          TSOutputTypeNames.Number },
                 { typeof(string).FullName,          TSOutputTypeNames.String },
                 { typeof(Guid).FullName,            TSOutputTypeNames.String },
-                { typeof(DateTime).FullName,        this.useNativeDates ? TSOutputTypeNames.Date : TSOutputTypeNames.String },
-                { typeof(DateTimeOffset).FullName,  this.useNativeDates ? TSOutputTypeNames.Date : TSOutputTypeNames.String },
+                {
+                    typeof(DateTime).FullName,
+                    (this.settings.UseNativeDates)
+                        ? TSOutputTypeNames.Date
+                        : TSOutputTypeNames.String
+                },
+                {
+                    typeof(DateTimeOffset).FullName,
+                    this.settings.UseNativeDates
+                        ? TSOutputTypeNames.Date
+                        : TSOutputTypeNames.String
+                },
                 { typeof(Nullable<>).FullName,      TSOutputTypeNames.Nullable },
                 { typeof(IList<>).FullName,         TSOutputTypeNames.Array },
                 { typeof(List<>).FullName,          TSOutputTypeNames.Array },
@@ -281,6 +357,9 @@ namespace T4TS
             public const string Array = "{0}[]";
             public const string Dictionary = "{{ [name: {0}]: {1}}}";
             public const string Nullable = "{0}?";
+
+            public const string OldBool = "bool";
+            public static readonly Version OldBoolEndVersion = new Version(0, 9, 0);
         }
     }
 }

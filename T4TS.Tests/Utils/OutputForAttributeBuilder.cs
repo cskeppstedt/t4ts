@@ -39,7 +39,10 @@ namespace T4TS.Tests.Utils
         {
             var solution = DTETransformer.BuildDteSolution(this.Types.ToArray());
             var attributeBuilder = new AttributeInterfaceBuilder(this.Settings);
-            var typeContext = new TypeContext(this.Settings.UseNativeDates);
+            var typeContext = new TypeContext(new TypeContext.Settings()
+            {
+                UseNativeDates = this.Settings.UseNativeDates
+            });
             var generator = new CodeTraverser(
                 solution,
                 typeContext)

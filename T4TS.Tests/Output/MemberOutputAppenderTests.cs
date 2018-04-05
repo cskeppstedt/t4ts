@@ -14,14 +14,19 @@ namespace T4TS.Tests
         [TestMethod]
         public void TypescriptVersion083YieldsBool()
         {
-            TypeContext typeContext = new TypeContext(useNativeDates: false);
+            Version version = new Version(0, 8, 3);
+            TypeContext typeContext = new TypeContext(new TypeContext.Settings()
+            {
+                CompatibilityVersion = version
+            });
 
             var sb = new StringBuilder();
             var member = new TypeScriptInterfaceMember
             {
                 Name = "Foo",
                 Type = typeContext.GetTypeReference(
-                    TypeName.FromLiteral(typeof(bool).FullName))
+                    TypeName.FromLiteral(typeof(bool).FullName),
+                    contextTypeReference: null)
             };
 
             var appender = new MemberOutputAppender(
@@ -29,9 +34,9 @@ namespace T4TS.Tests
                 0,
                 new Settings
                 {
-                    CompatibilityVersion = new Version(0, 8, 3)
+                    CompatibilityVersion = version
                 },
-                new TypeContext(useNativeDates: false));
+                typeContext);
 
             appender.AppendOutput(member);
             Assert.AreEqual("Foo: bool;", sb.ToString().Trim());
@@ -40,14 +45,15 @@ namespace T4TS.Tests
         [TestMethod]
         public void TypescriptVersion090YieldsBoolean()
         {
-            TypeContext typeContext = new TypeContext(useNativeDates: false);
+            TypeContext typeContext = new TypeContext();
 
             var sb = new StringBuilder();
             var member = new TypeScriptInterfaceMember
             {
                 Name = "Foo",
                 Type = typeContext.GetTypeReference(
-                    TypeName.FromLiteral(typeof(bool).FullName))
+                    TypeName.FromLiteral(typeof(bool).FullName),
+                    contextTypeReference: null)
             };
 
             var appender = new MemberOutputAppender(
@@ -57,7 +63,7 @@ namespace T4TS.Tests
                 {
                     CompatibilityVersion = new Version(0, 9, 0)
                 },
-                new TypeContext(useNativeDates: false));
+                new TypeContext());
 
             appender.AppendOutput(member);
             Assert.AreEqual("Foo: boolean;", sb.ToString().Trim());
@@ -66,14 +72,15 @@ namespace T4TS.Tests
         [TestMethod]
         public void DefaultTypescriptVersionYieldsBoolean()
         {
-            TypeContext typeContext = new TypeContext(useNativeDates: false);
+            TypeContext typeContext = new TypeContext();
 
             var sb = new StringBuilder();
             var member = new TypeScriptInterfaceMember
             {
                 Name = "Foo",
                 Type = typeContext.GetTypeReference(
-                    TypeName.FromLiteral(typeof(bool).FullName))
+                    TypeName.FromLiteral(typeof(bool).FullName),
+                    contextTypeReference: null)
             };
 
             var appender = new MemberOutputAppender(
@@ -83,7 +90,7 @@ namespace T4TS.Tests
                 {
                     CompatibilityVersion = null
                 },
-                new TypeContext(useNativeDates: false));
+                new TypeContext());
 
             appender.AppendOutput(member);
             Assert.AreEqual("Foo: boolean;", sb.ToString().Trim());

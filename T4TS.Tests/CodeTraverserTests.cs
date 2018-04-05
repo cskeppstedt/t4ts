@@ -25,7 +25,7 @@ namespace T4TS.Tests
             var attributeBuilder = new AttributeInterfaceBuilder(new Settings());
             var codeTraverser = new CodeTraverser(
                 solution,
-                new TypeContext(useNativeDates: false))
+                new TypeContext())
             {
                 Settings = new CodeTraverser.TraverserSettings()
                 {
@@ -56,7 +56,7 @@ namespace T4TS.Tests
             var attributeBuilder = new AttributeInterfaceBuilder(new Settings());
             var codeTraverser = new CodeTraverser(
                 solution,
-                new TypeContext(useNativeDates: false))
+                new TypeContext())
             {
                 Settings = new CodeTraverser.TraverserSettings()
                 {
@@ -77,7 +77,7 @@ namespace T4TS.Tests
             var attributeBuilder = new AttributeInterfaceBuilder(new Settings());
             var codeTraverser = new CodeTraverser(
                 solution,
-                new TypeContext(useNativeDates: false))
+                new TypeContext())
             {
                 Settings = new CodeTraverser.TraverserSettings()
                 {

@@ -29,7 +29,7 @@ namespace T4TS.Outputs
         {
             AppendIndentedLine("/** Generated from " + segment.SourceType.RawName + " **/");
 
-            TypeName outputName = this.TypeContext.ResolveOutputTypeName(segment.SourceType);
+            TypeName outputName = this.TypeContext.ResolveOutputTypeName(segment);
             if (this.inGlobalModule)
                 AppendIndented("enum " + outputName.QualifiedSimpleName);
             else
