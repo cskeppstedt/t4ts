@@ -68,21 +68,15 @@
     <Compile Include="Outputs\TypeScriptInterfaceAttributeValues.cs" />
     <Compile Include="Outputs\TypeScriptMemberAttributeValues.cs" />
     <Compile Include="CodeTraverser.cs" />
-    <Compile Include="Outputs\TypeScriptOutputType.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Traversal.cs" />
     <Compile Include="Outputs\TypeScriptModule.cs" />
     <Compile Include="TypeFullName.cs" />
     <Compile Include="TypeFullNameParser.cs" />
-    <Compile Include="Types\ArrayType.cs" />
-    <Compile Include="Types\DictionaryType.cs" />
-    <Compile Include="Types\GenericType.cs" />
-    <Compile Include="Types\NullableType.cs" />
     <Compile Include="TypeContext.cs" />
     <Compile Include="Outputs\TypeScriptInterface.cs" />
     <Compile Include="Outputs\TypeScriptInterfaceMember.cs" />
-    <Compile Include="Types\TypeScriptType.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
