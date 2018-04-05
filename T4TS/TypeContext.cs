@@ -356,7 +356,8 @@ namespace T4TS
 
             public const string Array = "{0}[]";
             public const string Dictionary = "{{ [name: {0}]: {1}}}";
-            public const string Nullable = "{0}?";
+            // All types are nullable in TS, no markup needed
+            public const string Nullable = "{0}";
 
             public const string OldBool = "bool";
             public static readonly Version OldBoolEndVersion = new Version(0, 9, 0);
