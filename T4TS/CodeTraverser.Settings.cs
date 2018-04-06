@@ -9,11 +9,13 @@ namespace T4TS
     {
         public class TraverserSettings
         {
-            public CodeClassInterfaceBuilder InterfaceBuilder { get; set; }
+            public ICodeClassToInterfaceBuilder ClassToInterfaceBuilder { get; set; }
+            public ICodeInterfaceToInterfaceBuilder InterfaceToInterfaceBuilder { get; set; }
             public CodeEnumBuilder EnumBuilder { get; set; }
 
             public Func<CodeNamespace, bool> NamespaceFilter { get; set; }
             public Func<CodeClass, bool> ClassFilter { get; set; }
+            public Func<CodeInterface, bool> InterfaceFilter { get; set; }
             public Func<CodeEnum, bool> EnumFilter { get; set; }
 
             public bool ResolveReferences { get; set; }

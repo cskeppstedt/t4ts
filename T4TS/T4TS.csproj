@@ -47,7 +47,8 @@
   <ItemGroup>
     <Compile Include="Builders\BuilderHelper.cs" />
     <Compile Include="Builders\CodeEnumBuilder.cs" />
-    <Compile Include="Builders\CodeClassInterfaceBuilder.cs" />
+    <Compile Include="Builders\ICodeInterfaceToInterfaceBuilder.cs" />
+    <Compile Include="Builders\ICodeClassToInterfaceBuilder.cs" />
     <Compile Include="Builders\DirectEnumBuilder.cs" />
     <Compile Include="Builders\DirectInterfaceBuilder.cs" />
     <Compile Include="Builders\AttributeInterfaceBuilder.cs" />

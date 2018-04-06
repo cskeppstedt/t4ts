@@ -22,7 +22,8 @@ namespace T4TS.Tests.Utils
             this.Settings = new DirectSettings();
             this.TraverserSettings = new CodeTraverser.TraverserSettings()
             {
-                InterfaceBuilder = new DirectInterfaceBuilder(this.Settings),
+                ClassToInterfaceBuilder = new DirectInterfaceBuilder(this.Settings),
+                InterfaceToInterfaceBuilder = new DirectInterfaceBuilder(this.Settings),
                 EnumBuilder = new DirectEnumBuilder(this.Settings)
             };
         }

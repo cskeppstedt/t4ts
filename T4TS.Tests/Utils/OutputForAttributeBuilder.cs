@@ -49,7 +49,7 @@ namespace T4TS.Tests.Utils
             {
                 Settings =
                 {
-                    InterfaceBuilder = attributeBuilder
+                    ClassToInterfaceBuilder = attributeBuilder
                 }
             };
             var data = generator.GetAllInterfaces().ToList();

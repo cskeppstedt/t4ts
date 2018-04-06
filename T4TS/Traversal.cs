@@ -58,23 +58,36 @@ namespace T4TS
                 {
                     if (elem is CodeClass)
                     {
-                        CodeClass codeClass = (CodeClass)elem;
-                        withCodeClass(codeClass);
-
-                        if (codeClass.Children != null)
-                        {
-                            foreach (object child in codeClass.Children)
-                            {
-                                if (child is CodeClass)
-                                {
-                                    withCodeClass((CodeClass)child);
-                                }
-                            }
-                        }
+                        TraverseClass(
+                            (CodeClass)elem,
+                            withCodeClass);
                     }
                 }
             }
         }
+
+        public static void TraverseInterfacesInNamespace(
+            CodeNamespace ns,
+            Action<CodeInterface> withInterface)
+        {
+            if (ns == null)
+                throw new ArgumentNullException("ns");
+
+            if (withInterface == null)
+                throw new ArgumentNullException("withInterface");
+
+            if (ns.Members != null)
+            {
+                foreach (object elem in ns.Members)
+                {
+                    if (elem is CodeInterface)
+                    {
+                        withInterface((CodeInterface)elem);
+                    }
+                }
+            }
+        }
+
         public static void TraverseEnumsInNamespace(CodeNamespace ns, Action<CodeEnum> withCodeEnum)
         {
             if (ns == null)
@@ -93,17 +106,14 @@ namespace T4TS
             }
         }
 
-        public static void TraversePropertiesInClass(CodeClass codeClass, Action<CodeProperty> withProperty)
+        public static void TraverseProperties(CodeElements elements, Action<CodeProperty> withProperty)
         {
-            if (codeClass == null)
-                throw new ArgumentNullException("codeClass");
-
             if (withProperty == null)
                 throw new ArgumentNullException("withProperty");
             
-            if (codeClass.Members != null)
+            if (elements != null)
             {
-                foreach (var property in codeClass.Members)
+                foreach (var property in elements)
                 {
                     if (property is CodeProperty)
                         withProperty((CodeProperty)property);
@@ -162,6 +172,26 @@ namespace T4TS
                         Traversal.TraverseNamespace(
                             (CodeNamespace)elem,
                             withNamespace);
+                    }
+                }
+            }
+        }
+
+        private static void TraverseClass(
+            CodeClass codeClass,
+            Action<CodeClass> withClass)
+        {
+            withClass(codeClass);
+
+            if (codeClass.Children != null)
+            {
+                foreach (object child in codeClass.Children)
+                {
+                    if (child is CodeClass)
+                    {
+                        TraverseClass(
+                            (CodeClass)child,
+                            withClass);
                     }
                 }
             }

@@ -29,7 +29,7 @@ namespace T4TS.Tests
             {
                 Settings = new CodeTraverser.TraverserSettings()
                 {
-                    InterfaceBuilder = attributeBuilder
+                    ClassToInterfaceBuilder = attributeBuilder
                 }
             };
             Assert.AreEqual(2, codeTraverser.GetAllInterfaces().Count());
@@ -60,7 +60,7 @@ namespace T4TS.Tests
             {
                 Settings = new CodeTraverser.TraverserSettings()
                 {
-                    InterfaceBuilder = attributeBuilder
+                    ClassToInterfaceBuilder = attributeBuilder
                 }
             };
             var allModules = codeTraverser.GetAllInterfaces();
@@ -81,7 +81,7 @@ namespace T4TS.Tests
             {
                 Settings = new CodeTraverser.TraverserSettings()
                 {
-                    InterfaceBuilder = attributeBuilder
+                    ClassToInterfaceBuilder = attributeBuilder
                 }
             };
             

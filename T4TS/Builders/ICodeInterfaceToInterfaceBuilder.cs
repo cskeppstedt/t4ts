@@ -3,10 +3,10 @@ using T4TS.Outputs;
 
 namespace T4TS.Builders
 {
-    public interface CodeClassInterfaceBuilder
+    public interface ICodeInterfaceToInterfaceBuilder
     {
         TypeScriptInterface Build(
-            CodeClass codeClass,
+            CodeInterface codeInterface,
             TypeContext typeContext);
     }
 }

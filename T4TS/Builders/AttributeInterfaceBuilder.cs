@@ -9,7 +9,7 @@ using T4TS.Outputs;
 
 namespace T4TS.Builders
 {
-    public class AttributeInterfaceBuilder : CodeClassInterfaceBuilder
+    public class AttributeInterfaceBuilder : ICodeClassToInterfaceBuilder
     {
         private static readonly string InterfaceAttributeFullName = "T4TS.TypeScriptInterfaceAttribute";
         private static readonly string MemberAttributeFullName = "T4TS.TypeScriptMemberAttribute";
@@ -69,18 +69,20 @@ namespace T4TS.Builders
                     codeClass,
                     typeContext);
 
-                Traversal.TraversePropertiesInClass(codeClass, (property) =>
-                {
-                    TypeScriptInterfaceMember member;
-                    if (TryGetMember(
-                        result,
-                        property,
-                        typeContext,
-                        out member))
+                Traversal.TraverseProperties(
+                    codeClass.Members,
+                    (property) =>
                     {
-                        result.Members.Add(member);
-                    }
-                });
+                        TypeScriptInterfaceMember member;
+                        if (TryGetMember(
+                            result,
+                            property,
+                            typeContext,
+                            out member))
+                        {
+                            result.Members.Add(member);
+                        }
+                    });
             }
             return result;
         }

@@ -78,7 +78,7 @@ namespace T4TS
             if (settings.NamespaceFilter == null
                 || settings.NamespaceFilter(codeNamespace))
             {
-                if (settings.InterfaceBuilder != null)
+                if (settings.ClassToInterfaceBuilder != null)
                 {
                     Traversal.TraverseClassesInNamespace(
                         codeNamespace,
@@ -87,8 +87,24 @@ namespace T4TS
                             if (settings.ClassFilter == null
                                 || settings.ClassFilter(codeClass))
                             {
-                                settings.InterfaceBuilder.Build(
+                                settings.ClassToInterfaceBuilder.Build(
                                     codeClass,
+                                    this.context);
+                            }
+                        });
+                }
+
+                if (settings.InterfaceToInterfaceBuilder != null)
+                {
+                    Traversal.TraverseInterfacesInNamespace(
+                        codeNamespace,
+                        (codeInterface) =>
+                        {
+                            if (settings.InterfaceFilter == null
+                                || settings.InterfaceFilter(codeInterface))
+                            {
+                                settings.InterfaceToInterfaceBuilder.Build(
+                                    codeInterface,
                                     this.context);
                             }
                         });
@@ -173,7 +189,7 @@ namespace T4TS
             {
                 settings = new TraverserSettings()
                 {
-                    InterfaceBuilder = this.Settings.InterfaceBuilder,
+                    ClassToInterfaceBuilder = this.Settings.ClassToInterfaceBuilder,
                     EnumBuilder = this.Settings.EnumBuilder,
                     ClassFilter = (codeClass) =>
                     {

@@ -107,6 +107,10 @@ namespace T4TS.Tests.Utils
             {
                 result = DTETransformer.BuildDteClass(fromType);
             }
+            else if (fromType.IsInterface)
+            {
+                result = DTETransformer.BuildDteInterface(fromType);
+            }
             else if (fromType.IsEnum)
             {
                 result = DTETransformer.BuildDteEnum(fromType);
@@ -143,6 +147,44 @@ namespace T4TS.Tests.Utils
             var moqCodeNamespace = new Mock<CodeNamespace>();
             moqCodeNamespace.SetupGet(x => x.FullName).Returns(fromClass.Namespace);
             
+            moqMember.SetupGet(x => x.Name).Returns(DTETransformer.GenerateNameFromType(fromClass));
+            moqMember.SetupGet(x => x.FullName).Returns(DTETransformer.GenerateFullNameFromType(fromClass));
+            moqMember.SetupGet(x => x.Bases).Returns(basesMoq.Object);
+            moqMember.SetupGet(x => x.Members).Returns(propertiesMoq.Object);
+            moqMember.SetupGet(x => x.Namespace).Returns(moqCodeNamespace.Object);
+
+            return moqMember.Object;
+        }
+
+        public static CodeInterface BuildDteInterface(Type fromClass)
+        {
+            var moqMember = new Mock<CodeInterface>();
+
+            var classAttributes = BuildDteAttributes<TypeScriptInterfaceAttribute>(fromClass);
+            moqMember.SetupGet(x => x.Attributes).Returns(classAttributes);
+
+            var properties = new List<CodeProperty>(
+                fromClass
+                    .GetProperties(BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.Instance)
+                    .Select(BuildDteProperty)
+            );
+
+            var propertiesMoq = new Mock<CodeElements>();
+            propertiesMoq.Setup(x => x.GetEnumerator()).Returns(() => properties.GetEnumerator());
+
+            var bases = GetBaseTypes(fromClass)
+                .Select(BuildDteBase)
+                .ToList();
+
+            var basesMoq = new Mock<CodeElements>();
+            basesMoq.Setup(x => x.GetEnumerator()).Returns(() => bases.GetEnumerator());
+            basesMoq.Setup(x => x.Count).Returns(() => bases.Count);
+            basesMoq.Setup(x => x.Item(It.IsAny<int>()))
+                .Returns((int i) => bases.ElementAtOrDefault(i - 1)); // Item() accessor is not zero-based
+
+            var moqCodeNamespace = new Mock<CodeNamespace>();
+            moqCodeNamespace.SetupGet(x => x.FullName).Returns(fromClass.Namespace);
+
             moqMember.SetupGet(x => x.Name).Returns(DTETransformer.GenerateNameFromType(fromClass));
             moqMember.SetupGet(x => x.FullName).Returns(DTETransformer.GenerateFullNameFromType(fromClass));
             moqMember.SetupGet(x => x.Bases).Returns(basesMoq.Object);

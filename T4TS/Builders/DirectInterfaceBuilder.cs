@@ -9,7 +9,9 @@ using T4TS.Builders;
 
 namespace T4TS.Builders
 {
-    public partial class DirectInterfaceBuilder : CodeClassInterfaceBuilder
+    public partial class DirectInterfaceBuilder
+        : ICodeClassToInterfaceBuilder,
+        ICodeInterfaceToInterfaceBuilder
     {
         private DirectSettings settings;
 
@@ -32,41 +34,94 @@ namespace T4TS.Builders
                 TypeName.ParseDte(codeClass.FullName),
                 codeClass.Name,
                 out interfaceCreated);
-            
-            if (codeClass.Bases != null)
+
+            this.PopulateBases(
+                codeClass.Bases,
+                result,
+                typeContext);
+
+            this.PopulateMembers(
+                codeClass.Members,
+                result,
+                typeContext);
+
+            return result;
+        }
+
+        public TypeScriptInterface Build(
+            CodeInterface codeInterface,
+            TypeContext typeContext)
+        {
+            TypeScriptInterface result = null;
+
+            string moduleName = this.settings.GetModuleNameFromNamespace(codeInterface.Namespace);
+
+            bool interfaceCreated;
+            result = typeContext.GetOrCreateInterface(
+                moduleName,
+                TypeName.ParseDte(codeInterface.FullName),
+                codeInterface.Name,
+                out interfaceCreated);
+
+            this.PopulateBases(
+                codeInterface.Bases,
+                result,
+                typeContext);
+
+            this.PopulateMembers(
+                codeInterface.Members,
+                result,
+                typeContext);
+
+            return result;
+        }
+
+        private void PopulateBases(
+            CodeElements bases,
+            TypeScriptInterface interfaceOutput,
+            TypeContext typeContext)
+        {
+            if (bases != null)
             {
-                foreach (CodeElement baseElement in codeClass.Bases)
+                foreach (CodeElement baseElement in bases)
                 {
                     if (baseElement.FullName != typeof(Object).FullName)
                     {
-                        result.Bases.Add(
+                        interfaceOutput.Bases.Add(
                             typeContext.GetTypeReference(
                                 TypeName.ParseDte(baseElement.FullName),
-                                result));
+                                interfaceOutput));
                     }
                 }
 
-                TypeReference parentType = result.Bases.FirstOrDefault();
+                TypeReference parentType = interfaceOutput.Bases.FirstOrDefault();
                 if (parentType != null
                     && BuilderHelper.IsValidBaseType(parentType.SourceType))
                 {
-                    result.Parent = parentType;
+                    interfaceOutput.Parent = parentType;
                 }
             }
+        }
 
-            Traversal.TraversePropertiesInClass(codeClass, (property) =>
-            {
-                TypeScriptInterfaceMember member;
-                if (TryGetMember(
-                    result,
-                    property,
-                    typeContext,
-                    out member))
+        private void PopulateMembers(
+            CodeElements members,
+            TypeScriptInterface interfaceOutput,
+            TypeContext typeContext)
+        {
+            Traversal.TraverseProperties(
+                members,
+                (property) =>
                 {
-                    result.Members.Add(member);
-                }
-            });
-            return result;
+                    TypeScriptInterfaceMember member;
+                    if (TryGetMember(
+                        interfaceOutput,
+                        property,
+                        typeContext,
+                        out member))
+                    {
+                        interfaceOutput.Members.Add(member);
+                    }
+                });
         }
 
         private bool TryGetAttribute(CodeElements attributes, string attributeFullName, out CodeAttribute attribute)

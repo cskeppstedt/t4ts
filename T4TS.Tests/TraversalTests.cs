@@ -36,8 +36,8 @@ namespace T4TS.Tests
 
             var expectedNames = new string[] { "A", "B", "C" };
 
-            Traversal.TraversePropertiesInClass(
-                codeClass,
+            Traversal.TraverseProperties(
+                codeClass.Members,
                 (p) => { Assert.AreEqual(expectedNames[callCount++], p.Name); });
             Assert.AreEqual(3, callCount);
         }

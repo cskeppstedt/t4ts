@@ -70,6 +70,8 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Fixtures\BasicInterface\IBasic.cs" />
+    <Compile Include="Fixtures\BasicInterface\Test.cs" />
     <Compile Include="Fixtures\Basic\Test.cs" />
     <Compile Include="Fixtures\Basic\BasicModel.cs" />
     <Compile Include="Fixtures\Enumeration\EnumerationModel.cs" />
