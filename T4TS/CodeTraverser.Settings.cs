@@ -17,6 +17,8 @@ namespace T4TS
             public Func<CodeEnum, bool> EnumFilter { get; set; }
 
             public bool ResolveReferences { get; set; }
+
+            public bool FailOnUnresolvedReferences { get; set; }
         }
     }
 }

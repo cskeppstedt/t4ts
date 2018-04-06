@@ -159,6 +159,13 @@ namespace T4TS
 
         public TypeName ResolveOutputTypeName(TypeReference typeReference)
         {
+            return this.ResolveOutputTypeName(
+                typeReference,
+                allowNull: false);
+        }
+
+        public TypeName ResolveOutputTypeName(TypeReference typeReference, bool allowNull)
+        {
             TypeName result;
             string outputName = this.GetOutputName(typeReference.SourceType.UniversalName);
 
@@ -173,6 +180,12 @@ namespace T4TS
                 else
                 {
                     result = null;
+                }
+                
+                if (result == null
+                    && !allowNull)
+                {
+                    result = TypeName.FromLiteral("UNKNOWN_TYPE_" + typeReference.SourceType.RawName);
                 }
             }
             else if (typeReference.SourceType.TypeArguments == null
@@ -192,10 +205,10 @@ namespace T4TS
                     .Select(
                         (typeArgumentReference) =>
                         {
-                            TypeName argumentName = this.ResolveOutputTypeName(typeArgumentReference);
+                            TypeName argumentName = this.ResolveOutputTypeName(typeArgumentReference, allowNull);
                             return (argumentName != null)
                                 ? argumentName.QualifiedName
-                                : "UNKNOWN_TYPE_" + typeArgumentReference.SourceType.RawName;
+                                : typeArgumentReference.SourceType.QualifiedName;
                         });
                 result = TypeName.Format(
                     outputName,
@@ -203,6 +216,7 @@ namespace T4TS
             }
             return result;
         }
+
 
         public IEnumerable<TypeScriptModule> GetModules()
         {
@@ -213,6 +227,13 @@ namespace T4TS
         public IEnumerable<TypeReference> GetTypeReferences()
         {
             return this.typeReferences;
+        }
+
+        public void SetOutputName(
+            string sourceName,
+            string outputName)
+        {
+            this.sourceNamesToOutputTypeMap[sourceName] = outputName;
         }
 
         private string GetOutputName(string sourceTypeName)

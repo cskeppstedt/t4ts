@@ -28,15 +28,7 @@ namespace T4TS
 
             bool isOptional = member.Optional;
             TypeName outputName = this.TypeContext.ResolveOutputTypeName(member.Type);
-
-            //if (member.Type.FullName == typeof(bool).FullName)
-            //{
-            //    if (Settings.CompatibilityVersion != null && Settings.CompatibilityVersion < new Version(0, 9, 0))
-            //        typeName = "bool";
-            //    else
-            //        typeName = "boolean";
-            //}
-
+            
             Output.AppendFormat("{0}{1}: {2}",
                 member.Name,
                 (isOptional ? "?" : ""),

@@ -125,16 +125,17 @@ namespace T4TS
             IDictionary<IList<CodeNamespace>, ICollection<string>> typeNamesByNamespaces =
                 new Dictionary<IList<CodeNamespace>, ICollection<string>>();
 
-            TypeName sourceName;
             TypeName outputName;
             IList<CodeNamespace> namespaceList;
             ICollection<string> typeNames;
             IList<TypeReference> typeReferences = this.context.GetTypeReferences().ToList();
             foreach (TypeReference typeReference in typeReferences)
             {
-                if (!attemptedSourceNames.Contains(typeReference.SourceType.QualifiedName))
+                if (!attemptedSourceNames.Contains(typeReference.SourceType.UniversalName))
                 {
-                    outputName = this.context.ResolveOutputTypeName(typeReference);
+                    outputName = this.context.ResolveOutputTypeName(
+                        typeReference,
+                        allowNull: true);
                     if (outputName == null)
                     {
                         if (namespacesByName.TryGetValue(
@@ -151,17 +152,18 @@ namespace T4TS
                                     typeNames);
                             }
 
-                            typeNames.Add(typeReference.SourceType.QualifiedName);
+                            typeNames.Add(typeReference.SourceType.UniversalName);
                             result++;
                         }
-                        else
+                        else if (typeReference.ContextTypeReference == null
+                            && this.Settings.FailOnUnresolvedReferences)
                         {
                             throw new Exception(String.Format(
                                 "Can't resolve type {0} because the namespace is unknown",
-                                typeReference));
+                                typeReference.SourceType.QualifiedName));
                         }
                     }
-                    attemptedSourceNames.Add(typeReference.SourceType.QualifiedName);
+                    attemptedSourceNames.Add(typeReference.SourceType.UniversalName);
                 }
             }
 
@@ -173,8 +175,16 @@ namespace T4TS
                 {
                     InterfaceBuilder = this.Settings.InterfaceBuilder,
                     EnumBuilder = this.Settings.EnumBuilder,
-                    ClassFilter = (codeClass) => namespaceTypeNamesPair.Value.Contains(codeClass.FullName),
-                    EnumFilter = (codeEnum) => namespaceTypeNamesPair.Value.Contains(codeEnum.FullName)
+                    ClassFilter = (codeClass) =>
+                    {
+                        TypeName currentName = TypeName.ParseDte(codeClass.FullName);
+                        return namespaceTypeNamesPair.Value.Contains(currentName.UniversalName);
+                    },
+                    EnumFilter = (codeEnum) =>
+                    {
+                        TypeName currentName = TypeName.ParseDte(codeEnum.FullName);
+                        return namespaceTypeNamesPair.Value.Contains(currentName.UniversalName);
+                    }
                 };
 
                 foreach (CodeNamespace codeNamespace in namespaceTypeNamesPair.Key)

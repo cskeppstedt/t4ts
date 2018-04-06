@@ -51,13 +51,27 @@ namespace T4TS
 
             if (withCodeClass == null)
                 throw new ArgumentNullException("withCodeClass");
-            
+
             if (ns.Members != null)
             {
                 foreach (object elem in ns.Members)
                 {
                     if (elem is CodeClass)
-                        withCodeClass((CodeClass)elem);
+                    {
+                        CodeClass codeClass = (CodeClass)elem;
+                        withCodeClass(codeClass);
+
+                        if (codeClass.Children != null)
+                        {
+                            foreach (object child in codeClass.Children)
+                            {
+                                if (child is CodeClass)
+                                {
+                                    withCodeClass((CodeClass)child);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -110,7 +124,11 @@ namespace T4TS
                     foreach (object elem in codeElements)
                     {
                         if (elem is CodeNamespace)
-                            withNamespace((CodeNamespace)elem);
+                        {
+                            Traversal.TraverseNamespace(
+                                (CodeNamespace)elem,
+                                withNamespace);
+                        }
                     }
                 }
 
@@ -125,6 +143,26 @@ namespace T4TS
                     Traversal.TraverseNamespacesInProjectItems(
                         pi.SubProject.ProjectItems,
                         withNamespace);
+                }
+            }
+        }
+
+        private static void TraverseNamespace(
+            CodeNamespace codeNamespace,
+            Action<CodeNamespace> withNamespace)
+        {
+            withNamespace(codeNamespace);
+
+            if (codeNamespace.Members != null)
+            {
+                foreach (object elem in codeNamespace.Members)
+                {
+                    if (elem is CodeNamespace)
+                    {
+                        Traversal.TraverseNamespace(
+                            (CodeNamespace)elem,
+                            withNamespace);
+                    }
                 }
             }
         }
