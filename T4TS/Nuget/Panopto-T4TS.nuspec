@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>Panopto.T4TS</id>
-    <version>0.8.1</version>
+    <version>0.8.2</version>
     <title>Conversion from C# to TS</title>
     <authors>BKraus</authors>
     <owners>Panopto</owners>
