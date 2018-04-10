@@ -89,11 +89,11 @@ namespace T4TS.Tests
             var interfaces = modules.Single().Interfaces;
             var modelInterface = interfaces.Single();
             
-            var classProp = modelInterface.Members.SingleOrDefault(m => m.Name == "class");
-            var readonlyProp = modelInterface.Members.SingleOrDefault(m => m.Name == "readonly");
-            var publicProp = modelInterface.Members.SingleOrDefault(m => m.Name == "public");
+            var classProp = modelInterface.Fields.SingleOrDefault(m => m.Name == "class");
+            var readonlyProp = modelInterface.Fields.SingleOrDefault(m => m.Name == "readonly");
+            var publicProp = modelInterface.Fields.SingleOrDefault(m => m.Name == "public");
 
-            Assert.AreEqual(3, modelInterface.Members.Count);
+            Assert.AreEqual(3, modelInterface.Fields.Count);
 
             Assert.IsNotNull(classProp);
             Assert.IsNotNull(readonlyProp);

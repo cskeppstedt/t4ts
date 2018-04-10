@@ -73,14 +73,14 @@ namespace T4TS.Builders
                     codeClass.Members,
                     (property) =>
                     {
-                        TypeScriptInterfaceMember member;
+                        TypeScriptMember member;
                         if (TryGetMember(
                             result,
                             property,
                             typeContext,
                             out member))
                         {
-                            result.Members.Add(member);
+                            result.Fields.Add(member);
                         }
                     });
             }
@@ -167,7 +167,7 @@ namespace T4TS.Builders
         private bool TryGetMember(TypeScriptInterface interfaceContext,
             CodeProperty property,
             TypeContext typeContext,
-            out TypeScriptInterfaceMember member)
+            out TypeScriptMember member)
         {
             member = null;
             if (property.Access != vsCMAccess.vsCMAccessPublic)
@@ -203,7 +203,7 @@ namespace T4TS.Builders
                     interfaceContext);
             }
 
-            member = new TypeScriptInterfaceMember
+            member = new TypeScriptMember
             {
                 Name = name,
                 //FullName = property.FullName,

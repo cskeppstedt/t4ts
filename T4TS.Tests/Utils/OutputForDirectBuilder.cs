@@ -13,25 +13,29 @@ namespace T4TS.Tests.Utils
     class OutputForDirectBuilder
     {
         readonly IReadOnlyCollection<Type> Types;
-        public DirectSettings Settings { get; private set; }
+        public Settings OutputSettings { get; private set; }
+        public DirectSettings DirectSettings { get; private set; }
         public CodeTraverser.TraverserSettings TraverserSettings { get; private set; }
+        public TypeContext TypeContext { get; private set; }
 
         public OutputForDirectBuilder(params Type[] types)
         {
             this.Types = new ReadOnlyCollection<Type>(types);
-            this.Settings = new DirectSettings();
+            this.OutputSettings = new Settings();
+            this.DirectSettings = new DirectSettings();
             this.TraverserSettings = new CodeTraverser.TraverserSettings()
             {
-                ClassToInterfaceBuilder = new DirectInterfaceBuilder(this.Settings),
-                InterfaceToInterfaceBuilder = new DirectInterfaceBuilder(this.Settings),
-                EnumBuilder = new DirectEnumBuilder(this.Settings)
+                ClassToInterfaceBuilder = new DirectInterfaceBuilder(this.DirectSettings),
+                InterfaceToInterfaceBuilder = new DirectInterfaceBuilder(this.DirectSettings),
+                EnumBuilder = new DirectEnumBuilder(this.DirectSettings)
             };
+            this.TypeContext = new TypeContext();
         }
 
         public OutputForDirectBuilder WithSettings(
             Action<DirectSettings> changeSettings)
         {
-            changeSettings(this.Settings);
+            changeSettings(this.DirectSettings);
             return this;
         }
 
@@ -39,6 +43,12 @@ namespace T4TS.Tests.Utils
             Action<CodeTraverser.TraverserSettings> changeSettings)
         {
             changeSettings(this.TraverserSettings);
+            return this;
+        }
+
+        public OutputForDirectBuilder Edit(Action<OutputForDirectBuilder> applyEdits)
+        {
+            applyEdits(this);
             return this;
         }
 
@@ -53,10 +63,9 @@ namespace T4TS.Tests.Utils
         private string GenerateOutput()
         {
             var solution = DTETransformer.BuildDteSolution(this.Types.ToArray());
-            var typeContext = new TypeContext();
             var generator = new CodeTraverser(
                 solution,
-                typeContext)
+                this.TypeContext)
             {
                 Settings = this.TraverserSettings
             };
@@ -64,8 +73,8 @@ namespace T4TS.Tests.Utils
 
             return OutputFormatter.GetOutput(
                 data,
-                new Settings(),
-                typeContext);
+                this.OutputSettings,
+                this.TypeContext);
         }
 
         static string Normalize(string output)

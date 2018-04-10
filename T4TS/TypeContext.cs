@@ -54,9 +54,26 @@ namespace T4TS
         public TypeReference GetLiteralReference(string outputName)
         {
             TypeName sourceType = TypeName.FromLiteral(outputName);
-            this.sourceNamesToOutputTypeMap.Add(
-                sourceType.UniversalName,
-                outputName);
+
+            string currentName;
+            if (this.sourceNamesToOutputTypeMap.TryGetValue(
+                outputName,
+                out currentName))
+            {
+                if (currentName != outputName)
+                {
+                    throw new InvalidOperationException(String.Format(
+                        "Trying to map name {0} when it's already maps to {1}",
+                        outputName, 
+                        currentName));
+                }
+            }
+            else
+            { 
+                this.sourceNamesToOutputTypeMap.Add(
+                    sourceType.UniversalName,
+                    outputName);
+            }
 
             return this.GetTypeReference(
                 sourceType,

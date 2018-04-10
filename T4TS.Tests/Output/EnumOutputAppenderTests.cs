@@ -92,13 +92,14 @@ enum ExplicitEnum {
         {
             var sb = new StringBuilder();
             var appender = new EnumOutputAppender(
-                sb,
-                0,
                 new Settings(),
                 this.typeContext,
                 inGlobalModule: false);
 
-            appender.AppendOutput(this.explicitEnumType);
+            appender.AppendOutput(
+                sb,
+                0,
+                this.explicitEnumType);
 
             Assert.AreEqual(EnumOutputAppenderTests.NotGlobalExplicitExpectedOutput, sb.ToString());
         }
@@ -108,13 +109,14 @@ enum ExplicitEnum {
         {
             var sb = new StringBuilder();
             var appender = new EnumOutputAppender(
-                sb,
-                0,
                 new Settings(),
                 this.typeContext,
                 inGlobalModule: true);
 
-            appender.AppendOutput(this.explicitEnumType);
+            appender.AppendOutput(
+                sb,
+                0,
+                this.explicitEnumType);
 
             Assert.AreEqual(EnumOutputAppenderTests.GlobalExplicitExpectedOutput, sb.ToString());
         }
@@ -124,13 +126,14 @@ enum ExplicitEnum {
         {
             var sb = new StringBuilder();
             var appender = new EnumOutputAppender(
-                sb,
-                0,
                 new Settings(),
                 this.typeContext,
                 inGlobalModule: false);
 
-            appender.AppendOutput(this.implicitEnumType);
+            appender.AppendOutput(
+                sb,
+                0,
+                this.implicitEnumType);
 
             Assert.AreEqual(EnumOutputAppenderTests.NotGlobalImplicitExpectedOutput, sb.ToString());
         }

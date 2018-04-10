@@ -7,35 +7,36 @@ using T4TS.Outputs;
 
 namespace T4TS
 {
-    public class MemberOutputAppender : OutputAppender<TypeScriptInterfaceMember>
+    public class MemberOutputAppender : OutputAppender<TypeScriptMember>
     {
         public MemberOutputAppender(
-            StringBuilder output,
-            int baseIndentation,
             Settings settings,
             TypeContext typeContext)
                 : base(
-                      output,
-                      baseIndentation,
                       settings,
                       typeContext)
         {
         }
 
-        public override void AppendOutput(TypeScriptInterfaceMember member)
+        public override void AppendOutput(
+            StringBuilder output,
+            int baseIndentation,
+            TypeScriptMember member)
         {
-            AppendIndendation();
+            this.AppendIndendation(
+                output,
+                baseIndentation);
 
             bool isOptional = member.Optional;
             TypeName outputName = this.TypeContext.ResolveOutputTypeName(member.Type);
             
-            Output.AppendFormat("{0}{1}: {2}",
+            output.AppendFormat("{0}{1}: {2}",
                 member.Name,
                 (isOptional ? "?" : ""),
                 outputName.QualifiedName
             );
             
-            Output.AppendLine(";");
+            output.AppendLine(";");
         }
     }
 }

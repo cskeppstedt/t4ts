@@ -21,7 +21,7 @@ namespace T4TS.Tests
             });
 
             var sb = new StringBuilder();
-            var member = new TypeScriptInterfaceMember
+            var member = new TypeScriptMember
             {
                 Name = "Foo",
                 Type = typeContext.GetTypeReference(
@@ -30,15 +30,16 @@ namespace T4TS.Tests
             };
 
             var appender = new MemberOutputAppender(
-                sb,
-                0,
                 new Settings
                 {
                     CompatibilityVersion = version
                 },
                 typeContext);
 
-            appender.AppendOutput(member);
+            appender.AppendOutput(
+                sb,
+                0,
+                member);
             Assert.AreEqual("Foo: bool;", sb.ToString().Trim());
         }
 
@@ -48,7 +49,7 @@ namespace T4TS.Tests
             TypeContext typeContext = new TypeContext();
 
             var sb = new StringBuilder();
-            var member = new TypeScriptInterfaceMember
+            var member = new TypeScriptMember
             {
                 Name = "Foo",
                 Type = typeContext.GetTypeReference(
@@ -57,15 +58,16 @@ namespace T4TS.Tests
             };
 
             var appender = new MemberOutputAppender(
-                sb,
-                0,
                 new Settings
                 {
                     CompatibilityVersion = new Version(0, 9, 0)
                 },
                 new TypeContext());
 
-            appender.AppendOutput(member);
+            appender.AppendOutput(
+                sb,
+                0,
+                member);
             Assert.AreEqual("Foo: boolean;", sb.ToString().Trim());
         }
 
@@ -75,7 +77,7 @@ namespace T4TS.Tests
             TypeContext typeContext = new TypeContext();
 
             var sb = new StringBuilder();
-            var member = new TypeScriptInterfaceMember
+            var member = new TypeScriptMember
             {
                 Name = "Foo",
                 Type = typeContext.GetTypeReference(
@@ -84,15 +86,16 @@ namespace T4TS.Tests
             };
 
             var appender = new MemberOutputAppender(
-                sb,
-                0,
                 new Settings
                 {
                     CompatibilityVersion = null
                 },
                 new TypeContext());
 
-            appender.AppendOutput(member);
+            appender.AppendOutput(
+                sb,
+                0,
+                member);
             Assert.AreEqual("Foo: boolean;", sb.ToString().Trim());
         }
     }

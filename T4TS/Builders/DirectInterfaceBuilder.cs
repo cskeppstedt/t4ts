@@ -112,14 +112,14 @@ namespace T4TS.Builders
                 members,
                 (property) =>
                 {
-                    TypeScriptInterfaceMember member;
+                    TypeScriptMember member;
                     if (TryGetMember(
                         interfaceOutput,
                         property,
                         typeContext,
                         out member))
                     {
-                        interfaceOutput.Members.Add(member);
+                        interfaceOutput.Fields.Add(member);
                     }
                 });
         }
@@ -143,7 +143,7 @@ namespace T4TS.Builders
             TypeScriptInterface interfaceContext,
             CodeProperty property,
             TypeContext typeContext,
-            out TypeScriptInterfaceMember member)
+            out TypeScriptMember member)
         {
             member = null;
             if (property.Access != vsCMAccess.vsCMAccessPublic)
@@ -163,7 +163,7 @@ namespace T4TS.Builders
                 name = name.Substring(0, 1).ToLowerInvariant() + name.Substring(1);
             }
             
-            member = new TypeScriptInterfaceMember
+            member = new TypeScriptMember
             {
                 Name = name,
                 Type = typeContext.GetTypeReference(

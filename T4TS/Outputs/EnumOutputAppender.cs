@@ -11,38 +11,59 @@ namespace T4TS.Outputs
         private bool inGlobalModule;
 
         public EnumOutputAppender(
-            StringBuilder output,
-            int baseIndentation,
             Settings settings,
             TypeContext typeContext,
             bool inGlobalModule)
                 : base(
-                      output,
-                      baseIndentation,
                       settings,
                       typeContext)
         {
             this.inGlobalModule = inGlobalModule;
         }
 
-        public override void AppendOutput(TypeScriptEnum segment)
+        public override void AppendOutput(
+            StringBuilder output,
+            int indentation,
+            TypeScriptEnum segment)
         {
-            AppendIndentedLine("/** Generated from " + segment.SourceType.RawName + " **/");
+            this.AppendIndentedLine(
+                output,
+                indentation,
+                "/** Generated from " + segment.SourceType.RawName + " **/");
 
             TypeName outputName = this.TypeContext.ResolveOutputTypeName(segment);
             if (this.inGlobalModule)
-                AppendIndented("enum " + outputName.QualifiedSimpleName);
+            {
+                this.AppendIndented(
+                    output,
+                    indentation,
+                    "enum " + outputName.QualifiedSimpleName);
+            }
             else
-                AppendIndented("export enum " + outputName.QualifiedSimpleName);
-            
-            Output.AppendLine(" {");
+            {
+                this.AppendIndented(
+                    output,
+                    indentation, 
+                    "export enum " + outputName.QualifiedSimpleName);
+            }
 
-            AppendValues(segment);
+            output.AppendLine(" {");
 
-            AppendIndentedLine("}");
+            this.AppendValues(
+                output,
+                indentation, 
+                segment);
+
+            this.AppendIndentedLine(
+                output,
+                indentation,
+                "}");
         }
 
-        private void AppendValues(TypeScriptEnum segment)
+        private void AppendValues(
+            StringBuilder output,
+            int indentation,
+            TypeScriptEnum segment)
         {
             bool first = true;
             foreach (var value in segment.Values)
@@ -53,17 +74,20 @@ namespace T4TS.Outputs
                 }
                 else
                 {
-                    Output.AppendLine(",");
+                    output.AppendLine(",");
                 }
 
-                AppendIndented("    " + value.Name);
+                this.AppendIndented(
+                    output,
+                    indentation + 4,
+                    value.Name);
 
                 if (value.Value != null)
                 {
-                    Output.Append(" = " + value.Value);
+                    output.Append(" = " + value.Value);
                 }
             }
-            Output.AppendLine();
+            output.AppendLine();
         }
     }
 }

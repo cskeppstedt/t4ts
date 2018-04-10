@@ -87,9 +87,20 @@ namespace T4TS
                             if (settings.ClassFilter == null
                                 || settings.ClassFilter(codeClass))
                             {
-                                settings.ClassToInterfaceBuilder.Build(
-                                    codeClass,
-                                    this.context);
+                                TypeScriptInterface builtType = 
+                                    settings.ClassToInterfaceBuilder.Build(
+                                        codeClass,
+                                        this.context);
+
+                                if (builtType != null
+                                    && settings.TypeDecorators != null
+                                    && settings.TypeDecorators.Any())
+                                {
+                                    foreach (Action<TypeScriptType> typeDecorator in settings.TypeDecorators)
+                                    {
+                                        typeDecorator(builtType);
+                                    }
+                                }
                             }
                         });
                 }
@@ -103,9 +114,20 @@ namespace T4TS
                             if (settings.InterfaceFilter == null
                                 || settings.InterfaceFilter(codeInterface))
                             {
-                                settings.InterfaceToInterfaceBuilder.Build(
-                                    codeInterface,
-                                    this.context);
+                                TypeScriptInterface builtType = 
+                                    settings.InterfaceToInterfaceBuilder.Build(
+                                        codeInterface,
+                                        this.context);
+
+                                if (builtType != null
+                                    && settings.TypeDecorators != null
+                                    && settings.TypeDecorators.Any())
+                                {
+                                    foreach(Action<TypeScriptType> typeDecorator in settings.TypeDecorators)
+                                    {
+                                        typeDecorator(builtType);
+                                    }
+                                }
                             }
                         });
                 }

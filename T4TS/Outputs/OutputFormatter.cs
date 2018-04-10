@@ -21,14 +21,15 @@ namespace T4TS
             output.AppendLine("****************************************************************************/");
 
             var moduleAppender = new ModuleOutputAppender(
-                output,
-                0,
                 settings,
                 typeContext);
             foreach (var module in modules)
             {
                 output.AppendLine();
-                moduleAppender.AppendOutput(module);
+                moduleAppender.AppendOutput(
+                    output,
+                    0,
+                    module);
             }
 
             return output.ToString();

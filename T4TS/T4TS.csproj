@@ -54,7 +54,12 @@
     <Compile Include="Builders\AttributeInterfaceBuilder.cs" />
     <Compile Include="Builders\DirectSettings.cs" />
     <Compile Include="CodeTraverser.Settings.cs" />
+    <Compile Include="Outputs\Custom\CaseChangeCopyMethod.OutputAppender.cs" />
+    <Compile Include="Outputs\Custom\ChangeCaseCopyMethod.cs" />
+    <Compile Include="Outputs\MethodAppender.cs" />
     <Compile Include="Outputs\TypeReference.cs" />
+    <Compile Include="Outputs\TypeScriptMethod.cs" />
+    <Compile Include="Outputs\TypeScriptType.cs" />
     <Compile Include="TypeContext.Settings.cs" />
     <Compile Include="TypeName.cs" />
     <Compile Include="TypeName.Parser.cs" />
@@ -77,7 +82,7 @@
     <Compile Include="TypeFullNameParser.cs" />
     <Compile Include="TypeContext.cs" />
     <Compile Include="Outputs\TypeScriptInterface.cs" />
-    <Compile Include="Outputs\TypeScriptInterfaceMember.cs" />
+    <Compile Include="Outputs\TypeScriptMember.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

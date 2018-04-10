@@ -8,14 +8,8 @@ using EnvDTE;
 namespace T4TS.Outputs
 {
     [System.Diagnostics.DebuggerDisplay("TypeScriptInterface {FullName}")]    
-    public class TypeScriptInterface : TypeReference
+    public class TypeScriptInterface : TypeScriptType
     {
-        public List<TypeScriptInterfaceMember> Members { get; set; }
-        public TypeReference IndexedType { get; set; }
-        public TypeReference Parent { get; set; }
-
-        public IList<TypeReference> Bases { get; set; }
-
         public TypeScriptInterface(
             TypeName sourceType,
             IEnumerable<TypeReference> typeArgumentReferences,
@@ -25,8 +19,6 @@ namespace T4TS.Outputs
                     typeArgumentReferences,
                     contextTypeReference)
         {
-            Members = new List<TypeScriptInterfaceMember>();
-            Bases = new List<TypeReference>();
         }
     }
 }

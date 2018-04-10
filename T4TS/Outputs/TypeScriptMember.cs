@@ -5,7 +5,7 @@ using System.Text;
 
 namespace T4TS.Outputs
 {
-    public class TypeScriptInterfaceMember
+    public class TypeScriptMember
     {
         public string Name { get; set; }
         public TypeReference Type { get; set; }

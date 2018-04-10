@@ -12,6 +12,11 @@ namespace T4TS.Tests.Utils
         public static void AssertAreEqual(string expected, string actual)
         {
             string assertMessage = null;
+            if (expected.Length == 0
+                && actual.Length != 0)
+            {
+                assertMessage = "Expected empty string";
+            }
             for (int index = 0; index < expected.Length; index++)
             {
                 if (actual.Length <= index)

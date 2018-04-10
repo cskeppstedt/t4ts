@@ -86,6 +86,7 @@
     <Compile Include="Fixtures\Generics\Test.cs" />
     <Compile Include="Fixtures\Indexed\IndexedModel.cs" />
     <Compile Include="Fixtures\Indexed\Test.cs" />
+    <Compile Include="Fixtures\Methods\MethodsTest.cs" />
     <Compile Include="Fixtures\Nullable\NullableModel.cs" />
     <Compile Include="Fixtures\Nullable\Test.cs" />
     <Compile Include="Fixtures\Enumerable\EnumerableModel.cs" />

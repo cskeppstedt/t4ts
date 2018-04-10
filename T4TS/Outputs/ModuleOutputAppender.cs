@@ -10,72 +10,81 @@ namespace T4TS
     public class ModuleOutputAppender : OutputAppender<TypeScriptModule>
     {
         public ModuleOutputAppender(
-            StringBuilder output,
-            int baseIndentation,
             Settings settings,
             TypeContext typeContext)
                 : base(
-                    output,
-                    baseIndentation,
                     settings,
                     typeContext)
         {
         }
 
-        public override void AppendOutput(TypeScriptModule module)
+        public override void AppendOutput(
+            StringBuilder output,
+            int baseIndentation,
+            TypeScriptModule module)
         {
-            BeginModule(module);
+            BeginModule(
+                output,
+                module);
 
             InterfaceOutputAppender interfaceAppender = new InterfaceOutputAppender(
-                this.Output,
-                this.BaseIndentation + 4,
                 this.Settings,
                 this.TypeContext,
                 module.IsGlobal);
             foreach (var tsInterface in module.Interfaces
                 .OrderBy((currentInterface) => currentInterface.SourceType.RawName))
             {
-                interfaceAppender.AppendOutput(tsInterface);
+                interfaceAppender.AppendOutput(
+                    output,
+                    baseIndentation + 4,
+                    tsInterface);
             }
 
             EnumOutputAppender enumAppender = new EnumOutputAppender(
-                this.Output,
-                this.BaseIndentation + 4,
                 this.Settings,
                 this.TypeContext,
                 module.IsGlobal);
             foreach (var tsEnum in module.Enums)
             {
-                enumAppender.AppendOutput(tsEnum);
+                enumAppender.AppendOutput(
+                    output,
+                    baseIndentation + 4, 
+                    tsEnum);
             }
 
-            EndModule(module);
+            this.EndModule(
+                output,
+                module);
         }
 
-        private void BeginModule(TypeScriptModule module)
+        private void BeginModule(
+            StringBuilder output,
+            TypeScriptModule module)
         {
             if (module.IsGlobal)
             {
-                Output.AppendLine("// -- Begin global interfaces");
+                output.AppendLine("// -- Begin global interfaces");
             }
             else
             {
                 if (Settings.CompatibilityVersion != null && Settings.CompatibilityVersion < new Version(0, 9, 0))
-                    Output.Append("module ");
+                    output.Append("module ");
                 else
-                    Output.Append("declare module ");
+                    output.Append("declare module ");
 
-                Output.Append(module.QualifiedName);
-                Output.AppendLine(" {");
+                output.Append(module.QualifiedName);
+                output.AppendLine(" {");
             }
         }
 
-        private void EndModule(TypeScriptModule module)
+        private void EndModule(
+            StringBuilder output,
+            TypeScriptModule module)
         {
             if (module.IsGlobal)
-                Output.AppendLine("// -- End global interfaces");
+                output.AppendLine("// -- End global interfaces");
             else
-                Output.AppendLine("}");
+                output.AppendLine("}");
         }
     }
 }
