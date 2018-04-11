@@ -55,36 +55,15 @@ namespace T4TS.Outputs.Custom
                 string fromObjectName = (this.toContainingType)
                     ? method.Arguments.First().Name
                     : "this";
-
-                string camelCase;
-                string pascalCase;
-                string fromName;
-                string toName;
+                
                 foreach (TypeScriptMember field in containingType.Fields)
                 {
-                    camelCase = field.Name[0].ToString().ToLower()
-                        + field.Name.Substring(1);
-                    pascalCase = field.Name[0].ToString().ToUpper()
-                        + field.Name.Substring(1);
-                    if (this.toCamelCase)
-                    {
-                        toName = camelCase;
-                        fromName = pascalCase;
-                    }
-                    else
-                    {
-                        toName = pascalCase;
-                        fromName = camelCase;
-                    }
-
-                    this.AppendIndentedLine(
+                    this.AppendFieldCopy(
                         output,
                         bodyIndent,
-                        String.Format(
-                            "result.{0} = {1}.{2};",
-                            toName,
-                            fromObjectName,
-                            fromName));
+                        method,
+                        fromObjectName,
+                        field);
                 }
 
                 this.AppendIndentedLine(
@@ -96,6 +75,96 @@ namespace T4TS.Outputs.Custom
                     output,
                     baseIndentation,
                     "}");
+            }
+
+            private void AppendFieldCopy(
+                StringBuilder output,
+                int indent,
+                TypeScriptMethod parentMethod,
+                string fromObjectName,
+                TypeScriptMember field)
+            {
+                string camelCase = field.Name[0].ToString().ToLower()
+                    + field.Name.Substring(1);
+                string pascalCase = field.Name[0].ToString().ToUpper()
+                    + field.Name.Substring(1);
+
+                string fromName;
+                string toName;
+                if (this.toCamelCase)
+                {
+                    toName = camelCase;
+                    fromName = pascalCase;
+                }
+                else
+                {
+                    toName = pascalCase;
+                    fromName = camelCase;
+                }
+
+                TypeScriptInterface interfaceType = this.TypeContext.GetInterface(field.Type.SourceType);
+                TypeScriptMethod copyMethod = null;
+                if (interfaceType != null
+                    && interfaceType.Methods != null)
+                {
+                    copyMethod = interfaceType.Methods.FirstOrDefault(
+                        (fieldInterfaceMethod)
+                            => fieldInterfaceMethod.Appender is ChangeCaseCopyMethod.OutputAppender
+                                && fieldInterfaceMethod.Name == parentMethod.Name);
+                }
+
+                if (copyMethod != null)
+                {
+                    this.AppendIndentedLine(
+                        output,
+                        indent,
+                        String.Format(
+                            "result.{0} = {1};",
+                            toName,
+                            this.GetMethodCall(
+                                fromObjectName,
+                                fromName,
+                                interfaceType,
+                                copyMethod)));
+                }
+                else
+                {
+                    this.AppendIndentedLine(
+                        output,
+                        indent,
+                        String.Format(
+                            "result.{0} = {1}.{2};",
+                            toName,
+                            fromObjectName,
+                            fromName));
+                }
+            }
+
+            private string GetMethodCall(
+                string fromObjectName,
+                string fromName,
+                TypeScriptInterface interfaceType,
+                TypeScriptMethod copyMethod)
+            {
+                string result;
+                if (copyMethod.IsStatic)
+                {
+                    TypeName outputName = this.TypeContext.ResolveOutputTypeName(interfaceType);
+                    result = String.Format(
+                        "{0}.{1}({2}.{3})",
+                        outputName.QualifiedName,
+                        copyMethod.Name,
+                        fromObjectName,
+                        fromName);
+                }
+                else
+                {
+                    result = String.Format(
+                        "{0}.{1}()",
+                        fromObjectName,
+                        copyMethod.Name);
+                }
+                return result;
             }
         }
     }

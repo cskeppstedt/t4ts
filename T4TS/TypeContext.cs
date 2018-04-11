@@ -80,6 +80,16 @@ namespace T4TS
                 contextTypeReference: null);
         }
 
+        public TypeScriptInterface GetInterface(
+            TypeName sourceType)
+        {
+            TypeScriptInterface result;
+            this.sourceToInterfaceMap.TryGetValue(
+                sourceType.UniversalName,
+                out result);
+            return result;
+        }
+
         public TypeScriptInterface GetOrCreateInterface(
             string moduleName,
             TypeName sourceType,
