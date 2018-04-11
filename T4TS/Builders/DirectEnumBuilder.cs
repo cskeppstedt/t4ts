@@ -10,9 +10,9 @@ namespace T4TS.Builders
 {
     public class DirectEnumBuilder : CodeEnumBuilder
     {
-        private DirectSettings settings;
+        private DirectBuilderSettings settings;
 
-        public DirectEnumBuilder(DirectSettings settings)
+        public DirectEnumBuilder(DirectBuilderSettings settings)
         {
             this.settings = settings;
         }

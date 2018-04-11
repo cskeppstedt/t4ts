@@ -11,7 +11,7 @@ namespace T4TS
     {
         public static string GetOutput(
             List<TypeScriptModule> modules,
-            Settings settings,
+            OutputSettings settings,
             TypeContext typeContext)
         {
             var output = new StringBuilder();

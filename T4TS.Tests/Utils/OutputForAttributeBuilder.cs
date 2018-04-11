@@ -7,23 +7,38 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using T4TS.Builders;
+using T4TS.Outputs;
 
 namespace T4TS.Tests.Utils
 {
     class OutputForAttributeBuilder
     {
         readonly IReadOnlyCollection<Type> Types;
+
         public Settings Settings { get; private set; }
+
+        public OutputSettings OutputSettings { get; private set; }
+
+        public TypeContext.Settings TypeSettings { get; private set; }
+
 
         public OutputForAttributeBuilder(params Type[] types)
         {
             this.Types = new ReadOnlyCollection<Type>(types);
             this.Settings = new Settings();
+            this.OutputSettings = new OutputSettings();
+            this.TypeSettings = new TypeContext.Settings();
         }
 
         public OutputForAttributeBuilder With(Settings settings)
         {
             this.Settings = settings;
+            return this;
+        }
+
+        public OutputForAttributeBuilder WithTypeSettings(TypeContext.Settings typeSettings)
+        {
+            this.TypeSettings = typeSettings;
             return this;
         }
 
@@ -39,10 +54,7 @@ namespace T4TS.Tests.Utils
         {
             var solution = DTETransformer.BuildDteSolution(this.Types.ToArray());
             var attributeBuilder = new AttributeInterfaceBuilder(this.Settings);
-            var typeContext = new TypeContext(new TypeContext.Settings()
-            {
-                UseNativeDates = this.Settings.UseNativeDates
-            });
+            var typeContext = new TypeContext(this.TypeSettings);
             var generator = new CodeTraverser(
                 solution,
                 typeContext)
@@ -56,7 +68,7 @@ namespace T4TS.Tests.Utils
 
             return OutputFormatter.GetOutput(
                 data,
-                this.Settings,
+                this.OutputSettings,
                 typeContext);
         }
 

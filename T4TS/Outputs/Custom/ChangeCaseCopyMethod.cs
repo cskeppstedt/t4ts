@@ -9,7 +9,7 @@ namespace T4TS.Outputs.Custom
     public partial class ChangeCaseCopyMethod : TypeScriptMethod
     {
         public static TypeScriptMethod Create(
-            Settings outputSettings,
+            OutputSettings outputSettings,
             TypeContext typeContext,
             string name,
             TypeScriptType containingType,

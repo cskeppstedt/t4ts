@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace T4TS.Builders
 {
-    public class DirectSettings
+    public class DirectBuilderSettings
     {
         public IDictionary<string, string> NamespaceToModuleMap { get; set; }
 
         public bool CamelCase { get; set; }
         public bool CreateClasses { get; set; }
 
-        public DirectSettings()
+        public DirectBuilderSettings()
         {
             this.NamespaceToModuleMap = new Dictionary<string, string>();
         }

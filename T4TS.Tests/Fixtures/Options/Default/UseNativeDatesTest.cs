@@ -11,10 +11,12 @@ namespace T4TS.Tests.Fixtures.Options.Default
         {
             // Expect
             new OutputForAttributeBuilder(
-                typeof(UseNativeDatesModel)
-            ).With(new Settings {
-                UseNativeDates = true
-            }).ToEqual(ExpectedOutput);
+                typeof(UseNativeDatesModel))
+                    .WithTypeSettings(new TypeContext.Settings
+                        {
+                            UseNativeDates = true
+                        })
+                    .ToEqual(ExpectedOutput);
         }
 
 const string ExpectedOutput = 

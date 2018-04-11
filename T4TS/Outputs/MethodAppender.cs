@@ -9,7 +9,7 @@ namespace T4TS.Outputs
     public abstract class MethodAppender : OutputAppender<TypeScriptMethod>
     {
         public MethodAppender(
-            Settings settings,
+            OutputSettings settings,
             TypeContext typeContext)
                 : base(
                     settings,

@@ -92,7 +92,7 @@ enum ExplicitEnum {
         {
             var sb = new StringBuilder();
             var appender = new EnumOutputAppender(
-                new Settings(),
+                new OutputSettings(),
                 this.typeContext,
                 inGlobalModule: false);
 
@@ -109,7 +109,7 @@ enum ExplicitEnum {
         {
             var sb = new StringBuilder();
             var appender = new EnumOutputAppender(
-                new Settings(),
+                new OutputSettings(),
                 this.typeContext,
                 inGlobalModule: true);
 
@@ -126,7 +126,7 @@ enum ExplicitEnum {
         {
             var sb = new StringBuilder();
             var appender = new EnumOutputAppender(
-                new Settings(),
+                new OutputSettings(),
                 this.typeContext,
                 inGlobalModule: false);
 

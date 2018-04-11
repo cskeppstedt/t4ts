@@ -12,7 +12,7 @@ namespace T4TS
         private bool InGlobalModule { get; set; }
 
         public InterfaceOutputAppender(
-            Settings settings,
+            OutputSettings settings,
             TypeContext typeContext,
             bool inGlobalModule)
                 : base(
@@ -119,7 +119,19 @@ namespace T4TS
                 output.Append(" extends " + parentName.QualifiedName);
             }
 
-            output.AppendLine(" {");
+            if (!this.Settings.OpenBraceOnNextLine)
+            {
+                output.AppendLine(" {");
+            }
+            else
+            {
+                output.AppendLine();
+
+                this.AppendIndentedLine(
+                    output,
+                    baseIndentation,
+                    "{");
+            }
         }
 
         private void EndInterface(

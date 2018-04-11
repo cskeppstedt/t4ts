@@ -10,7 +10,7 @@ namespace T4TS
     public class MemberOutputAppender : OutputAppender<TypeScriptMember>
     {
         public MemberOutputAppender(
-            Settings settings,
+            OutputSettings settings,
             TypeContext typeContext)
                 : base(
                       settings,

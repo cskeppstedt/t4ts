@@ -11,7 +11,7 @@ namespace T4TS.Outputs
         private bool inGlobalModule;
 
         public EnumOutputAppender(
-            Settings settings,
+            OutputSettings settings,
             TypeContext typeContext,
             bool inGlobalModule)
                 : base(

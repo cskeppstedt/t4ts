@@ -10,7 +10,7 @@ namespace T4TS
     public class ModuleOutputAppender : OutputAppender<TypeScriptModule>
     {
         public ModuleOutputAppender(
-            Settings settings,
+            OutputSettings settings,
             TypeContext typeContext)
                 : base(
                     settings,
@@ -25,6 +25,7 @@ namespace T4TS
         {
             BeginModule(
                 output,
+                baseIndentation,
                 module);
 
             InterfaceOutputAppender interfaceAppender = new InterfaceOutputAppender(
@@ -59,6 +60,7 @@ namespace T4TS
 
         private void BeginModule(
             StringBuilder output,
+            int indent,
             TypeScriptModule module)
         {
             if (module.IsGlobal)
@@ -73,7 +75,20 @@ namespace T4TS
                     output.Append("declare module ");
 
                 output.Append(module.QualifiedName);
-                output.AppendLine(" {");
+
+                if (!this.Settings.OpenBraceOnNextLine)
+                {
+                    output.AppendLine(" {");
+                }
+                else
+                {
+                    output.AppendLine();
+
+                    this.AppendIndentedLine(
+                        output,
+                        indent,
+                        "{");
+                }
             }
         }
 

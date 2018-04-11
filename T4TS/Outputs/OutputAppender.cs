@@ -5,15 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace T4TS
+namespace T4TS.Outputs
 {
-    public abstract class OutputAppender<TSegment> where TSegment: class
+    public abstract partial class OutputAppender<TSegment> where TSegment: class
     {
-        protected Settings Settings { get; private set; }
+        protected OutputSettings Settings { get; private set; }
         protected TypeContext TypeContext { get; private set; }
 
         public OutputAppender(
-            Settings settings,
+            OutputSettings settings,
             TypeContext typeContext)
         {
             if (settings == null)

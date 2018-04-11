@@ -13,9 +13,9 @@ namespace T4TS.Builders
         : ICodeClassToInterfaceBuilder,
         ICodeInterfaceToInterfaceBuilder
     {
-        private DirectSettings settings;
+        private DirectBuilderSettings settings;
 
-        public DirectInterfaceBuilder(DirectSettings settings)
+        public DirectInterfaceBuilder(DirectBuilderSettings settings)
         {
             this.settings = settings;
         }

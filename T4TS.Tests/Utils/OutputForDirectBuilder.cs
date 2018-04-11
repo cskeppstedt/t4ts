@@ -7,22 +7,23 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using T4TS.Builders;
+using T4TS.Outputs;
 
 namespace T4TS.Tests.Utils
 {
     class OutputForDirectBuilder
     {
         readonly IReadOnlyCollection<Type> Types;
-        public Settings OutputSettings { get; private set; }
-        public DirectSettings DirectSettings { get; private set; }
+        public OutputSettings OutputSettings { get; private set; }
+        public DirectBuilderSettings DirectSettings { get; private set; }
         public CodeTraverser.TraverserSettings TraverserSettings { get; private set; }
         public TypeContext TypeContext { get; private set; }
 
         public OutputForDirectBuilder(params Type[] types)
         {
             this.Types = new ReadOnlyCollection<Type>(types);
-            this.OutputSettings = new Settings();
-            this.DirectSettings = new DirectSettings();
+            this.OutputSettings = new OutputSettings();
+            this.DirectSettings = new DirectBuilderSettings();
             this.TraverserSettings = new CodeTraverser.TraverserSettings()
             {
                 ClassToInterfaceBuilder = new DirectInterfaceBuilder(this.DirectSettings),
@@ -33,7 +34,7 @@ namespace T4TS.Tests.Utils
         }
 
         public OutputForDirectBuilder WithSettings(
-            Action<DirectSettings> changeSettings)
+            Action<DirectBuilderSettings> changeSettings)
         {
             changeSettings(this.DirectSettings);
             return this;

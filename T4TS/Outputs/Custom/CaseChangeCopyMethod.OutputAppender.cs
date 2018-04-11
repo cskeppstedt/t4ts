@@ -16,7 +16,7 @@ namespace T4TS.Outputs.Custom
             private bool toCamelCase;
 
             public OutputAppender(
-                Settings settings,
+                OutputSettings settings,
                 TypeContext typeContext,
                 TypeScriptType containingType,
                 TypeReference otherType,

@@ -30,7 +30,7 @@ namespace T4TS.Tests
             };
 
             var appender = new MemberOutputAppender(
-                new Settings
+                new OutputSettings
                 {
                     CompatibilityVersion = version
                 },
@@ -58,7 +58,7 @@ namespace T4TS.Tests
             };
 
             var appender = new MemberOutputAppender(
-                new Settings
+                new OutputSettings
                 {
                     CompatibilityVersion = new Version(0, 9, 0)
                 },
@@ -86,7 +86,7 @@ namespace T4TS.Tests
             };
 
             var appender = new MemberOutputAppender(
-                new Settings
+                new OutputSettings
                 {
                     CompatibilityVersion = null
                 },

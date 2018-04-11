@@ -27,17 +27,7 @@ namespace T4TS
         /// The default string to prefix interface names with. For instance, you might want to prefix the names with an "I" to get conventional interface names.
         /// </summary>
         public string DefaultInterfaceNamePrefix { get; set; }
-
-        /// <summary>
-        /// The version of Typescript that is targeted
-        /// </summary>
-        public Version CompatibilityVersion { get; set; }
-
-        /// <summary>
-        /// If true translates System.DateTime to native date
-        /// </summary>
-        public bool UseNativeDates { get; set; }
-
+        
         public static Settings Parse(Dictionary<string,object> settingsValues)
         {
             // Read settings from T4TS.tt.settings.tt
@@ -46,9 +36,7 @@ namespace T4TS
                 DefaultModule = ParseSettingReferenceType(settingsValues, "DefaultModule", s => s as string, "T4TS"),
                 DefaultOptional = ParseSettingNullableType(settingsValues, "DefaultOptional", false),
                 DefaultCamelCaseMemberNames = ParseSettingNullableType(settingsValues, "DefaultCamelCaseMemberNames", false),
-                DefaultInterfaceNamePrefix = ParseSettingReferenceType(settingsValues, "DefaultInterfaceNamePrefix", s => s as string, string.Empty),
-                CompatibilityVersion = ParseSettingReferenceType(settingsValues, "CompatibilityVersion", v => v as Version, new Version(0, 9, 1, 1)),
-                UseNativeDates = ParseSettingNullableType(settingsValues, "UseNativeDates", false)
+                DefaultInterfaceNamePrefix = ParseSettingReferenceType(settingsValues, "DefaultInterfaceNamePrefix", s => s as string, string.Empty)
             };
         }
 
