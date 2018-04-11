@@ -77,6 +77,27 @@ namespace T4TS.Outputs.Custom
                     "}");
             }
 
+            private void DetermineFieldNames(
+                string baseName,
+                out string toFieldName,
+                out string fromFieldName)
+            {
+                string allExceptFirst = baseName.Substring(1);
+                string camelCase = baseName[0].ToString().ToLower() + allExceptFirst;
+                string pascalCase = baseName[0].ToString().ToUpper() + allExceptFirst;
+                
+                if (this.toCamelCase)
+                {
+                    toFieldName = camelCase;
+                    fromFieldName = pascalCase;
+                }
+                else
+                {
+                    toFieldName = pascalCase;
+                    fromFieldName = camelCase;
+                }
+            }
+
             private void AppendFieldCopy(
                 StringBuilder output,
                 int indent,
@@ -84,59 +105,80 @@ namespace T4TS.Outputs.Custom
                 string fromObjectName,
                 TypeScriptMember field)
             {
-                string camelCase = field.Name[0].ToString().ToLower()
-                    + field.Name.Substring(1);
-                string pascalCase = field.Name[0].ToString().ToUpper()
-                    + field.Name.Substring(1);
+                string toFieldName;
+                string fromFieldName;
+                this.DetermineFieldNames(
+                    field.Name,
+                    out toFieldName,
+                    out fromFieldName);
 
-                string fromName;
-                string toName;
-                if (this.toCamelCase)
-                {
-                    toName = camelCase;
-                    fromName = pascalCase;
-                }
-                else
-                {
-                    toName = pascalCase;
-                    fromName = camelCase;
-                }
+                this.AppendFieldValueCopy(
+                    output,
+                    indent,
+                    toFieldName,
+                    fromObjectName,
+                    fromFieldName,
+                    parentMethod,
+                    field.Type);
+            }
 
-                TypeScriptInterface interfaceType = this.TypeContext.GetInterface(field.Type.SourceType);
-                TypeScriptMethod copyMethod = null;
-                if (interfaceType != null
-                    && interfaceType.Methods != null)
+            private void AppendFieldValueCopy(
+                StringBuilder output,
+                int indent,
+                string toName,
+                string fromObjectName,
+                string fromName,
+                TypeScriptMethod parentMethod,
+                TypeReference fieldType)
+            {
+                if (!fieldType.SourceType.IsArray)
                 {
-                    copyMethod = interfaceType.Methods.FirstOrDefault(
-                        (fieldInterfaceMethod)
-                            => fieldInterfaceMethod.Appender is ChangeCaseCopyMethod.OutputAppender
-                                && fieldInterfaceMethod.Name == parentMethod.Name);
-                }
+                    TypeScriptInterface interfaceType = this.TypeContext.GetInterface(fieldType.SourceType);
+                    TypeScriptMethod copyMethod = null;
+                    if (interfaceType != null
+                        && interfaceType.Methods != null)
+                    {
+                        copyMethod = interfaceType.Methods.FirstOrDefault(
+                            (fieldInterfaceMethod)
+                                => fieldInterfaceMethod.Appender is ChangeCaseCopyMethod.OutputAppender
+                                    && fieldInterfaceMethod.Name == parentMethod.Name);
+                    }
 
-                if (copyMethod != null)
-                {
+                    string rightHandSide;
+                    if (copyMethod != null)
+                    {
+                        rightHandSide = this.GetMethodCall(
+                            fromObjectName,
+                            fromName,
+                            interfaceType,
+                            copyMethod);
+                    }
+                    else
+                    {
+                        rightHandSide = String.Format(
+                            "{0}.{1}",
+                            fromObjectName,
+                            fromName);
+                    }
+
                     this.AppendIndentedLine(
                         output,
                         indent,
                         String.Format(
                             "result.{0} = {1};",
                             toName,
-                            this.GetMethodCall(
-                                fromObjectName,
-                                fromName,
-                                interfaceType,
-                                copyMethod)));
+                            rightHandSide));
                 }
                 else
                 {
-                    this.AppendIndentedLine(
+                    this.AppendArrayCopy(
                         output,
                         indent,
-                        String.Format(
-                            "result.{0} = {1}.{2};",
-                            toName,
-                            fromObjectName,
-                            fromName));
+                        toName,
+                        fromObjectName,
+                        fromName,
+                        parentMethod,
+                        fieldType);
                 }
             }
 
@@ -165,6 +207,62 @@ namespace T4TS.Outputs.Custom
                         copyMethod.Name);
                 }
                 return result;
+            }
+
+
+            private void AppendArrayCopy(
+                StringBuilder output,
+                int indent,
+                string toName,
+                string fromObjectName,
+                string fromName,
+                TypeScriptMethod parentMethod,
+                TypeReference fieldType)
+            {
+                TypeName resolvedType = this.TypeContext.ResolveOutputTypeName(fieldType);
+                TypeName itemType = fieldType.SourceType.TypeArguments.First();
+                this.AppendIndentedLine(
+                    output,
+                    indent,
+                    String.Format(
+                        "result.{0} = new {1}[{2}.{3}.length];",
+                        toName,
+                        itemType,
+                        fromObjectName,
+                        fromName));
+
+                this.AppendIndentedLine(
+                    output,
+                    indent,
+                    String.Format(
+                        "for (var index{0}: number = 0; index{0} < {1}.{2}.length; index{0}++)",
+                        indent / 4,
+                        fromObjectName,
+                        fromName));
+
+                this.AppendIndentedLine(
+                    output,
+                    indent,
+                    "{");
+
+                this.AppendFieldValueCopy(
+                    output,
+                    indent + 4,
+                    String.Format(
+                        "{0}[index{1}]",
+                        toName,
+                        indent / 4),
+                    fromObjectName,
+                    fromName,
+                    parentMethod,
+                    this.TypeContext.GetTypeReference(
+                        itemType,
+                        fieldType.ContextTypeReference));
+
+                this.AppendIndentedLine(
+                    output,
+                    indent,
+                    "}");
             }
         }
     }
