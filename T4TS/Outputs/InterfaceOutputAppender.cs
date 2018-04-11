@@ -94,20 +94,24 @@ namespace T4TS
 
             TypeName outputName = this.TypeContext.ResolveOutputTypeName(tsInterface);
 
-            if (InGlobalModule)
+            this.AppendIndendation(
+                output,
+                baseIndentation);
+
+            if (!InGlobalModule)
             {
-                this.AppendIndented(
-                    output,
-                    baseIndentation,
-                    "interface " + outputName.QualifiedSimpleName);
+                output.Append("export ");
+            }
+
+            if (tsInterface.IsClass)
+            {
+                output.Append("class ");
             }
             else
             {
-                this.AppendIndented(
-                    output,
-                    baseIndentation,
-                    "export interface " + outputName.QualifiedSimpleName);
+                output.Append("interface ");
             }
+            output.Append(outputName.QualifiedSimpleName);
             
             if (tsInterface.Parent != null)
             {

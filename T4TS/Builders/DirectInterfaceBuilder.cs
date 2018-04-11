@@ -34,6 +34,7 @@ namespace T4TS.Builders
                 TypeName.ParseDte(codeClass.FullName),
                 codeClass.Name,
                 out interfaceCreated);
+            result.IsClass = this.settings.CreateClasses;
 
             this.PopulateBases(
                 codeClass.Bases,

@@ -12,6 +12,7 @@ namespace T4TS.Builders
         public IDictionary<string, string> NamespaceToModuleMap { get; set; }
 
         public bool CamelCase { get; set; }
+        public bool CreateClasses { get; set; }
 
         public DirectSettings()
         {

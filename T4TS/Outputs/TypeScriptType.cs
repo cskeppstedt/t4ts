@@ -15,6 +15,8 @@ namespace T4TS.Outputs
         public TypeReference Parent { get; set; }
 
         public IList<TypeReference> Bases { get; set; }
+        
+        public bool IsClass { get; internal set; }
 
         public TypeScriptType(
             TypeName sourceType,
