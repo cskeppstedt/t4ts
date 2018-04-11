@@ -148,6 +148,19 @@ namespace T4TS
                 new List<TypeName>(this.TypeArguments));
         }
 
+        public TypeName ReplaceNamespace(string newNamespace)
+        {
+            string currentNamesace = this.Namespace;
+            return new TypeName(
+                this.RawName.Replace(
+                    currentNamesace,
+                    newNamespace),
+                this.UnqualifiedName.Replace(
+                    currentNamesace,
+                    newNamespace),
+                new List<TypeName>(this.TypeArguments));
+        }
+
         public static TypeName Format(
             string format,
             IEnumerable<TypeName> typaArguments)

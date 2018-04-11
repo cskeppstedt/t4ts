@@ -15,6 +15,8 @@ namespace T4TS.Outputs
 
         public bool OpenBraceOnNextLine { get; set; }
 
+        public bool OrderInterfacesByReference { get; set; }
+
         public OutputSettings()
         {
             this.CompatibilityVersion = new Version(0, 9, 1, 1);

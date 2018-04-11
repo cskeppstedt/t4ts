@@ -28,18 +28,6 @@ namespace T4TS
                 baseIndentation,
                 module);
 
-            InterfaceOutputAppender interfaceAppender = new InterfaceOutputAppender(
-                this.Settings,
-                this.TypeContext,
-                module.IsGlobal);
-            foreach (var tsInterface in module.Interfaces
-                .OrderBy((currentInterface) => currentInterface.SourceType.RawName))
-            {
-                interfaceAppender.AppendOutput(
-                    output,
-                    baseIndentation + 4,
-                    tsInterface);
-            }
 
             EnumOutputAppender enumAppender = new EnumOutputAppender(
                 this.Settings,
@@ -49,8 +37,23 @@ namespace T4TS
             {
                 enumAppender.AppendOutput(
                     output,
-                    baseIndentation + 4, 
+                    baseIndentation + 4,
                     tsEnum);
+            }
+
+            if (!this.Settings.OrderInterfacesByReference)
+            {
+                this.AppendInterfacesInCreatedOrder(
+                    output,
+                    baseIndentation + 4,
+                    module);
+            }
+            else
+            {
+                this.AppendInterfacesInReferenceOrder(
+                    output,
+                    baseIndentation + 4,
+                    module);
             }
 
             this.EndModule(
@@ -100,6 +103,74 @@ namespace T4TS
                 output.AppendLine("// -- End global interfaces");
             else
                 output.AppendLine("}");
+        }
+
+        private void AppendInterfacesInCreatedOrder(
+            StringBuilder output,
+            int indent,
+            TypeScriptModule module)
+        {
+            InterfaceOutputAppender interfaceAppender = new InterfaceOutputAppender(
+                this.Settings,
+                this.TypeContext,
+                module.IsGlobal);
+
+            foreach (var tsInterface in module.Interfaces
+                .OrderBy((currentInterface) => currentInterface.SourceType.RawName))
+            {
+                interfaceAppender.AppendOutput(
+                    output,
+                    indent,
+                    tsInterface);
+            }
+        }
+
+        private void AppendInterfacesInReferenceOrder(
+            StringBuilder output,
+            int indent,
+            TypeScriptModule module)
+        {
+            InterfaceOutputAppender interfaceAppender = new InterfaceOutputAppender(
+                this.Settings,
+                this.TypeContext,
+                module.IsGlobal);
+
+            HashSet<string> outputTypeNames = new HashSet<string>();
+            int handledCount = 0;
+            IList<TypeReference> allTypeReferences = new List<TypeReference>(this.TypeContext.GetTypeReferences());
+            while (handledCount < allTypeReferences.Count)
+            {
+                for (; handledCount < allTypeReferences.Count; handledCount++)
+                {
+                    TypeReference typeReference = allTypeReferences[handledCount];
+                    if (!outputTypeNames.Contains(typeReference.SourceType.UniversalName))
+                    {
+                        TypeScriptInterface interfaceType = this.TypeContext.GetInterface(typeReference.SourceType);
+                        if (interfaceType != null
+                            && module.Interfaces.Contains(interfaceType))
+                        {
+                            interfaceAppender.AppendOutput(
+                                output,
+                                indent,
+                                interfaceType);
+                            outputTypeNames.Add(typeReference.SourceType.UniversalName);
+                        }
+                    }
+                }
+
+                allTypeReferences = new List<TypeReference>(this.TypeContext.GetTypeReferences());
+            }
+
+            foreach (TypeScriptInterface currentInterface in module.Interfaces)
+            {
+                if (!outputTypeNames.Contains(currentInterface.SourceType.UniversalName))
+                {
+                    interfaceAppender.AppendOutput(
+                        output,
+                        indent,
+                        currentInterface);
+                }
+            }
         }
     }
 }
