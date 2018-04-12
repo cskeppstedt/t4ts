@@ -59,6 +59,7 @@
     <Compile Include="Outputs\MethodAppender.cs" />
     <Compile Include="Outputs\OutputSettings.cs" />
     <Compile Include="Outputs\TypeReference.cs" />
+    <Compile Include="Outputs\TypeScriptConstructor.cs" />
     <Compile Include="Outputs\TypeScriptMethod.cs" />
     <Compile Include="Outputs\TypeScriptType.cs" />
     <Compile Include="TypeContext.Settings.cs" />

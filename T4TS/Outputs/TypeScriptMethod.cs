@@ -10,8 +10,16 @@ namespace T4TS.Outputs
     {
         public IList<TypeScriptMember> Arguments { get; set; }
 
+        public IList<TypeReference> TypeArguments { get; set; }
+
         public OutputAppender<TypeScriptMethod> Appender { get; set; }
 
         public bool IsStatic { get; set; }
+
+        public TypeScriptMethod()
+        {
+            this.Arguments = new List<TypeScriptMember>();
+            this.TypeArguments = new List<TypeReference>();
+        }
     }
 }

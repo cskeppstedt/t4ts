@@ -34,27 +34,39 @@ namespace T4TS.Outputs.Custom
 
             protected override void AppendBody(
                 StringBuilder output,
-                int baseIndentation,
+                int indent,
                 TypeScriptMethod method)
             {
                 this.AppendIndentedLine(
                     output,
-                    baseIndentation,
+                    indent,
                     "{");
 
-                TypeName returnType = this.TypeContext.ResolveOutputTypeName(method.Type);
+                int bodyIndent = indent + 4;
 
-                int bodyIndent = baseIndentation + 4;
-                this.AppendIndentedLine(
-                    output,
-                    bodyIndent,
-                    String.Format(
-                        "{0} result = new {0}();",
-                        this.otherType.SourceType.QualifiedName));
+                string toObjectName;
+                string fromObjectName;
 
-                string fromObjectName = (this.toContainingType)
-                    ? method.Arguments.First().Name
-                    : "this";
+                if (this.toContainingType)
+                {
+                    toObjectName = "this";
+                    fromObjectName = method.Arguments.First().Name;
+                }
+                else
+                {
+                    TypeName returnType = this.TypeContext.ResolveOutputTypeName(method.Type);
+
+                    toObjectName = "result";
+                    fromObjectName = "this";
+                    this.AppendIndentedLine(
+                        output,
+                        bodyIndent,
+                        String.Format(
+                            "var {0}: {1} = new {1}();",
+                            toObjectName,
+                            returnType.QualifiedName));
+                }
+
                 
                 foreach (TypeScriptMember field in containingType.Fields)
                 {
@@ -62,18 +74,24 @@ namespace T4TS.Outputs.Custom
                         output,
                         bodyIndent,
                         method,
+                        toObjectName,
                         fromObjectName,
                         field);
                 }
 
+                if (!this.toContainingType)
+                {
                 this.AppendIndentedLine(
                     output,
                     bodyIndent,
-                    "return result;");
+                    String.Format(
+                        "return {0};",
+                        toObjectName));
+                }
 
                 this.AppendIndentedLine(
                     output,
-                    baseIndentation,
+                    indent,
                     "}");
             }
 
@@ -102,6 +120,7 @@ namespace T4TS.Outputs.Custom
                 StringBuilder output,
                 int indent,
                 TypeScriptMethod parentMethod,
+                string toObjectName,
                 string fromObjectName,
                 TypeScriptMember field)
             {
@@ -115,6 +134,7 @@ namespace T4TS.Outputs.Custom
                 this.AppendFieldValueCopy(
                     output,
                     indent,
+                    toObjectName,
                     toFieldName,
                     fromObjectName,
                     fromFieldName,
@@ -125,9 +145,10 @@ namespace T4TS.Outputs.Custom
             private void AppendFieldValueCopy(
                 StringBuilder output,
                 int indent,
-                string toName,
+                string toObjectName,
+                string toFieldName,
                 string fromObjectName,
-                string fromName,
+                string fromFieldName,
                 TypeScriptMethod parentMethod,
                 TypeReference fieldType)
             {
@@ -149,7 +170,7 @@ namespace T4TS.Outputs.Custom
                     {
                         rightHandSide = this.GetMethodCall(
                             fromObjectName,
-                            fromName,
+                            fromFieldName,
                             interfaceType,
                             copyMethod);
                     }
@@ -158,15 +179,16 @@ namespace T4TS.Outputs.Custom
                         rightHandSide = String.Format(
                             "{0}.{1}",
                             fromObjectName,
-                            fromName);
+                            fromFieldName);
                     }
 
                     this.AppendIndentedLine(
                         output,
                         indent,
                         String.Format(
-                            "result.{0} = {1};",
-                            toName,
+                            "{0}.{1} = {2};",
+                            toObjectName,
+                            toFieldName,
                             rightHandSide));
                 }
                 else
@@ -174,9 +196,10 @@ namespace T4TS.Outputs.Custom
                     this.AppendArrayCopy(
                         output,
                         indent,
-                        toName,
+                        toObjectName,
+                        toFieldName,
                         fromObjectName,
-                        fromName,
+                        fromFieldName,
                         parentMethod,
                         fieldType);
                 }
@@ -184,7 +207,7 @@ namespace T4TS.Outputs.Custom
 
             private string GetMethodCall(
                 string fromObjectName,
-                string fromName,
+                string fromFieldName,
                 TypeScriptInterface interfaceType,
                 TypeScriptMethod copyMethod)
             {
@@ -197,7 +220,7 @@ namespace T4TS.Outputs.Custom
                         outputName.QualifiedName,
                         copyMethod.Name,
                         fromObjectName,
-                        fromName);
+                        fromFieldName);
                 }
                 else
                 {
@@ -213,9 +236,10 @@ namespace T4TS.Outputs.Custom
             private void AppendArrayCopy(
                 StringBuilder output,
                 int indent,
-                string toName,
+                string toObjectName,
+                string toFieldName,
                 string fromObjectName,
-                string fromName,
+                string fromFieldName,
                 TypeScriptMethod parentMethod,
                 TypeReference fieldType)
             {
@@ -225,11 +249,12 @@ namespace T4TS.Outputs.Custom
                     output,
                     indent,
                     String.Format(
-                        "result.{0} = new {1}[{2}.{3}.length];",
-                        toName,
+                        "{0}.{1} = new {2}[{3}.{4}.length];",
+                        toObjectName,
+                        toFieldName,
                         itemType,
                         fromObjectName,
-                        fromName));
+                        fromFieldName));
 
                 this.AppendIndentedLine(
                     output,
@@ -238,7 +263,7 @@ namespace T4TS.Outputs.Custom
                         "for (var index{0}: number = 0; index{0} < {1}.{2}.length; index{0}++)",
                         indent / 4,
                         fromObjectName,
-                        fromName));
+                        fromFieldName));
 
                 this.AppendIndentedLine(
                     output,
@@ -248,12 +273,13 @@ namespace T4TS.Outputs.Custom
                 this.AppendFieldValueCopy(
                     output,
                     indent + 4,
+                    toObjectName,
                     String.Format(
                         "{0}[index{1}]",
-                        toName,
+                        toFieldName,
                         indent / 4),
                     fromObjectName,
-                    fromName,
+                    fromFieldName,
                     parentMethod,
                     this.TypeContext.GetTypeReference(
                         itemType,
