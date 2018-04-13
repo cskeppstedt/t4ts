@@ -6,46 +6,110 @@ using System.Threading.Tasks;
 
 namespace T4TS.Outputs
 {
-    public abstract class MethodAppender : OutputAppender<TypeScriptMethod>
+    public class MethodAppender : OutputAppender<TypeScriptMethod>
     {
+        private bool hasBody;
+
         public MethodAppender(
             OutputSettings settings,
-            TypeContext typeContext)
+            TypeContext typeContext,
+            bool hasBody)
                 : base(
                     settings,
                     typeContext)
         {
+            this.hasBody = hasBody;
         }
 
         public override void AppendOutput(
             StringBuilder output,
-            int baseIndentation,
+            int indent,
             TypeScriptMethod method)
         {
             this.AppendMethodPrototype(
                 output,
-                baseIndentation,
+                indent,
                 method);
 
-            this.AppendBody(
-                output,
-                baseIndentation,
-                method);
+            if (this.hasBody)
+            {
+                output.AppendLine();
+
+                this.AppendBody(
+                    output,
+                    indent,
+                    method);
+            }
+            else
+            {
+                output.AppendLine(";");
+            }
         }
 
-        protected abstract void AppendBody(
+        protected virtual void AppendBody(
             StringBuilder output,
-            int baseIndentation,
-            TypeScriptMethod method);
+            int indent,
+            TypeScriptMethod method)
+        {
+            this.AppendIndentedLine(
+                output,
+                indent,
+                "{");
+
+            TypeScriptConstructor constructor = method as TypeScriptConstructor;
+            if (constructor != null)
+            {
+                output.AppendLine();
+
+                this.AppendMethodCall(
+                    output,
+                    indent + 4,
+                    objectName: null,
+                    methodName: "super",
+                    methodArguments: constructor.BaseArguments);
+            }
+
+            this.AppendIndentedLine(
+                output,
+                indent,
+                "}");
+        }
+
+        protected void AppendMethodCall(
+            StringBuilder output,
+            int indent,
+            string objectName,
+            string methodName,
+            IList<string> methodArguments)
+        {
+            IList<string> baseArguments = methodArguments ?? new List<string>(0);
+
+            this.AppendIndendation(
+                output,
+                indent);
+
+            if (!String.IsNullOrEmpty(objectName))
+            {
+                output.Append(objectName);
+                output.Append('.');
+            }
+
+            output.AppendLine(String.Format(
+                "{0}({1});",
+                methodName,
+                String.Join(
+                    ", ",
+                    baseArguments)));
+        }
 
         protected void AppendMethodPrototype(
             StringBuilder output,
-            int baseIndentation,
+            int indent,
             TypeScriptMethod method)
         {
             this.AppendIndendation(
                 output,
-                baseIndentation);
+                indent);
 
             if (method.IsStatic)
             {
@@ -110,22 +174,6 @@ namespace T4TS.Outputs
             {
                 TypeName returnTypeName = this.TypeContext.ResolveOutputTypeName(method.Type);
                 output.Append(": " + returnTypeName.QualifiedName);
-            }
-            output.AppendLine();
-
-            TypeScriptConstructor constructor = method as TypeScriptConstructor;
-            if (constructor != null
-                && constructor.BaseArguments != null
-                && constructor.BaseArguments.Any())
-            {
-                this.AppendIndentedLine(
-                    output,
-                    baseIndentation + 4,
-                    String.Format(
-                        ": base({0})",
-                        String.Join(
-                            ", ",
-                            constructor.BaseArguments)));
             }
         }
     }

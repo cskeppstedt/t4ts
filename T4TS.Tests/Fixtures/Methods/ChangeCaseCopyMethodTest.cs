@@ -26,19 +26,22 @@ namespace T4TS.Tests.Fixtures.Methods
                         builder.TraverserSettings.TypeDecorators.Add((outputType) =>
                         {
                             string otherTypeLiteral = "T4TSTests.OtherType";
-                            outputType.Methods.Add(T4TS.Outputs.Custom.ChangeCaseCopyMethod.CreateConstructor(
+                            outputType.Methods.Add(T4TS.Outputs.Custom.ChangeCaseCopyMethod.Create(
                                 builder.OutputSettings,
                                 builder.TypeContext,
+                                baseName: "FromOther",
                                 containingType: outputType,
                                 otherTypeLiteral: otherTypeLiteral,
+                                toContainingType: true,
                                 toCamelCase: false));
 
-                            outputType.Methods.Add(T4TS.Outputs.Custom.ChangeCaseCopyMethod.CreateMethod(
+                            outputType.Methods.Add(T4TS.Outputs.Custom.ChangeCaseCopyMethod.Create(
                                 builder.OutputSettings,
                                 builder.TypeContext,
-                                name: "ToOther",
+                                baseName: "ToOther",
                                 containingType: outputType,
                                 otherTypeLiteral: otherTypeLiteral,
+                                toContainingType: false,
                                 toCamelCase: true));
                         });
                     })
@@ -64,19 +67,22 @@ namespace T4TS.Tests.Fixtures.Methods
                         builder.TraverserSettings.TypeDecorators.Add((outputType) =>
                         {
                             string otherTypeLiteral = "T4TSTests.OtherType";
-                            outputType.Methods.Add(T4TS.Outputs.Custom.ChangeCaseCopyMethod.CreateConstructor(
+                            outputType.Methods.Add(T4TS.Outputs.Custom.ChangeCaseCopyMethod.Create(
                                 builder.OutputSettings,
                                 builder.TypeContext,
+                                baseName: "FromOther",
                                 containingType: outputType,
                                 otherTypeLiteral: otherTypeLiteral,
+                                toContainingType: true,
                                 toCamelCase: false));
 
-                            outputType.Methods.Add(T4TS.Outputs.Custom.ChangeCaseCopyMethod.CreateMethod(
+                            outputType.Methods.Add(T4TS.Outputs.Custom.ChangeCaseCopyMethod.Create(
                                 builder.OutputSettings,
                                 builder.TypeContext,
-                                name: "ToOther",
+                                baseName: "ToOther",
                                 containingType: outputType,
                                 otherTypeLiteral: otherTypeLiteral,
+                                toContainingType: false,
                                 toCamelCase: true));
                         });
                     })
@@ -102,19 +108,22 @@ namespace T4TS.Tests.Fixtures.Methods
                         builder.TraverserSettings.TypeDecorators.Add((outputType) =>
                         {
                             string otherTypeLiteral = "T4TSTests.OtherType";
-                            outputType.Methods.Add(T4TS.Outputs.Custom.ChangeCaseCopyMethod.CreateConstructor(
+                            outputType.Methods.Add(T4TS.Outputs.Custom.ChangeCaseCopyMethod.Create(
                                 builder.OutputSettings,
                                 builder.TypeContext,
+                                baseName: "FromOther",
                                 containingType: outputType,
                                 otherTypeLiteral: otherTypeLiteral,
+                                toContainingType: true,
                                 toCamelCase: false));
 
-                            outputType.Methods.Add(T4TS.Outputs.Custom.ChangeCaseCopyMethod.CreateMethod(
+                            outputType.Methods.Add(T4TS.Outputs.Custom.ChangeCaseCopyMethod.Create(
                                 builder.OutputSettings,
                                 builder.TypeContext,
-                                name: "ToOther",
+                                baseName: "ToOther",
                                 containingType: outputType,
                                 otherTypeLiteral: otherTypeLiteral,
+                                toContainingType: false,
                                 toCamelCase: true));
                         });
                     })
@@ -128,6 +137,7 @@ namespace T4TS.Tests.Fixtures.Methods
             new OutputForDirectBuilder(
                 typeof(Inheritance.InheritanceModel),
                 typeof(Inheritance.OtherInheritanceModel),
+                typeof(Example.Models.ModelFromDifferentProject),
                 typeof(BasicModel))
                     .Edit((builder) =>
                     {
@@ -141,19 +151,22 @@ namespace T4TS.Tests.Fixtures.Methods
                         builder.TraverserSettings.TypeDecorators.Add((outputType) =>
                         {
                             string otherTypeLiteral = "T4TSTests.OtherType";
-                            outputType.Methods.Add(T4TS.Outputs.Custom.ChangeCaseCopyMethod.CreateConstructor(
+                            outputType.Methods.Add(T4TS.Outputs.Custom.ChangeCaseCopyMethod.Create(
                                 builder.OutputSettings,
                                 builder.TypeContext,
+                                baseName: "FromOther",
                                 containingType: outputType,
                                 otherTypeLiteral: otherTypeLiteral,
+                                toContainingType: true,
                                 toCamelCase: false));
 
-                            outputType.Methods.Add(T4TS.Outputs.Custom.ChangeCaseCopyMethod.CreateMethod(
+                            outputType.Methods.Add(T4TS.Outputs.Custom.ChangeCaseCopyMethod.Create(
                                 builder.OutputSettings,
                                 builder.TypeContext,
-                                name: "ToOther",
+                                baseName: "ToOther",
                                 containingType: outputType,
                                 otherTypeLiteral: otherTypeLiteral,
+                                toContainingType: false,
                                 toCamelCase: true));
                         });
                     })
@@ -169,17 +182,17 @@ declare module T4TS {
     export interface BasicModel {
         MyProperty: number;
         SomeDateTime: string;
-        constructor(other: T4TSTests.OtherType)
+        FromOtherBasicModel(source: T4TSTests.OtherType): T4TS.BasicModel
         {
-            this.MyProperty = other.myProperty;
-            this.SomeDateTime = other.someDateTime;
+            this.MyProperty = source.myProperty;
+            this.SomeDateTime = source.someDateTime;
+            return this;
         }
-        ToOther(): T4TSTests.OtherType
+        ToOtherBasicModel(target: T4TSTests.OtherType): T4TSTests.OtherType
         {
-            var result: T4TSTests.OtherType = new T4TSTests.OtherType();
-            result.myProperty = this.MyProperty;
-            result.someDateTime = this.SomeDateTime;
-            return result;
+            target.myProperty = this.MyProperty;
+            target.someDateTime = this.SomeDateTime;
+            return target;
         }
     }
 }";
@@ -193,31 +206,31 @@ declare module T4TS {
     export interface BasicModel {
         MyProperty: number;
         SomeDateTime: string;
-        constructor(other: T4TSTests.OtherType)
+        FromOtherBasicModel(source: T4TSTests.OtherType): T4TS.BasicModel
         {
-            this.MyProperty = other.myProperty;
-            this.SomeDateTime = other.someDateTime;
+            this.MyProperty = source.myProperty;
+            this.SomeDateTime = source.someDateTime;
+            return this;
         }
-        ToOther(): T4TSTests.OtherType
+        ToOtherBasicModel(target: T4TSTests.OtherType): T4TSTests.OtherType
         {
-            var result: T4TSTests.OtherType = new T4TSTests.OtherType();
-            result.myProperty = this.MyProperty;
-            result.someDateTime = this.SomeDateTime;
-            return result;
+            target.myProperty = this.MyProperty;
+            target.someDateTime = this.SomeDateTime;
+            return target;
         }
     }
     /** Generated from T4TS.Tests.Fixtures.ExtendsExplicit.ExtendsExplicitModel **/
     export interface ExtendsExplicitModel {
         Basic: T4TS.BasicModel;
-        constructor(other: T4TSTests.OtherType)
+        FromOtherExtendsExplicitModel(source: T4TSTests.OtherType): T4TS.ExtendsExplicitModel
         {
-            this.Basic = other.constructor();
+            this.Basic = new T4TS.BasicModel().FromOtherBasicModel(source.basic);
+            return this;
         }
-        ToOther(): T4TSTests.OtherType
+        ToOtherExtendsExplicitModel(target: T4TSTests.OtherType): T4TSTests.OtherType
         {
-            var result: T4TSTests.OtherType = new T4TSTests.OtherType();
-            result.basic = this.ToOther();
-            return result;
+            target.basic = this.Basic.ToOtherBasicModel(new T4TSTests.OtherType());
+            return target;
         }
     }
 }";
@@ -231,17 +244,17 @@ declare module T4TS {
     export interface BasicModel {
         MyProperty: number;
         SomeDateTime: string;
-        constructor(other: T4TSTests.OtherType)
+        FromOtherBasicModel(source: T4TSTests.OtherType): T4TS.BasicModel
         {
-            this.MyProperty = other.myProperty;
-            this.SomeDateTime = other.someDateTime;
+            this.MyProperty = source.myProperty;
+            this.SomeDateTime = source.someDateTime;
+            return this;
         }
-        ToOther(): T4TSTests.OtherType
+        ToOtherBasicModel(target: T4TSTests.OtherType): T4TSTests.OtherType
         {
-            var result: T4TSTests.OtherType = new T4TSTests.OtherType();
-            result.myProperty = this.MyProperty;
-            result.someDateTime = this.SomeDateTime;
-            return result;
+            target.myProperty = this.MyProperty;
+            target.someDateTime = this.SomeDateTime;
+            return target;
         }
     }
     /** Generated from T4TS.Tests.Fixtures.Enumerable.EnumerableModel **/
@@ -254,61 +267,101 @@ declare module T4TS {
         DeepArray: number[][];
         DeepList: number[][];
         Generic: string[];
-        constructor(other: T4TSTests.OtherType)
+        FromOtherEnumerableModel(source: T4TSTests.OtherType): T4TS.EnumerableModel
         {
-            this.NormalProperty = other.normalProperty;
-            this.PrimitiveArray = new T4TS.TypeName[other.primitiveArray.length];
-            for (var index3: number = 0; index3 < other.primitiveArray.length; index3++)
+            this.NormalProperty = source.normalProperty;
+            this.PrimitiveArray = new Array(source.primitiveArray.length);
+            for (var index3: number = 0; index3 < source.primitiveArray.length; index3++)
             {
-                this.PrimitiveArray[index3] = other.primitiveArray;
+                this.PrimitiveArray[index3] = source.primitiveArray[index3];
             }
-            this.PrimitiveList = other.primitiveList;
-            this.InterfaceArray = new T4TS.TypeName[other.interfaceArray.length];
-            for (var index3: number = 0; index3 < other.interfaceArray.length; index3++)
+            this.PrimitiveList = new Array(source.primitiveList.length);
+            for (var index3: number = 0; index3 < source.primitiveList.length; index3++)
             {
-                this.InterfaceArray[index3] = other.constructor();
+                this.PrimitiveList[index3] = source.primitiveList[index3];
             }
-            this.InterfaceList = other.interfaceList;
-            this.DeepArray = new T4TS.TypeName[other.deepArray.length];
-            for (var index3: number = 0; index3 < other.deepArray.length; index3++)
+            this.InterfaceArray = new Array(source.interfaceArray.length);
+            for (var index3: number = 0; index3 < source.interfaceArray.length; index3++)
             {
-                this.DeepArray[index3] = new T4TS.TypeName[other.deepArray.length];
-                for (var index4: number = 0; index4 < other.deepArray.length; index4++)
+                this.InterfaceArray[index3] = new T4TS.BasicModel().FromOtherBasicModel(source.interfaceArray[index3]);
+            }
+            this.InterfaceList = new Array(source.interfaceList.length);
+            for (var index3: number = 0; index3 < source.interfaceList.length; index3++)
+            {
+                this.InterfaceList[index3] = new T4TS.BasicModel().FromOtherBasicModel(source.interfaceList[index3]);
+            }
+            this.DeepArray = new Array(source.deepArray.length);
+            for (var index3: number = 0; index3 < source.deepArray.length; index3++)
+            {
+                this.DeepArray[index3] = new Array(source.deepArray[index3].length);
+                for (var index4: number = 0; index4 < source.deepArray[index3].length; index4++)
                 {
-                    this.DeepArray[index3][index4] = other.deepArray;
+                    this.DeepArray[index3][index4] = source.deepArray[index3][index4];
                 }
             }
-            this.DeepList = other.deepList;
-            this.Generic = other.generic;
+            this.DeepList = new Array(source.deepList.length);
+            for (var index3: number = 0; index3 < source.deepList.length; index3++)
+            {
+                this.DeepList[index3] = new Array(source.deepList[index3].length);
+                for (var index4: number = 0; index4 < source.deepList[index3].length; index4++)
+                {
+                    this.DeepList[index3][index4] = source.deepList[index3][index4];
+                }
+            }
+            this.Generic = new Array(source.generic.length);
+            for (var index3: number = 0; index3 < source.generic.length; index3++)
+            {
+                this.Generic[index3] = source.generic[index3];
+            }
+            return this;
         }
-        ToOther(): T4TSTests.OtherType
+        ToOtherEnumerableModel(target: T4TSTests.OtherType): T4TSTests.OtherType
         {
-            var result: T4TSTests.OtherType = new T4TSTests.OtherType();
-            result.normalProperty = this.NormalProperty;
-            result.primitiveArray = new T4TS.TypeName[this.PrimitiveArray.length];
+            target.normalProperty = this.NormalProperty;
+            target.primitiveArray = new Array(this.PrimitiveArray.length);
             for (var index3: number = 0; index3 < this.PrimitiveArray.length; index3++)
             {
-                result.primitiveArray[index3] = this.PrimitiveArray;
+                target.primitiveArray[index3] = this.PrimitiveArray[index3];
             }
-            result.primitiveList = this.PrimitiveList;
-            result.interfaceArray = new T4TS.TypeName[this.InterfaceArray.length];
+            target.primitiveList = new Array(this.PrimitiveList.length);
+            for (var index3: number = 0; index3 < this.PrimitiveList.length; index3++)
+            {
+                target.primitiveList[index3] = this.PrimitiveList[index3];
+            }
+            target.interfaceArray = new Array(this.InterfaceArray.length);
             for (var index3: number = 0; index3 < this.InterfaceArray.length; index3++)
             {
-                result.interfaceArray[index3] = this.ToOther();
+                target.interfaceArray[index3] = this.InterfaceArray[index3].ToOtherBasicModel(new T4TSTests.OtherType());
             }
-            result.interfaceList = this.InterfaceList;
-            result.deepArray = new T4TS.TypeName[this.DeepArray.length];
+            target.interfaceList = new Array(this.InterfaceList.length);
+            for (var index3: number = 0; index3 < this.InterfaceList.length; index3++)
+            {
+                target.interfaceList[index3] = this.InterfaceList[index3].ToOtherBasicModel(new T4TSTests.OtherType());
+            }
+            target.deepArray = new Array(this.DeepArray.length);
             for (var index3: number = 0; index3 < this.DeepArray.length; index3++)
             {
-                result.deepArray[index3] = new T4TS.TypeName[this.DeepArray.length];
-                for (var index4: number = 0; index4 < this.DeepArray.length; index4++)
+                target.deepArray[index3] = new Array(this.DeepArray[index3].length);
+                for (var index4: number = 0; index4 < this.DeepArray[index3].length; index4++)
                 {
-                    result.deepArray[index3][index4] = this.DeepArray;
+                    target.deepArray[index3][index4] = this.DeepArray[index3][index4];
                 }
             }
-            result.deepList = this.DeepList;
-            result.generic = this.Generic;
-            return result;
+            target.deepList = new Array(this.DeepList.length);
+            for (var index3: number = 0; index3 < this.DeepList.length; index3++)
+            {
+                target.deepList[index3] = new Array(this.DeepList[index3].length);
+                for (var index4: number = 0; index4 < this.DeepList[index3].length; index4++)
+                {
+                    target.deepList[index3][index4] = this.DeepList[index3][index4];
+                }
+            }
+            target.generic = new Array(this.Generic.length);
+            for (var index3: number = 0; index3 < this.Generic.length; index3++)
+            {
+                target.generic[index3] = this.Generic[index3];
+            }
+            return target;
         }
     }
 }";
@@ -322,17 +375,34 @@ declare module T4TS {
     export interface BasicModel {
         MyProperty: number;
         SomeDateTime: string;
-        constructor(other: T4TSTests.OtherType)
+        FromOtherBasicModel(source: T4TSTests.OtherType): T4TS.BasicModel
         {
-            this.MyProperty = other.myProperty;
-            this.SomeDateTime = other.someDateTime;
+            this.MyProperty = source.myProperty;
+            this.SomeDateTime = source.someDateTime;
+            return this;
         }
-        ToOther(): T4TSTests.OtherType
+        ToOtherBasicModel(target: T4TSTests.OtherType): T4TSTests.OtherType
         {
-            var result: T4TSTests.OtherType = new T4TSTests.OtherType();
-            result.myProperty = this.MyProperty;
-            result.someDateTime = this.SomeDateTime;
-            return result;
+            target.myProperty = this.MyProperty;
+            target.someDateTime = this.SomeDateTime;
+            return target;
+        }
+    }
+}
+
+declare module T4TS.Example.Models {
+    /** Generated from T4TS.Example.Models.ModelFromDifferentProject **/
+    export interface ModelFromDifferentProject {
+        Id: number;
+        FromOtherModelFromDifferentProject(source: T4TSTests.OtherType): T4TS.Example.Models.ModelFromDifferentProject
+        {
+            this.Id = source.id;
+            return this;
+        }
+        ToOtherModelFromDifferentProject(target: T4TSTests.OtherType): T4TSTests.OtherType
+        {
+            target.id = this.Id;
+            return target;
         }
     }
 }
@@ -341,31 +411,33 @@ declare module T4TS.Tests.Fixtures.Inheritance {
     /** Generated from T4TS.Tests.Fixtures.Inheritance.InheritanceModel **/
     export interface InheritanceModel extends T4TS.Tests.Fixtures.Inheritance.OtherInheritanceModel {
         OnInheritanceModel: T4TS.BasicModel;
-        constructor(other: T4TSTests.OtherType)
-            : base(other)
+        FromOtherInheritanceModel(source: T4TSTests.OtherType): T4TS.Tests.Fixtures.Inheritance.InheritanceModel
         {
-            this.OnInheritanceModel = other.constructor();
+            super.FromOtherOtherInheritanceModel(source);
+            this.OnInheritanceModel = new T4TS.BasicModel().FromOtherBasicModel(source.onInheritanceModel);
+            return this;
         }
-        ToOther(): T4TSTests.OtherType
+        ToOtherInheritanceModel(target: T4TSTests.OtherType): T4TSTests.OtherType
         {
-            var result: T4TSTests.OtherType = new T4TSTests.OtherType();
-            result.onInheritanceModel = this.ToOther();
-            return result;
+            super.ToOtherOtherInheritanceModel(target);
+            target.onInheritanceModel = this.OnInheritanceModel.ToOtherBasicModel(new T4TSTests.OtherType());
+            return target;
         }
     }
     /** Generated from T4TS.Tests.Fixtures.Inheritance.OtherInheritanceModel **/
-    export interface OtherInheritanceModel extends UNKNOWN_TYPE_T4TS.Example.Models.ModelFromDifferentProject {
+    export interface OtherInheritanceModel extends T4TS.Example.Models.ModelFromDifferentProject {
         OnOtherInheritanceModel: T4TS.BasicModel;
-        constructor(other: T4TSTests.OtherType)
-            : base(other)
+        FromOtherOtherInheritanceModel(source: T4TSTests.OtherType): T4TS.Tests.Fixtures.Inheritance.OtherInheritanceModel
         {
-            this.OnOtherInheritanceModel = other.constructor();
+            super.FromOtherModelFromDifferentProject(source);
+            this.OnOtherInheritanceModel = new T4TS.BasicModel().FromOtherBasicModel(source.onOtherInheritanceModel);
+            return this;
         }
-        ToOther(): T4TSTests.OtherType
+        ToOtherOtherInheritanceModel(target: T4TSTests.OtherType): T4TSTests.OtherType
         {
-            var result: T4TSTests.OtherType = new T4TSTests.OtherType();
-            result.onOtherInheritanceModel = this.ToOther();
-            return result;
+            super.ToOtherModelFromDifferentProject(target);
+            target.onOtherInheritanceModel = this.OnOtherInheritanceModel.ToOtherBasicModel(new T4TSTests.OtherType());
+            return target;
         }
     }
 }";

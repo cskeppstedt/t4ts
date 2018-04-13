@@ -222,7 +222,8 @@ namespace T4TS
                     {
                         TypeName currentName = TypeName.ParseDte(codeEnum.FullName);
                         return namespaceTypeNamesPair.Value.Contains(currentName.UniversalName);
-                    }
+                    },
+                    TypeDecorators = this.Settings.TypeDecorators
                 };
 
                 foreach (CodeNamespace codeNamespace in namespaceTypeNamesPair.Key)

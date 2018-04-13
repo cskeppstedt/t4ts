@@ -72,10 +72,16 @@ namespace T4TS
             }
             else
             {
-                if (Settings.CompatibilityVersion != null && Settings.CompatibilityVersion < new Version(0, 9, 0))
+                if (!this.Settings.IsDeclaration
+                    || (Settings.CompatibilityVersion != null
+                        && Settings.CompatibilityVersion < new Version(0, 9, 0)))
+                {
                     output.Append("module ");
+                }
                 else
+                {
                     output.Append("declare module ");
+                }
 
                 output.Append(module.QualifiedName);
 
@@ -142,20 +148,13 @@ namespace T4TS
             {
                 for (; handledCount < allTypeReferences.Count; handledCount++)
                 {
-                    TypeReference typeReference = allTypeReferences[handledCount];
-                    if (!outputTypeNames.Contains(typeReference.SourceType.UniversalName))
-                    {
-                        TypeScriptInterface interfaceType = this.TypeContext.GetInterface(typeReference.SourceType);
-                        if (interfaceType != null
-                            && module.Interfaces.Contains(interfaceType))
-                        {
-                            interfaceAppender.AppendOutput(
-                                output,
-                                indent,
-                                interfaceType);
-                            outputTypeNames.Add(typeReference.SourceType.UniversalName);
-                        }
-                    }
+                    this.AppendType(
+                        output,
+                        indent,
+                        allTypeReferences[handledCount],
+                        outputTypeNames,
+                        interfaceAppender,
+                        module);
                 }
 
                 allTypeReferences = new List<TypeReference>(this.TypeContext.GetTypeReferences());
@@ -169,6 +168,45 @@ namespace T4TS
                         output,
                         indent,
                         currentInterface);
+                }
+            }
+        }
+
+        private void AppendType(
+            StringBuilder output,
+            int indent,
+            TypeReference typeReference,
+            HashSet<string> outputTypeNames,
+            InterfaceOutputAppender interfaceAppender,
+            TypeScriptModule currentModule)
+        {
+            if (!outputTypeNames.Contains(typeReference.SourceType.UniversalName))
+            {
+                TypeScriptInterface interfaceType = this.TypeContext.GetInterface(typeReference.SourceType);
+                if (interfaceType != null
+                    && currentModule.Interfaces.Contains(interfaceType))
+                {
+                    if (interfaceType.Parent != null)
+                    {
+                        this.AppendType(
+                            output,
+                            indent,
+                            interfaceType.Parent,
+                            outputTypeNames,
+                            interfaceAppender,
+                            currentModule);
+                    }
+
+                    // More reference handling...
+
+                    if (!outputTypeNames.Contains(typeReference.SourceType.UniversalName))
+                    { 
+                        interfaceAppender.AppendOutput(
+                            output,
+                            indent,
+                            interfaceType);
+                        outputTypeNames.Add(typeReference.SourceType.UniversalName);
+                    }
                 }
             }
         }

@@ -108,6 +108,25 @@ namespace T4TS
             }
         }
 
+        public string UnqualifiedSimpleName
+        {
+            get
+            {
+                string result;
+                int typeStartIndex = this.UnqualifiedName.LastIndexOf('.');
+                if (typeStartIndex < 0)
+                {
+                    result = this.UnqualifiedName;
+                }
+                else
+                {
+                    result = this.UnqualifiedName.Substring(
+                        typeStartIndex + 1);
+                }
+                return result;
+            }
+        }
+
         public bool IsArray
         {
             get { return this.UnqualifiedName == TypeName.ArraySuffix; }

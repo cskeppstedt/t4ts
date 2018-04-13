@@ -70,14 +70,29 @@ namespace T4TS
                 }
             }
 
-            if (tsInterface.Methods != null)
+            if (tsInterface.Methods != null
+                && tsInterface.Methods.Any())
             {
+                MethodAppender emptyAppender = new MethodAppender(
+                    this.Settings,
+                    this.TypeContext,
+                    tsInterface.IsClass);
                 foreach (TypeScriptMethod method in tsInterface.Methods)
                 {
-                    method.Appender.AppendOutput(
-                        output,
-                        baseIndentation + 4,
-                        method);
+                    if (method.Appender != null)
+                    {
+                        method.Appender.AppendOutput(
+                            output,
+                            baseIndentation + 4,
+                            method);
+                    }
+                    else
+                    {
+                        emptyAppender.AppendOutput(
+                            output,
+                            baseIndentation + 4,
+                            method);
+                    }
                 }
             }
         }

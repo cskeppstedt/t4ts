@@ -8,76 +8,51 @@ namespace T4TS.Outputs.Custom
 {
     public partial class ChangeCaseCopyMethod : TypeScriptMethod
     {
-        private const string OtherParameterName = "other";
-
-        public static TypeScriptConstructor CreateConstructor(
+        public static TypeScriptMethod Create(
             OutputSettings outputSettings,
             TypeContext typeContext,
+            string baseName,
             TypeScriptType containingType,
             string otherTypeLiteral,
-            bool toCamelCase)
-        {
-            TypeReference otherType = typeContext.GetLiteralReference(otherTypeLiteral);
-
-            TypeScriptConstructor result = new TypeScriptConstructor();
-            result.Appender = new ChangeCaseCopyMethod.OutputAppender(
-                outputSettings,
-                typeContext,
-                containingType,
-                otherType,
-                toContainingType: true,
-                toCamelCase: toCamelCase);
-            
-            result.Arguments = new List<TypeScriptMember>()
-                {
-                    new TypeScriptMember()
-                    {
-                        Name = ChangeCaseCopyMethod.OtherParameterName,
-                        Type = otherType
-                    }
-                };
-
-            if (containingType.Parent != null)
-            { 
-                result.BaseArguments = new List<string>()
-                {
-                    ChangeCaseCopyMethod.OtherParameterName
-                };
-            }
-
-            if (containingType.SourceType.TypeArguments != null
-                && containingType.SourceType.TypeArguments.Any())
-            {
-                result.TypeArguments = containingType.SourceType.TypeArguments
-                    .Select((typeName) => typeContext.GetTypeReference(
-                        typeName,
-                        containingType))
-                    .ToList();
-            }
-
-            return result;
-        }
-
-        public static TypeScriptMethod CreateMethod(
-            OutputSettings outputSettings,
-            TypeContext typeContext,
-            string name,
-            TypeScriptType containingType,
-            string otherTypeLiteral,
+            bool toContainingType,
             bool toCamelCase)
         {
             TypeReference otherType = typeContext.GetLiteralReference(otherTypeLiteral);
 
             TypeScriptMethod result = new TypeScriptMethod();
-            result.Name = name;
+            result.Name = baseName + containingType.SourceType.UnqualifiedSimpleName;
             result.Appender = new ChangeCaseCopyMethod.OutputAppender(
                 outputSettings,
                 typeContext,
                 containingType,
                 otherType,
-                toContainingType: false,
-                toCamelCase: toCamelCase);
-            result.Type = otherType;
+                toContainingType,
+                toCamelCase);
+
+            if (toContainingType)
+            {
+                result.Arguments = new List<TypeScriptMember>()
+                {
+                    new TypeScriptMember()
+                    {
+                        Name = "source",
+                        Type = otherType
+                    }
+                };
+                result.Type = containingType;
+            }
+            else
+            {
+                result.Arguments = new List<TypeScriptMember>()
+                {
+                    new TypeScriptMember()
+                    {
+                        Name = "target",
+                        Type = otherType
+                    }
+                };
+                result.Type = otherType;
+            }
 
             return result;
         }
