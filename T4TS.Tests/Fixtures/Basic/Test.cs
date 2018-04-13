@@ -65,7 +65,7 @@ namespace T4TS.Tests.Fixtures.Basic
 ****************************************************************************/
 
 declare module T4TS {
-    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel **/
+    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel */
     export interface BasicModel {
         MyProperty: number;
         SomeDateTime: string;
@@ -78,7 +78,7 @@ declare module T4TS {
 ****************************************************************************/
 
 declare module T4TS.Tests.Fixtures.Basic {
-    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel **/
+    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel */
     export interface BasicModel {
         MyProperty: number;
         SomeDateTime: string;
@@ -91,7 +91,7 @@ declare module T4TS.Tests.Fixtures.Basic {
 
 declare module T4TS.Tests.Fixtures.Basic
 {
-    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel **/
+    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel */
     export interface BasicModel
     {
         MyProperty: number;
@@ -104,7 +104,7 @@ declare module T4TS.Tests.Fixtures.Basic
 ****************************************************************************/
 
 declare module T4TS.Tests.Fixtures.Basic {
-    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel **/
+    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel */
     export class BasicModel {
         MyProperty: number;
         SomeDateTime: string;
@@ -117,7 +117,7 @@ declare module T4TS.Tests.Fixtures.Basic {
 ****************************************************************************/
 
 declare module Bar {
-    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel **/
+    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel */
     export interface BasicModel {
         MyProperty: number;
         SomeDateTime: string;

@@ -29,7 +29,7 @@ namespace T4TS.Outputs
             this.AppendIndentedLine(
                 output,
                 indentation,
-                "/** Generated from " + segment.SourceType.RawName + " **/");
+                "/** Generated from " + segment.SourceType.RawName + " */");
 
             TypeName outputName = this.TypeContext.ResolveOutputTypeName(segment);
             if (this.inGlobalModule)

@@ -40,7 +40,7 @@ namespace T4TS.Tests.Fixtures.Generics
 ****************************************************************************/
 
 declare module T4TS {
-    /** Generated from T4TS.Tests.Fixtures.Generics.GenericModel<TItem> **/
+    /** Generated from T4TS.Tests.Fixtures.Generics.GenericModel<TItem> */
     export interface GenericModel<TItem> {
         Item: TItem;
         SomethingElse: number;
@@ -51,12 +51,12 @@ declare module T4TS {
 ****************************************************************************/
 
 declare module T4TS {
-    /** Generated from T4TS.Tests.Fixtures.Generics.GenericModel<TItem> **/
+    /** Generated from T4TS.Tests.Fixtures.Generics.GenericModel<TItem> */
     export interface GenericModel<TItem> {
         Item: TItem;
         SomethingElse: number;
     }
-    /** Generated from T4TS.Tests.Fixtures.Generics.InheritGenericModel **/
+    /** Generated from T4TS.Tests.Fixtures.Generics.InheritGenericModel */
     export interface InheritGenericModel extends T4TS.GenericModel<string> {
         SubTypeProperty: string;
     }

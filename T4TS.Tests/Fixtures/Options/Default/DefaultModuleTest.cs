@@ -24,14 +24,14 @@ const string ExpectedOutput =
 ****************************************************************************/
 
 declare module Foobar {
-    /** Generated from T4TS.Tests.Fixtures.Options.Default.DefaultModuleModel **/
+    /** Generated from T4TS.Tests.Fixtures.Options.Default.DefaultModuleModel */
     export interface DefaultModuleModel {
         SomeProp: string;
     }
 }
 
 declare module Override {
-    /** Generated from T4TS.Tests.Fixtures.Options.Default.DefaultModuleOverrideModel **/
+    /** Generated from T4TS.Tests.Fixtures.Options.Default.DefaultModuleOverrideModel */
     export interface DefaultModuleOverrideModel {
         SomeProp: string;
     }

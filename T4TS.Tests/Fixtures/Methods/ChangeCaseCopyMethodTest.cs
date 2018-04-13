@@ -178,7 +178,7 @@ namespace T4TS.Tests.Fixtures.Methods
 ****************************************************************************/
 
 declare module T4TS {
-    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel **/
+    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel */
     export interface BasicModel {
         MyProperty: number;
         SomeDateTime: string;
@@ -202,7 +202,7 @@ declare module T4TS {
 ****************************************************************************/
 
 declare module T4TS {
-    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel **/
+    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel */
     export interface BasicModel {
         MyProperty: number;
         SomeDateTime: string;
@@ -219,7 +219,7 @@ declare module T4TS {
             return target;
         }
     }
-    /** Generated from T4TS.Tests.Fixtures.ExtendsExplicit.ExtendsExplicitModel **/
+    /** Generated from T4TS.Tests.Fixtures.ExtendsExplicit.ExtendsExplicitModel */
     export interface ExtendsExplicitModel {
         Basic: T4TS.BasicModel;
         FromOtherExtendsExplicitModel(source: T4TSTests.OtherType): T4TS.ExtendsExplicitModel
@@ -240,7 +240,7 @@ declare module T4TS {
 ****************************************************************************/
 
 declare module T4TS {
-    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel **/
+    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel */
     export interface BasicModel {
         MyProperty: number;
         SomeDateTime: string;
@@ -257,7 +257,7 @@ declare module T4TS {
             return target;
         }
     }
-    /** Generated from T4TS.Tests.Fixtures.Enumerable.EnumerableModel **/
+    /** Generated from T4TS.Tests.Fixtures.Enumerable.EnumerableModel */
     export interface EnumerableModel {
         NormalProperty: number;
         PrimitiveArray: number[];
@@ -371,7 +371,7 @@ declare module T4TS {
 ****************************************************************************/
 
 declare module T4TS {
-    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel **/
+    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel */
     export interface BasicModel {
         MyProperty: number;
         SomeDateTime: string;
@@ -391,7 +391,7 @@ declare module T4TS {
 }
 
 declare module T4TS.Example.Models {
-    /** Generated from T4TS.Example.Models.ModelFromDifferentProject **/
+    /** Generated from T4TS.Example.Models.ModelFromDifferentProject */
     export interface ModelFromDifferentProject {
         Id: number;
         FromOtherModelFromDifferentProject(source: T4TSTests.OtherType): T4TS.Example.Models.ModelFromDifferentProject
@@ -408,7 +408,7 @@ declare module T4TS.Example.Models {
 }
 
 declare module T4TS.Tests.Fixtures.Inheritance {
-    /** Generated from T4TS.Tests.Fixtures.Inheritance.InheritanceModel **/
+    /** Generated from T4TS.Tests.Fixtures.Inheritance.InheritanceModel */
     export interface InheritanceModel extends T4TS.Tests.Fixtures.Inheritance.OtherInheritanceModel {
         OnInheritanceModel: T4TS.BasicModel;
         FromOtherInheritanceModel(source: T4TSTests.OtherType): T4TS.Tests.Fixtures.Inheritance.InheritanceModel
@@ -424,7 +424,7 @@ declare module T4TS.Tests.Fixtures.Inheritance {
             return target;
         }
     }
-    /** Generated from T4TS.Tests.Fixtures.Inheritance.OtherInheritanceModel **/
+    /** Generated from T4TS.Tests.Fixtures.Inheritance.OtherInheritanceModel */
     export interface OtherInheritanceModel extends T4TS.Example.Models.ModelFromDifferentProject {
         OnOtherInheritanceModel: T4TS.BasicModel;
         FromOtherOtherInheritanceModel(source: T4TSTests.OtherType): T4TS.Tests.Fixtures.Inheritance.OtherInheritanceModel

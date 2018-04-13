@@ -25,19 +25,19 @@ const string ExpectedOutput =
 ****************************************************************************/
 
 declare module External {
-    /** Generated from T4TS.Example.Models.ModelFromDifferentProject **/
+    /** Generated from T4TS.Example.Models.ModelFromDifferentProject */
     export interface ModelFromDifferentProject {
         Id: number;
     }
 }
 
 declare module T4TS {
-    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel **/
+    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel */
     export interface BasicModel {
         MyProperty: number;
         SomeDateTime: string;
     }
-    /** Generated from T4TS.Tests.Fixtures.ExternalProp.ExternalPropModel **/
+    /** Generated from T4TS.Tests.Fixtures.ExternalProp.ExternalPropModel */
     export interface ExternalPropModel {
         Basic: T4TS.BasicModel;
         External: External.ModelFromDifferentProject;

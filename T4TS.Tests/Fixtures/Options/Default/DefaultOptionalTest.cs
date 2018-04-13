@@ -24,11 +24,11 @@ const string ExpectedOutput =
 ****************************************************************************/
 
 declare module T4TS {
-    /** Generated from T4TS.Tests.Fixtures.Options.Default.DefaultOptionalModel **/
+    /** Generated from T4TS.Tests.Fixtures.Options.Default.DefaultOptionalModel */
     export interface DefaultOptionalModel {
         SomeProp?: string;
     }
-    /** Generated from T4TS.Tests.Fixtures.Options.Default.DefaultOptionalOverrideModel **/
+    /** Generated from T4TS.Tests.Fixtures.Options.Default.DefaultOptionalOverrideModel */
     export interface DefaultOptionalOverrideModel {
         SomeProp: string;
     }

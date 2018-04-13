@@ -47,7 +47,7 @@ namespace T4TS.Tests.Fixtures.BasicInterface
 ****************************************************************************/
 
 declare module T4TS.Tests.Fixtures.BasicInterface {
-    /** Generated from T4TS.Tests.Fixtures.BasicInterface.IBasic **/
+    /** Generated from T4TS.Tests.Fixtures.BasicInterface.IBasic */
     export interface IBasic {
         MyProperty: number;
         SomeDateTime: string;
@@ -60,7 +60,7 @@ declare module T4TS.Tests.Fixtures.BasicInterface {
 ****************************************************************************/
 
 declare module Bar {
-    /** Generated from T4TS.Tests.Fixtures.BasicInterface.IBasic **/
+    /** Generated from T4TS.Tests.Fixtures.BasicInterface.IBasic */
     export interface IBasic {
         MyProperty: number;
         SomeDateTime: string;
@@ -73,7 +73,7 @@ declare module Bar {
 ****************************************************************************/
 
 declare module T4TS.Tests.Fixtures.BasicInterface {
-    /** Generated from T4TS.Tests.Fixtures.BasicInterface.IBasic **/
+    /** Generated from T4TS.Tests.Fixtures.BasicInterface.IBasic */
     export class IBasic {
         MyProperty: number;
         SomeDateTime: string;

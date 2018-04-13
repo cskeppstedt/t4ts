@@ -11,7 +11,7 @@ namespace T4TS.Tests.Output
     [TestClass]
     public class EnumOutputAppenderTests
     {
-        private const string NotGlobalExplicitExpectedOutput = @"/** Generated from Foo.ExplicitEnum **/
+        private const string NotGlobalExplicitExpectedOutput = @"/** Generated from Foo.ExplicitEnum */
 export enum ExplicitEnum {
     First = 1,
     Second = 2,
@@ -19,14 +19,14 @@ export enum ExplicitEnum {
 }
 ";
 
-        private const string NotGlobalImplicitExpectedOutput = @"/** Generated from Foo.ImplicitEnum **/
+        private const string NotGlobalImplicitExpectedOutput = @"/** Generated from Foo.ImplicitEnum */
 export enum ImplicitEnum {
     First,
     Second,
     Third
 }
 ";
-        private const string GlobalExplicitExpectedOutput = @"/** Generated from Foo.ExplicitEnum **/
+        private const string GlobalExplicitExpectedOutput = @"/** Generated from Foo.ExplicitEnum */
 enum ExplicitEnum {
     First = 1,
     Second = 2,

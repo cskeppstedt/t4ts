@@ -24,11 +24,11 @@ const string ExpectedOutput =
 ****************************************************************************/
 
 declare module T4TS {
-    /** Generated from T4TS.Tests.Fixtures.Options.Default.DefaultCamelCaseMemberNamesModel **/
+    /** Generated from T4TS.Tests.Fixtures.Options.Default.DefaultCamelCaseMemberNamesModel */
     export interface DefaultCamelCaseMemberNamesModel {
         someProp: string;
     }
-    /** Generated from T4TS.Tests.Fixtures.Options.Default.DefaultCamelCaseMemberNamesOverrideModel **/
+    /** Generated from T4TS.Tests.Fixtures.Options.Default.DefaultCamelCaseMemberNamesOverrideModel */
     export interface DefaultCamelCaseMemberNamesOverrideModel {
         SomeProp: string;
     }

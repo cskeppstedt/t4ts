@@ -206,12 +206,12 @@ namespace T4TS.Tests
 ****************************************************************************/
 
 declare module T4TS {
-    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel **/
+    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel */
     export interface BasicModel {
         MyProperty: number;
         SomeDateTime: string;
     }
-    /** Generated from T4TS.Tests.Fixtures.Inheritance.InheritanceModel **/
+    /** Generated from T4TS.Tests.Fixtures.Inheritance.InheritanceModel */
     export interface InheritanceModel {
         OnInheritanceModel: T4TS.BasicModel;
     }
@@ -224,23 +224,23 @@ declare module T4TS {
 ****************************************************************************/
 
 declare module External {
-    /** Generated from T4TS.Example.Models.ModelFromDifferentProject **/
+    /** Generated from T4TS.Example.Models.ModelFromDifferentProject */
     export interface ModelFromDifferentProject {
         Id: number;
     }
 }
 
 declare module T4TS {
-    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel **/
+    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel */
     export interface BasicModel {
         MyProperty: number;
         SomeDateTime: string;
     }
-    /** Generated from T4TS.Tests.Fixtures.Inheritance.InheritanceModel **/
+    /** Generated from T4TS.Tests.Fixtures.Inheritance.InheritanceModel */
     export interface InheritanceModel extends T4TS.OtherInheritanceModel {
         OnInheritanceModel: T4TS.BasicModel;
     }
-    /** Generated from T4TS.Tests.Fixtures.Inheritance.OtherInheritanceModel **/
+    /** Generated from T4TS.Tests.Fixtures.Inheritance.OtherInheritanceModel */
     export interface OtherInheritanceModel extends External.ModelFromDifferentProject {
         OnOtherInheritanceModel: T4TS.BasicModel;
     }
@@ -252,27 +252,27 @@ declare module T4TS {
 ****************************************************************************/
 
 declare module External {
-    /** Generated from T4TS.Example.Models.ModelFromDifferentProject **/
+    /** Generated from T4TS.Example.Models.ModelFromDifferentProject */
     export interface ModelFromDifferentProject {
         Id: number;
     }
 }
 
 declare module T4TS {
-    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel **/
+    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel */
     export interface BasicModel {
         MyProperty: number;
         SomeDateTime: string;
     }
-    /** Generated from T4TS.Tests.Fixtures.Basic.DifferentProjectSameNamespace **/
+    /** Generated from T4TS.Tests.Fixtures.Basic.DifferentProjectSameNamespace */
     export interface DifferentProjectSameNamespace {
         Id: number;
     }
-    /** Generated from T4TS.Tests.Fixtures.Inheritance.InheritanceModel **/
+    /** Generated from T4TS.Tests.Fixtures.Inheritance.InheritanceModel */
     export interface InheritanceModel extends T4TS.OtherInheritanceModel {
         OnInheritanceModel: T4TS.BasicModel;
     }
-    /** Generated from T4TS.Tests.Fixtures.Inheritance.OtherInheritanceModel **/
+    /** Generated from T4TS.Tests.Fixtures.Inheritance.OtherInheritanceModel */
     export interface OtherInheritanceModel extends External.ModelFromDifferentProject {
         OnOtherInheritanceModel: T4TS.BasicModel;
     }

@@ -24,17 +24,17 @@ const string ExpectedOutput =
 ****************************************************************************/
 
 declare module T4TS {
-    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel **/
+    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel */
     export interface BasicModel {
         MyProperty: number;
         SomeDateTime: string;
     }
-    /** Generated from T4TS.Tests.Fixtures.Indexed.IndexedComplexModel **/
+    /** Generated from T4TS.Tests.Fixtures.Indexed.IndexedComplexModel */
     export interface IndexedComplexModel {
         SomeProp: number;
         [index: number]: T4TS.BasicModel;
     }
-    /** Generated from T4TS.Tests.Fixtures.Indexed.IndexedPrimitiveModel **/
+    /** Generated from T4TS.Tests.Fixtures.Indexed.IndexedPrimitiveModel */
     export interface IndexedPrimitiveModel {
         SomeProp: number;
         [index: number]: string;

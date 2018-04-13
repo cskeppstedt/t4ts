@@ -24,12 +24,12 @@ const string ExpectedOutput =
 ****************************************************************************/
 
 declare module T4TS {
-    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel **/
+    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel */
     export interface BasicModel {
         MyProperty: number;
         SomeDateTime: string;
     }
-    /** Generated from T4TS.Tests.Fixtures.ExtendsExplicit.ExtendsExplicitModel **/
+    /** Generated from T4TS.Tests.Fixtures.ExtendsExplicit.ExtendsExplicitModel */
     export interface ExtendsExplicitModel extends SomeFooBar {
         Basic: T4TS.BasicModel;
     }

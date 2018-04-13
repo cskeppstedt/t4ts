@@ -105,7 +105,7 @@ namespace T4TS
             this.AppendIndentedLine(
                 output,
                 baseIndentation,
-                "/** Generated from " + tsInterface.SourceType.RawName + " **/");
+                "/** Generated from " + tsInterface.SourceType.RawName + " */");
 
             TypeName outputName = this.TypeContext.ResolveOutputTypeName(tsInterface);
 

@@ -23,12 +23,12 @@ const string ExpectedOutput =
 ****************************************************************************/
 
 declare module T4TS {
-    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel **/
+    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel */
     export interface BasicModel {
         MyProperty: number;
         SomeDateTime: string;
     }
-    /** Generated from T4TS.Tests.Fixtures.Dictionary.DictionaryModel **/
+    /** Generated from T4TS.Tests.Fixtures.Dictionary.DictionaryModel */
     export interface DictionaryModel {
         IntKey: { [name: number]: T4TS.BasicModel};
         StringKey: { [name: string]: T4TS.BasicModel};

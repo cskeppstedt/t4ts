@@ -43,7 +43,7 @@ namespace T4TS.Tests.Fixtures.Enumeration
 ****************************************************************************/
 
 declare module T4TS.Tests.Fixtures.Basic {
-    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel **/
+    /** Generated from T4TS.Tests.Fixtures.Basic.BasicModel */
     export interface BasicModel {
         MyProperty: number;
         SomeDateTime: string;
@@ -51,19 +51,19 @@ declare module T4TS.Tests.Fixtures.Basic {
 }
 
 declare module T4TS.Tests.Fixtures.Enumeration {
-    /** Generated from T4TS.Tests.Fixtures.Enumeration.ExplicitValueEnum **/
+    /** Generated from T4TS.Tests.Fixtures.Enumeration.ExplicitValueEnum */
     export enum ExplicitValueEnum {
         First = 1,
         Second = 2,
         Fifth = 5
     }
-    /** Generated from T4TS.Tests.Fixtures.Enumeration.ImplicitValueEnum **/
+    /** Generated from T4TS.Tests.Fixtures.Enumeration.ImplicitValueEnum */
     export enum ImplicitValueEnum {
         First = 0,
         Second = 1,
         Third = 2
     }
-    /** Generated from T4TS.Tests.Fixtures.Enumeration.EnumerationModel **/
+    /** Generated from T4TS.Tests.Fixtures.Enumeration.EnumerationModel */
     export interface EnumerationModel {
         ExplicitProperty: T4TS.Tests.Fixtures.Enumeration.ExplicitValueEnum;
         ExplicitArray: T4TS.Tests.Fixtures.Enumeration.ExplicitValueEnum[];
