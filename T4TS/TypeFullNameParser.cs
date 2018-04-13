@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace T4TS
 {
-    class TypeFullNameParser
+    public class TypeFullNameParser
     {
         private static TypeFullName ParseCSharp(string fullNameFromType)
         {
@@ -62,6 +62,16 @@ namespace T4TS
             {
                 if (fullNameFromType.Contains(","))
                     return Parse(fullNameFromType.Substring(0, fullNameFromType.IndexOf(",")));
+
+                if (fullNameFromType.EndsWith("[]"))
+                {
+                    var parameterName = new TypeFullName(fullNameFromType.Substring(
+                        0,
+                        fullNameFromType.LastIndexOf("[")));
+                    return new TypeFullName(
+                        fullNameFromType,
+                        parameterName);
+                }
 
                 return new TypeFullName(fullNameFromType);
             }

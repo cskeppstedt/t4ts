@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using T4TS.Outputs;
 
 namespace T4TS.Tests
 {
@@ -13,18 +14,28 @@ namespace T4TS.Tests
         [TestMethod]
         public void TypescriptVersion083YieldsModule()
         {
+            Version version = new Version(0, 8, 3);
+
             var sb = new StringBuilder();
             var module = new TypeScriptModule
             {
                 QualifiedName = "Foo"
             };
             
-            var appender = new ModuleOutputAppender(sb, 0, new Settings
-            {
-                CompatibilityVersion = new Version(0, 8, 3)
-            });
+            var appender = new ModuleOutputAppender(
+                new OutputSettings
+                {
+                    CompatibilityVersion = version
+                },
+                new TypeContext(new TypeContext.Settings()
+                {
+                    CompatibilityVersion = version
+                }));
 
-            appender.AppendOutput(module);
+            appender.AppendOutput(
+                sb,
+                0,
+                module);
             Assert.IsTrue(sb.ToString().StartsWith("module "));
         }
 
@@ -37,12 +48,17 @@ namespace T4TS.Tests
                 QualifiedName = "Foo"
             };
 
-            var appender = new ModuleOutputAppender(sb, 0, new Settings
-            {
-                CompatibilityVersion = new Version(0, 9, 0)
-            });
+            var appender = new ModuleOutputAppender(
+                new OutputSettings
+                {
+                    CompatibilityVersion = new Version(0, 9, 0)
+                },
+                new TypeContext());
 
-            appender.AppendOutput(module);
+            appender.AppendOutput(
+                sb,
+                0,
+                module);
             Assert.IsTrue(sb.ToString().StartsWith("declare module "));
         }
 
@@ -55,12 +71,17 @@ namespace T4TS.Tests
                 QualifiedName = "Foo"
             };
 
-            var appender = new ModuleOutputAppender(sb, 0, new Settings
-            {
-                CompatibilityVersion = null
-            });
+            var appender = new ModuleOutputAppender(
+                new OutputSettings
+                {
+                    CompatibilityVersion = null
+                },
+                new TypeContext());
 
-            appender.AppendOutput(module);
+            appender.AppendOutput(
+                sb,
+                0,
+                module);
             Assert.IsTrue(sb.ToString().StartsWith("declare module "));
         }
     }

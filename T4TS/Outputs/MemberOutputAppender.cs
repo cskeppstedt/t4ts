@@ -3,38 +3,40 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using T4TS.Outputs;
 
 namespace T4TS
 {
-    public class MemberOutputAppender : OutputAppender<TypeScriptInterfaceMember>
+    public class MemberOutputAppender : OutputAppender<TypeScriptMember>
     {
-        public MemberOutputAppender(StringBuilder output, int baseIndentation, Settings settings)
-            : base(output, baseIndentation, settings)
+        public MemberOutputAppender(
+            OutputSettings settings,
+            TypeContext typeContext)
+                : base(
+                      settings,
+                      typeContext)
         {
         }
 
-        public override void AppendOutput(TypeScriptInterfaceMember member)
+        public override void AppendOutput(
+            StringBuilder output,
+            int baseIndentation,
+            TypeScriptMember member)
         {
-            AppendIndendation();
+            this.AppendIndendation(
+                output,
+                baseIndentation);
 
             bool isOptional = member.Optional;
-            string type = member.Type.ToString();
-
-            if (member.Type is BoolType)
-            {
-                if (Settings.CompatibilityVersion != null && Settings.CompatibilityVersion < new Version(0, 9, 0))
-                    type = "bool";
-                else
-                    type = "boolean";
-            }
-
-            Output.AppendFormat("{0}{1}: {2}",
+            TypeName outputName = this.TypeContext.ResolveOutputTypeName(member.Type);
+            
+            output.AppendFormat("{0}{1}: {2}",
                 member.Name,
                 (isOptional ? "?" : ""),
-                type
+                outputName.QualifiedName
             );
             
-            Output.AppendLine(";");
+            output.AppendLine(";");
         }
     }
 }

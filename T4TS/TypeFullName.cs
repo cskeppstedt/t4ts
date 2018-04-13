@@ -9,9 +9,21 @@ namespace T4TS
     public class TypeFullName
     {
         public string FullName { get; private set; }
+        public string Name
+        {
+            get
+            {
+                int dotIndex = this.FullName.LastIndexOf('.');
+                return (dotIndex >= 0)
+                    ? this.FullName.Substring(dotIndex + 1)
+                    : this.FullName;
+            }
+        }
         public TypeFullName[] TypeArgumentFullNames { get; private set; }
 
-        public TypeFullName(string name, params TypeFullName[] arguments)
+        public TypeFullName(
+            string name,
+            params TypeFullName[] arguments)
         {
             this.FullName = name;
             this.TypeArgumentFullNames = arguments;
@@ -20,6 +32,11 @@ namespace T4TS
         public bool IsEnumerable()
         {
             return this.FullName == "System.Collections.Generic.IEnumerable";
+        }
+
+        public bool IsArray()
+        {
+            return this.FullName.EndsWith("[]");
         }
 
         public bool IsDictionary()
@@ -33,6 +50,12 @@ namespace T4TS
                 default:
                     return false;
             }
+        }
+
+        public static bool IsGenericType(string fullName)
+        {
+            return fullName.Contains('<')
+                    && fullName.Contains('>');
         }
 
         public static TypeFullName FromString(string name)

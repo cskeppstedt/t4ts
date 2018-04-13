@@ -5,49 +5,56 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace T4TS
+namespace T4TS.Outputs
 {
-    public abstract class OutputAppender<TSegment> where TSegment: class
+    public abstract partial class OutputAppender<TSegment> where TSegment: class
     {
-        protected StringBuilder Output { get; private set; }
-        protected int BaseIndentation { get; private set; }
-        protected Settings Settings { get; private set; }
+        protected OutputSettings Settings { get; private set; }
+        protected TypeContext TypeContext { get; private set; }
 
-        public OutputAppender(StringBuilder output, int baseIndentation, Settings settings)
+        public OutputAppender(
+            OutputSettings settings,
+            TypeContext typeContext)
         {
-            if (output == null)
-                throw new ArgumentNullException("output");
-            
             if (settings == null)
                 throw new ArgumentNullException("settings");
-
-            this.Output = output;
-            this.BaseIndentation = baseIndentation;
+            
             this.Settings = settings;
+            this.TypeContext = typeContext;
         }
 
-        public abstract void AppendOutput(TSegment segment);
+        public abstract void AppendOutput(
+            StringBuilder output,
+            int baseIndentation,
+            TSegment segment);
 
-        protected void AppendIndented(string text)
+        protected void AppendIndented(
+            StringBuilder output,
+            int indentation, 
+            string text)
         {
-            AppendIndendation();
-            Output.Append(text);
+            this.AppendIndendation(
+                output,
+                indentation);
+            output.Append(text);
         }
 
-        protected void AppendIndentedLine(string line)
+        protected void AppendIndentedLine(
+            StringBuilder output,
+            int indentation,
+            string line)
         {
-            AppendIndendation();
-            Output.AppendLine(line);
+            this.AppendIndendation(
+                output,
+                indentation);
+            output.AppendLine(line);
         }
 
-        protected void AppendIndendation()
+        protected void AppendIndendation(
+            StringBuilder output,
+            int indentation)
         {
-            Output.Append(' ', BaseIndentation);
-        }
-
-        public override string ToString()
-        {
-            return Output.ToString();
+            output.Append(' ', indentation);
         }
     }
 }

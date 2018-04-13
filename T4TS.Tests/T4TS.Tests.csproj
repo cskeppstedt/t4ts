@@ -70,14 +70,23 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Fixtures\BasicInterface\IBasic.cs" />
+    <Compile Include="Fixtures\BasicInterface\Test.cs" />
     <Compile Include="Fixtures\Basic\Test.cs" />
     <Compile Include="Fixtures\Basic\BasicModel.cs" />
+    <Compile Include="Fixtures\Enumeration\EnumerationModel.cs" />
+    <Compile Include="Fixtures\Enumeration\ImplicitValueEnum.cs" />
+    <Compile Include="Fixtures\Enumeration\ExplicitValueEnum.cs" />
+    <Compile Include="Fixtures\Enumeration\Test.cs" />
     <Compile Include="Fixtures\ExtendsExplicit\ExtendsExplicit.cs" />
     <Compile Include="Fixtures\ExtendsExplicit\Test.cs" />
     <Compile Include="Fixtures\Dictionary\DictionaryModel.cs" />
     <Compile Include="Fixtures\Dictionary\Test.cs" />
+    <Compile Include="Fixtures\Generics\GenericModel.cs" />
+    <Compile Include="Fixtures\Generics\Test.cs" />
     <Compile Include="Fixtures\Indexed\IndexedModel.cs" />
     <Compile Include="Fixtures\Indexed\Test.cs" />
+    <Compile Include="Fixtures\Methods\ChangeCaseCopyMethodTest.cs" />
     <Compile Include="Fixtures\Nullable\NullableModel.cs" />
     <Compile Include="Fixtures\Nullable\Test.cs" />
     <Compile Include="Fixtures\Enumerable\EnumerableModel.cs" />
@@ -100,18 +109,20 @@
     <Compile Include="Fixtures\Inheritance\Test.cs" />
     <Compile Include="Fixtures\ExternalProp\ExternalPropModel.cs" />
     <Compile Include="Fixtures\ExternalProp\Test.cs" />
-    <Compile Include="Traversal\Models\ReservedPropModel.cs" />
-    <Compile Include="Traversal\Models\LocalModel.cs" />
+    <Compile Include="Models\LocalModel.cs" />
+    <Compile Include="Models\ReservedPropModel.cs" />
+    <Compile Include="TypeNameTests.cs" />
+    <Compile Include="Output\EnumOutputAppenderTests.cs" />
+    <Compile Include="TraversalTests.cs" />
     <Compile Include="Output\MemberOutputAppenderTests.cs" />
     <Compile Include="Output\ModuleOutputAppenderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CodeTraverserTests.cs" />
-    <Compile Include="Traversal\ClassTraversalTests.cs" />
-    <Compile Include="Traversal\ProjectTraversalTests.cs" />
-    <Compile Include="Traversal\NamespaceTraverserTests.cs" />
     <Compile Include="TypeContext\TypeContextTests.cs" />
     <Compile Include="Utils\DTETransformer.cs" />
-    <Compile Include="Utils\OutputFor.cs" />
+    <Compile Include="Utils\OutputForDirectBuilder.cs" />
+    <Compile Include="Utils\OutputForAttributeBuilder.cs" />
+    <Compile Include="Utils\StringCompare.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\T4TS.Attributes\T4TS.Attributes.csproj">

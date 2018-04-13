@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using T4TS.Outputs;
 
 namespace T4TS.Tests
 {
@@ -13,57 +14,88 @@ namespace T4TS.Tests
         [TestMethod]
         public void TypescriptVersion083YieldsBool()
         {
-            var sb = new StringBuilder();
-            var member = new TypeScriptInterfaceMember
+            Version version = new Version(0, 8, 3);
+            TypeContext typeContext = new TypeContext(new TypeContext.Settings()
             {
-                Name = "Foo",
-                Type = new BoolType()
-            };
-
-            var appender = new MemberOutputAppender(sb, 0, new Settings
-            {
-                CompatibilityVersion = new Version(0, 8, 3)
+                CompatibilityVersion = version
             });
 
-            appender.AppendOutput(member);
+            var sb = new StringBuilder();
+            var member = new TypeScriptMember
+            {
+                Name = "Foo",
+                Type = typeContext.GetTypeReference(
+                    TypeName.FromLiteral(typeof(bool).FullName),
+                    contextTypeReference: null)
+            };
+
+            var appender = new MemberOutputAppender(
+                new OutputSettings
+                {
+                    CompatibilityVersion = version
+                },
+                typeContext);
+
+            appender.AppendOutput(
+                sb,
+                0,
+                member);
             Assert.AreEqual("Foo: bool;", sb.ToString().Trim());
         }
 
         [TestMethod]
         public void TypescriptVersion090YieldsBoolean()
         {
+            TypeContext typeContext = new TypeContext();
+
             var sb = new StringBuilder();
-            var member = new TypeScriptInterfaceMember
+            var member = new TypeScriptMember
             {
                 Name = "Foo",
-                Type = new BoolType()
+                Type = typeContext.GetTypeReference(
+                    TypeName.FromLiteral(typeof(bool).FullName),
+                    contextTypeReference: null)
             };
 
-            var appender = new MemberOutputAppender(sb, 0, new Settings
-            {
-                CompatibilityVersion = new Version(0, 9, 0)
-            });
+            var appender = new MemberOutputAppender(
+                new OutputSettings
+                {
+                    CompatibilityVersion = new Version(0, 9, 0)
+                },
+                new TypeContext());
 
-            appender.AppendOutput(member);
+            appender.AppendOutput(
+                sb,
+                0,
+                member);
             Assert.AreEqual("Foo: boolean;", sb.ToString().Trim());
         }
 
         [TestMethod]
         public void DefaultTypescriptVersionYieldsBoolean()
         {
+            TypeContext typeContext = new TypeContext();
+
             var sb = new StringBuilder();
-            var member = new TypeScriptInterfaceMember
+            var member = new TypeScriptMember
             {
                 Name = "Foo",
-                Type = new BoolType()
+                Type = typeContext.GetTypeReference(
+                    TypeName.FromLiteral(typeof(bool).FullName),
+                    contextTypeReference: null)
             };
 
-            var appender = new MemberOutputAppender(sb, 0, new Settings
-            {
-                CompatibilityVersion = null
-            });
+            var appender = new MemberOutputAppender(
+                new OutputSettings
+                {
+                    CompatibilityVersion = null
+                },
+                new TypeContext());
 
-            appender.AppendOutput(member);
+            appender.AppendOutput(
+                sb,
+                0,
+                member);
             Assert.AreEqual("Foo: boolean;", sb.ToString().Trim());
         }
     }

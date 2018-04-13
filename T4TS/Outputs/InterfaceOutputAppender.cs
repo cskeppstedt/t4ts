@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using T4TS.Outputs;
 
 namespace T4TS
 {
@@ -10,58 +11,167 @@ namespace T4TS
     {
         private bool InGlobalModule { get; set; }
 
-        public InterfaceOutputAppender(StringBuilder output, int baseIndentation, Settings settings, bool inGlobalModule)
-            : base(output, baseIndentation, settings)
+        public InterfaceOutputAppender(
+            OutputSettings settings,
+            TypeContext typeContext,
+            bool inGlobalModule)
+                : base(
+                    settings,
+                    typeContext)
         {
             this.InGlobalModule = inGlobalModule;
         }
 
-        public override void AppendOutput(TypeScriptInterface tsInterface)
+        public override void AppendOutput(
+            StringBuilder output,
+            int baseIndentation,
+            TypeScriptInterface tsInterface)
         {
-            BeginInterface(tsInterface);
+            this.BeginInterface(
+                output,
+                baseIndentation,
+                tsInterface);
 
-            AppendMembers(tsInterface);
-            
+            this.AppendMembers(
+                output,
+                baseIndentation,
+                tsInterface);
+
             if (tsInterface.IndexedType != null)
-                AppendIndexer(tsInterface);
+            {
+                this.AppendIndexer(
+                    output,
+                    baseIndentation,
+                    tsInterface.IndexedType);
+            }
 
-            EndInterface();
+            this.EndInterface(
+                output,
+                baseIndentation);
         }
 
-        private void AppendMembers(TypeScriptInterface tsInterface)
+        private void AppendMembers(
+            StringBuilder output,
+            int baseIndentation,
+            TypeScriptInterface tsInterface)
         {
-            var appender = new MemberOutputAppender(Output, BaseIndentation + 4, Settings);
-            foreach (var member in tsInterface.Members)
-                appender.AppendOutput(member);
+            var appender = new MemberOutputAppender(
+                this.Settings,
+                this.TypeContext);
+
+            if (tsInterface.Fields != null)
+            {
+                foreach (var field in tsInterface.Fields)
+                {
+                    appender.AppendOutput(
+                        output,
+                        baseIndentation + 4,
+                        field);
+                }
+            }
+
+            if (tsInterface.Methods != null
+                && tsInterface.Methods.Any())
+            {
+                MethodAppender emptyAppender = new MethodAppender(
+                    this.Settings,
+                    this.TypeContext,
+                    tsInterface.IsClass);
+                foreach (TypeScriptMethod method in tsInterface.Methods)
+                {
+                    if (method.Appender != null)
+                    {
+                        method.Appender.AppendOutput(
+                            output,
+                            baseIndentation + 4,
+                            method);
+                    }
+                    else
+                    {
+                        emptyAppender.AppendOutput(
+                            output,
+                            baseIndentation + 4,
+                            method);
+                    }
+                }
+            }
         }
 
-        private void BeginInterface(TypeScriptInterface tsInterface)
+        private void BeginInterface(
+            StringBuilder output,
+            int baseIndentation,
+            TypeScriptInterface tsInterface)
         {
-            AppendIndentedLine("/** Generated from " + tsInterface.FullName + " **/");
+            this.AppendIndentedLine(
+                output,
+                baseIndentation,
+                "/** Generated from " + tsInterface.SourceType.RawName + " */");
 
-            if (InGlobalModule)
-                AppendIndented("interface " + tsInterface.Name);
+            TypeName outputName = this.TypeContext.ResolveOutputTypeName(tsInterface);
+
+            this.AppendIndendation(
+                output,
+                baseIndentation);
+
+            if (!InGlobalModule)
+            {
+                output.Append("export ");
+            }
+
+            if (tsInterface.IsClass)
+            {
+                output.Append("class ");
+            }
             else
-                AppendIndented("export interface " + tsInterface.Name);
+            {
+                output.Append("interface ");
+            }
+            output.Append(outputName.QualifiedSimpleName);
+            
+            if (tsInterface.Parent != null)
+            {
+                TypeName parentName = this.TypeContext.ResolveOutputTypeName(tsInterface.Parent);
+                output.Append(" extends " + parentName.QualifiedName);
+            }
 
-            if (!string.IsNullOrEmpty(tsInterface.Extends))
-                Output.Append(" extends " + tsInterface.Extends);
-            else if (tsInterface.Parent != null)
-                Output.Append(" extends " + (tsInterface.Parent.Module.IsGlobal ? "" : tsInterface.Parent.Module.QualifiedName + ".") + tsInterface.Parent.Name);
+            if (!this.Settings.OpenBraceOnNextLine)
+            {
+                output.AppendLine(" {");
+            }
+            else
+            {
+                output.AppendLine();
 
-            Output.AppendLine(" {");
+                this.AppendIndentedLine(
+                    output,
+                    baseIndentation,
+                    "{");
+            }
         }
 
-        private void EndInterface()
+        private void EndInterface(
+            StringBuilder output,
+            int baseIndentation)
         {
-            AppendIndentedLine("}");
+            this.AppendIndentedLine(
+                output,
+                baseIndentation,
+                "}");
         }
 
-        private void AppendIndexer(TypeScriptInterface tsInterface)
+        private void AppendIndexer(
+            StringBuilder output,
+            int baseIndentation,
+            TypeReference indexedType)
         {
-            AppendIndendation();
-            Output.AppendFormat("    [index: number]: {0};", tsInterface.IndexedType);
-            Output.AppendLine();
+            TypeName indexedTypeName = this.TypeContext.ResolveOutputTypeName(indexedType);
+            this.AppendIndendation(
+                output,
+                baseIndentation);
+            output.AppendFormat(
+                "    [index: number]: {0};",
+                indexedTypeName.QualifiedName);
+            output.AppendLine();
         }
     }
 }

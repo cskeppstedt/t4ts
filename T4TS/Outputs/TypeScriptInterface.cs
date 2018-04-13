@@ -5,23 +5,20 @@ using System.Text;
 using System.Threading.Tasks;
 using EnvDTE;
 
-namespace T4TS
+namespace T4TS.Outputs
 {
     [System.Diagnostics.DebuggerDisplay("TypeScriptInterface {FullName}")]    
-    public class TypeScriptInterface
+    public class TypeScriptInterface : TypeScriptType
     {
-        public string Name { get; set; }
-        public string FullName { get; set; }
-        public string Extends { get; set; }
-
-        public List<TypeScriptInterfaceMember> Members { get; set; }
-        public TypescriptType IndexedType { get; set; }
-        public TypeScriptInterface Parent { get; set; }
-        public TypeScriptModule Module { get; set; }
-
-        public TypeScriptInterface()
+        public TypeScriptInterface(
+            TypeName sourceType,
+            IEnumerable<TypeReference> typeArgumentReferences,
+            TypeReference contextTypeReference)
+                : base(
+                    sourceType,
+                    typeArgumentReferences,
+                    contextTypeReference)
         {
-            Members = new List<TypeScriptInterfaceMember>();
         }
     }
 }
